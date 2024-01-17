@@ -28,6 +28,22 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('search', function (Request $request) {
+            $search = $request->get('s');
+            $page = $request->get('page', 1);
+            $movieType = $request->get('type');
+            $year = $request->get('year');
+
+            $cacheKey = 'search-' . $search . '-' . $page . '-' . $movieType . '-' . $year. '-' . $request->ip();
+            return Limit::perMinute(2)->by($cacheKey);
+        });
+
+        RateLimiter::for('movie-show', function (Request $request) {
+            $imdbId = $request->route('imdbID');
+            $cacheKey = 'movie-show.' .$imdbId.'.' . $request->ip();
+            return Limit::perMinute(2)->by($cacheKey);
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

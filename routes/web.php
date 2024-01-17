@@ -1,7 +1,8 @@
 <?php
 
+use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,14 +17,18 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::inertia('/', 'Welcome');
+Route::inertia('/terms', 'Terms');
+Route::inertia('/privacy', 'PrivacyPolicy');
+Route::inertia('/contact', 'Contact');
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
+
+Route::get('/search', [SearchController::class, 'index'])->name('search')->middleware('throttle:search');
+Route::get('/i/{imdbID}', [SearchController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
+Route::get('/i/{imdbID}', [SearchController::class, 'show'])->middleware('throttle:movie-show');
+
+Route::post('/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('subscribe')->middleware('throttle:api');
+Route::post('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscribe'])->name('unsubscribe')->middleware('throttle:api');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
