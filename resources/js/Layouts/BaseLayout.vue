@@ -1,6 +1,7 @@
 <script setup>
 import AppFooter from '@/Layouts/AppFooter.vue';
 import ToastNotifications from '@/Components/ToastNotifications.vue';
+import InstallBanner from '@/Components/InstallBanner.vue';
 import AppHeader from '@/Layouts/AppHeader.vue';
 
 </script>
@@ -10,7 +11,7 @@ import AppHeader from '@/Layouts/AppHeader.vue';
     <slot />
     <AppFooter/>
     <ToastNotifications />
+    <InstallBanner />
 
     <slot name="modals" />
 </template>
-
