@@ -30,6 +30,9 @@
         <meta name="msapplication-navbutton-color" content="#2A669F" />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/icons/ios/192.png">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Movie Guru">
         <link rel="manifest" href="/app.webmanifest" />
         <script type="application/ld+json">
             {
@@ -87,10 +90,11 @@
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
-                        console.log('Service Worker registered');
-                        registration.periodicSync.register('notificationSync', {
-                            minInterval: 5 * 60 * 60 * 1000, // 5 hours
-                        });
+                        if ("periodicSync" in registration) {
+                            registration.periodicSync.register('notificationSync', {
+                                minInterval: 5 * 60 * 60 * 1000, // 5 hours
+                            });
+                        }
                     })
                     .catch(error => {
                         console.log('Service Worker registration failed:', error);
