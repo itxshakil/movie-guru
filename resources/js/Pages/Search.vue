@@ -101,14 +101,14 @@ const pageDescription = 'Explore an extensive database of movies with detailed i
                         {{ searchResults.totalResults }} results found for {{ search }}
                     </h2>
 
-                    <form class="flex flex-col md:flex-row gap-2 items-center w-full" @submit.prevent="doSearch">
-                        <div class="w-full md:w-64">
+                    <form class="flex flex-col sm:flex-row gap-2 items-center w-full" @submit.prevent="doSearch">
+                        <div class="w-full sm:min-w-64 grow">
                             <InputLabel class="sr-only" for="search-input" value="Search"/>
                             <TextInput type="search" enterkeyhint="search" id="search-input" v-model="form.s" class="w-full" placeholder="Search movies and series"
                                        required/>
                         </div>
-                        <div class="flex gap-2 w-full">
-                            <div class="w-full md:w-36">
+                        <div class="flex gap-2 sm:w-60 w-full">
+                            <div class="w-full sm:w-36">
                                 <InputLabel class="sr-only" for="movie-type-select" value="Select Type"/>
                                 <select v-model="form.type" id="movie-type-select"
                                         class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-sm bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 rounded-lg focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200">
@@ -117,17 +117,17 @@ const pageDescription = 'Explore an extensive database of movies with detailed i
                                     </option>
                                 </select>
                             </div>
-                            <div class="w-full md:w-20">
+                            <div class="w-full sm:w-20">
                                 <InputLabel class="sr-only" for="year-input" value="Year"/>
                                 <TextInput v-model="form.year" id="year-input" class="w-full" placeholder="Year" type="number"/>
                             </div>
                         </div>
-                        <LoadingSpinnerButton :is-loading="form.processing" class="w-full md:w-auto justify-center"
+                        <LoadingSpinnerButton :is-loading="form.processing" class="w-full sm:w-auto justify-center"
                                               value="Search"/>
                     </form>
                 </div>
 
-                <div v-if="movieList && movieList.length" class="py-6 space-y-12 sm:grid sm:grid-cols-3 lg:grid-cols-4  sm:gap-6 sm:space-y-0">
+                <div v-if="movieList && movieList.length" class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 sm:space-y-0">
                     <SearchCard
                         v-for="movie in movieList"
                         :key="movie.imdbID"
@@ -190,4 +190,3 @@ const pageDescription = 'Explore an extensive database of movies with detailed i
         }
     }
 </style>
-

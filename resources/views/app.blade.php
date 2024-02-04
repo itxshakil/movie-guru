@@ -85,7 +85,7 @@
     </head>
     <body class="font-sans antialiased accent-primary-500">
         @inertia
-        <script>
+        <script type="text/javascript">
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js')
@@ -148,8 +148,6 @@
                         if (!isAppInstalled()) {
                             e.preventDefault();
                             showInstallPrompt();
-                        }else{
-                            console.log('App already installed');
                         }
                     }
                 });

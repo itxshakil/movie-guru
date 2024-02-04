@@ -494,6 +494,20 @@
             "type": "image/jpeg",
             "form_factor": "wide",
             "label" : "Information Modal Wide"
+        },
+        {
+            "src": "/assets/images/screenshots/MOVIE_GURU_HOME_WIDE_SCREENSHOT.png",
+            "sizes": "1098x797",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label" : "Home page"
+        },
+        {
+            "src": "/assets/images/screenshots/MOVIE_GURU_FEAURES_WIDE_SCREENSHOT.png",
+            "sizes": "1098x797",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label" : "Features Section Wide"
         }
     ],
     "features": ["Ratings from All Major Sources", "Simple UI", "Alternative to IMDb", "Lightweight"],
