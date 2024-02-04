@@ -112,6 +112,11 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'admin' => [
+        'address' => env('ADMIN_MAIL_TO_ADDRESS', 'admin@example.com'),
+        'name' => env('ADMIN_MAIL_TO_NAME', 'Admin'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Markdown Mail Settings

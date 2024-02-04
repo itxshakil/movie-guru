@@ -6,6 +6,13 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Notifications\DatabaseApproachingMaxConnections;
+use App\Notifications\SlowQueryDetected;
+use Illuminate\Database\Events\DatabaseBusy;
+use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\Notification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -25,7 +32,18 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(function (DatabaseBusy $event) {
+            Notification::route('mail', config('mail.admin.address'))
+                ->notify(new DatabaseApproachingMaxConnections(
+                    $event->connectionName,
+                    $event->connections
+                ));
+        });
+
+        DB::whenQueryingForLongerThan(100, function (Connection $connection, QueryExecuted $event) {
+            Notification::route('mail', config('mail.admin.address'))
+                ->notify(new SlowQueryDetected($connection, $event));
+        });
     }
 
     /**
