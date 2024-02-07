@@ -107,6 +107,10 @@ const props = defineProps({
         type: String,
         default: "Not Now",
     },
+    closeOnConfirm: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const emit = defineEmits(["close", "confirm"]);
@@ -122,7 +126,9 @@ const onCancel = () => {
 
 const onConfirm = () => {
     nextTick(() => {
-        show.value = false;
+        if (props.closeOnConfirm) {
+            show.value = false;
+        }
     });
     emit("confirm");
 }
