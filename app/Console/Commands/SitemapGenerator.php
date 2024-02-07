@@ -20,8 +20,9 @@ class SitemapGenerator extends Command
         $sitemap = Sitemap::create();
 
         // Add static pages
-        $sitemap->add(Url::create('/home'))
-                ->add(Url::create('/about'))
+        $sitemap->add(Url::create('/'))
+                ->add(Url::create('/privacy'))
+                ->add(Url::create('/terms'))
                 ->add(Url::create('/contact'));
 
         // Add top queries
