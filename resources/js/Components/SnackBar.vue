@@ -42,7 +42,7 @@
                         {{ description }}
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div>
+                        <div v-if="primaryAction">
                             <button
                                 @click="onConfirm"
                                 class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800"
