@@ -105,8 +105,8 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
             if (maxEntries && updatedCachedResponses.length >= maxEntries) {
                 await cache.delete(updatedCachedResponses[0]); // Remove the oldest entry
             }
-            return clonedResponse;
         }
+        
         return response;
     } catch (error) {
         logError('Error fetching and caching new data', error);
