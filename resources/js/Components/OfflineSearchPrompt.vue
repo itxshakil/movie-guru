@@ -4,13 +4,15 @@ import { ref } from "vue";
 
 const promptNotify = ref(false);
 const requestUrl = ref(null);
-const installAppPromptDescription = ref("You are currently offline. Enable notifications to be notified when the network is available.");
+const installAppPromptDescription = ref(
+    "You are currently offline. Enable notifications to be notified when the network is available."
+);
 const primaryAction = ref("Notify Me");
 const secondaryAction = ref("Not Now");
 const promptTitle = ref("Network Unavailable");
 
 // Add code to handle NETWORK_STATUS message
-window.addEventListener("message", (event) => {
+navigator.serviceWorker.addEventListener("message", (event) => { 
     if (
         event.data.type === "NETWORK_STATUS" &&
         event.data.status === "offline"
@@ -19,7 +21,6 @@ window.addEventListener("message", (event) => {
         promptNotify.value = true;
     }
 });
-
 
 const cancelPrompt = () => {
     promptNotify.value = false;
@@ -49,7 +50,8 @@ const handleNotificationConfirm = () => {
 
     // Check current notification permission status
     if (Notification.permission === "granted") {
-        installAppPromptDescription.value = "You will be notified when the network is available.";
+        installAppPromptDescription.value =
+            "You will be notified when the network is available.";
         handlePostNoticationConfirm();
     } else if (Notification.permission === "denied") {
         installAppPromptDescription.value =
@@ -90,6 +92,7 @@ const handleNotificationConfirm = () => {
         :description="installAppPromptDescription"
         :primaryAction="primaryAction"
         :secondaryAction="secondaryAction"
+        :closeOnConfirm="false"
         @confirm="handleNotificationConfirm"
         @close="cancelPrompt"
         :delay="100"
