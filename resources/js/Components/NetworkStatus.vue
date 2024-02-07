@@ -1,23 +1,27 @@
 <script setup>
 import Snackbar from "@/Components/Snackbar.vue";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 
 const promptNotify = ref(false);
 const onlineStatus = ref(navigator.onLine);
 const promptTitle = ref("Network Status");
 const primaryAction = ref(null);
 const secondaryAction = ref("Okay");
-const promptDescriptionOnline = ref("You are now online.");
-const promptDescriptionOffline = ref("You are currently offline. Enable notifications to be notified when the network is available.");
+
+const statusMessage = computed(() => {
+    return onlineStatus.value
+        ? "You are now online."
+        : "You are currently offline. Enable notifications to be notified when the network is available.";
+});
 
 const updateOnlineStatus = () => {
     onlineStatus.value = navigator.onLine;
     if (onlineStatus.value) {
         promptNotify.value = true;
-        primaryAction.value = "Notify Me";
+        primaryAction.value = null;
     } else {
         promptNotify.value = true;
-        primaryAction.value = null;
+        primaryAction.value = "Notify Me";
     }
 };
 
@@ -34,17 +38,17 @@ onUnmounted(() => {
 const cancelPrompt = () => {
     promptNotify.value = false;
 };
- 
 </script>
 
 <template>
     <Snackbar
         v-if="promptNotify"
         :title="promptTitle"
-        :description="onlineStatus.value ? promptDescriptionOnline : promptDescriptionOffline"
+        :description="statusMessage"
         :primaryAction="primaryAction"
         :secondaryAction="secondaryAction"
         @close="cancelPrompt"
+        @confirm="cancelPrompt"
         :delay="100"
     />
 </template>
