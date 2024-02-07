@@ -80,6 +80,11 @@ function logError(message, ...optionalParams) {
 
 // Function to fetch and cache a request
 const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
+    // If cache is not supported or request is not a GET request, fall back to network
+    if (!('caches' in self) || request.method !== 'GET') {
+        return fetch(request);
+    }
+
     try {
         const cache = await caches.open(cacheName);
         const cachedResponse = await cache.match(request);
@@ -106,9 +111,23 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
                 await cache.delete(updatedCachedResponses[0]); // Remove the oldest entry
             }
         }
-        
+
         return response;
     } catch (error) {
+        // if it get /search and network is not available, then we will prompt the user to check their network and notify when it is back
+        if (request.url.includes('/search') && navigator.onLine === false) {
+            // send message to the client
+            self.clients.matchAll().then((clients) => {
+                clients.forEach((client) => {
+                    client.postMessage({
+                        type: 'NETWORK_STATUS',
+                        status: 'offline',
+                        url: request.url,
+                    });
+                });
+            });
+        }
+
         logError('Error fetching and caching new data', error);
         throw error; // re-throw the error to be handled by the caller
     }
@@ -215,22 +234,39 @@ self.addEventListener('message', event => {
     }
 });
 
-// on notificationclick event. if event action is close then close either open the home url
-self.addEventListener('notificationclick', (event) => {
+function handleNotificationClick(event) {
     if (event.action === 'close') {
         event.notification.close();
     } else {
         event.waitUntil(clients.matchAll({
             type: 'window',
         }).then((clientList) => {
+            const notification = event.notification;
+            const data = notification.data || {};
+            const urlToOpen = data.url || '/';
+
+            // Check if clients.openWindow is available
             if (clients.openWindow) {
-                const notification = event.notification;
-                const data = notification.data || {};
-                return clients.openWindow(data.url);
+                // Check if the URL is valid before trying to open a window
+                if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
+                    return clients.openWindow(urlToOpen);
+                } else {
+                    // Fallback to opening the home URL
+                    return clients.openWindow('/');
+                }
+            } else {
+                // Fallback to opening the home URL using a different method if clients.openWindow is not available
+                if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
+                    // Use a different method to open the URL if clients.openWindow is not available
+                    window.open(urlToOpen, '_blank');
+                } else {
+                    // Fallback to opening the home URL
+                    window.open('/', '_blank');
+                }
             }
         }));
     }
-});
+}
 
 self.addEventListener('periodicsync', async (event) => {
     if (event.tag !== 'notificationSync') {
@@ -258,6 +294,40 @@ self.addEventListener('periodicsync', async (event) => {
                 log("Error while requesting and/or showing notification.", e);
             }
         }
+    }
+});
+
+self.addEventListener('sync', async (event) => {
+    const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
+
+    if (offlineRequestUrl) {
+        // Perform actions to notify the user about the stored offline request
+        self.registration.showNotification('Content is Ready!', {
+            body: 'The requested content is now available. Click to view.',
+            badge: '/icons/ios/152.png',
+            icon: '/icons/ios/152.png',
+            actions: [
+                {
+                    action: 'open',
+                    title: 'View Content',
+                },
+                {
+                    action: 'close',
+                    title: 'Not Now',
+                },
+            ],
+            data: {
+                url: offlineRequestUrl,
+            },
+            requireInteraction: true,
+            vibrate: [100, 50, 100],
+            renotify: true,
+        });
+
+        // Clear the stored offline request URL
+        localStorage.removeItem('offlineRequestUrl');
+
+        cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
     }
 });
 
