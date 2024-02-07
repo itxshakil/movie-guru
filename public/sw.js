@@ -1,10 +1,10 @@
 const DEBUG = true;
 
-const APP_CACHE = 'v-0.3.0';
-const SEARCH_CACHE = 'search-cache-v-0.3.0';
-const INFO_CACHE = 'info-cache-v-0.3.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-0.3.0';
-const POSTER_CACHE = 'poster-cache-v-0.3.0';
+const APP_CACHE = 'v-0.4.0';
+const SEARCH_CACHE = 'search-cache-v-0.4.0';
+const INFO_CACHE = 'info-cache-v-0.4.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-0.4.0';
+const POSTER_CACHE = 'poster-cache-v-0.4.0';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -22,37 +22,37 @@ const basicPathsToCache = [
     '/build/manifest.json',
     '/build/assets/Search-gQQPsr-3.css',
     '/build/assets/app-U--N9XqK.css',
-    '/build/assets/LoadingSpinner-Rlm10Kz6.js',
-    '/build/assets/ApplicationLogo-yee8g2b-.js',
-    '/build/assets/InputError-lnzTIaPt.js',
-    '/build/assets/InputLabel-5Ig9d7Lt.js',
-    '/build/assets/GuestLayout-qwCmoq2u.js',
-    '/build/assets/LoadingSpinnerButton-OSm-ewYf.js',
-    '/build/assets/Dashboard-RtR_RsHh.js',
-    '/build/assets/PrimaryButton-F9ObH13Q.js',
-    '/build/assets/Show-J1oLU0Sn.js',
-    '/build/assets/TextInput-StlNCIgW.js',
-    '/build/assets/Edit-pKjpX83f.js',
-    '/build/assets/ConfirmPassword-EI8SJc5p.js',
-    '/build/assets/ForgotPassword-ZN3zni6m.js',
-    '/build/assets/VerifyEmail-91rXY6Fm.js',
-    '/build/assets/ResetPassword-UZWoj4wg.js',
-    '/build/assets/Error-PCH10RAV.js',
-    '/build/assets/Register-pbxiHmkX.js',
-    '/build/assets/UpdatePasswordForm-EZZL7XCL.js',
-    '/build/assets/UpdateProfileInformationForm-aylbUlAW.js',
-    '/build/assets/Login-OlqQHU9l.js',
-    '/build/assets/Terms-mGbAnRib.js',
-    '/build/assets/NewsletterForm-jLArXhXP.js',
-    '/build/assets/DeleteUserForm-x1GRpLGc.js',
-    '/build/assets/PrivacyPolicy-quS5kbN8.js',
-    '/build/assets/Contact-kw1RhTm0.js',
-    '/build/assets/AuthenticatedLayout-3V3fDVRJ.js',
-    '/build/assets/Welcome-JiOedX3N.js',
-    '/build/assets/Search-1O3QAnAR.js',
-    '/build/assets/DetailCard-NClBBvtj.js',
-    '/build/assets/BaseLayout-m8L9RbyY.js',
-    '/build/assets/app-B2tkj5DN.js',
+    '/build/assets/LoadingSpinner-sKZidFlL.js',
+    '/build/assets/ApplicationLogo-iBiWDTtr.js',
+    '/build/assets/InputError-qoz-hwsf.js',
+    '/build/assets/InputLabel-pzYtsMgO.js',
+    '/build/assets/GuestLayout--IrB6plg.js',
+    '/build/assets/Dashboard-poITvojJ.js',
+    '/build/assets/LoadingSpinnerButton-XLM5d_PJ.js',
+    '/build/assets/PrimaryButton-ROoz2MKg.js',
+    '/build/assets/Show-hg1y1oF5.js',
+    '/build/assets/TextInput-jqb7yZmp.js',
+    '/build/assets/Edit-Ek8JrL6q.js',
+    '/build/assets/ConfirmPassword-fSr1yAY5.js',
+    '/build/assets/ForgotPassword-oWFoeWtu.js',
+    '/build/assets/VerifyEmail-nVjbDGSz.js',
+    '/build/assets/ResetPassword-1EdanGOi.js',
+    '/build/assets/Error-mdXgUv_p.js',
+    '/build/assets/Register-FVPgLN3y.js',
+    '/build/assets/UpdatePasswordForm-gDksLebp.js',
+    '/build/assets/UpdateProfileInformationForm-43_sUZyz.js',
+    '/build/assets/Login-RPPIcA0f.js',
+    '/build/assets/Terms-VXg1O35v.js',
+    '/build/assets/NewsletterForm-dt9Rav6z.js',
+    '/build/assets/DeleteUserForm-6so5S2Lw.js',
+    '/build/assets/PrivacyPolicy-SMqDxxqN.js',
+    '/build/assets/Contact-stZavQZN.js',
+    '/build/assets/AuthenticatedLayout-8s_1sabu.js',
+    '/build/assets/Welcome-dwhshSpO.js',
+    '/build/assets/Search-AovFsKJ7.js',
+    '/build/assets/DetailCard-07cfpbRf.js',
+    '/build/assets/BaseLayout-WR88GAk5.js',
+    '/build/assets/app-bURDZUqS.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -114,16 +114,21 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
 
         return response;
     } catch (error) {
+        console.log('Error fetching and caching new data', error);
+        console.log('Request URL', request.url, request.url.includes('/search'), navigator.onLine);
         // if it get /search and network is not available, then we will prompt the user to check their network and notify when it is back
         if (request.url.includes('/search') && navigator.onLine === false) {
             // send message to the client
             self.clients.matchAll().then((clients) => {
+                console.log('Clients', clients);
                 clients.forEach((client) => {
+                    console.log('Client', client);
                     client.postMessage({
                         type: 'NETWORK_STATUS',
                         status: 'offline',
                         url: request.url,
                     });
+                    console.log('Message Sent');
                 });
             });
         }
@@ -298,36 +303,38 @@ self.addEventListener('periodicsync', async (event) => {
 });
 
 self.addEventListener('sync', async (event) => {
-    const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
+    if (event.tag === 'offlineSync') {
+        const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
 
-    if (offlineRequestUrl) {
-        // Perform actions to notify the user about the stored offline request
-        self.registration.showNotification('Content is Ready!', {
-            body: 'The requested content is now available. Click to view.',
-            badge: '/icons/ios/152.png',
-            icon: '/icons/ios/152.png',
-            actions: [
-                {
-                    action: 'open',
-                    title: 'View Content',
+        if (offlineRequestUrl) {
+            // Perform actions to notify the user about the stored offline request
+            self.registration.showNotification('Content is Ready!', {
+                body: 'The requested content is now available. Click to view.',
+                badge: '/icons/ios/152.png',
+                icon: '/icons/ios/152.png',
+                actions: [
+                    {
+                        action: 'open',
+                        title: 'View Content',
+                    },
+                    {
+                        action: 'close',
+                        title: 'Not Now',
+                    },
+                ],
+                data: {
+                    url: offlineRequestUrl,
                 },
-                {
-                    action: 'close',
-                    title: 'Not Now',
-                },
-            ],
-            data: {
-                url: offlineRequestUrl,
-            },
-            requireInteraction: true,
-            vibrate: [100, 50, 100],
-            renotify: true,
-        });
+                requireInteraction: true,
+                vibrate: [100, 50, 100],
+                renotify: true,
+            });
 
-        // Clear the stored offline request URL
-        localStorage.removeItem('offlineRequestUrl');
+            // Clear the stored offline request URL
+            localStorage.removeItem('offlineRequestUrl');
 
-        cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
+            cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
+        }
     }
 });
 
