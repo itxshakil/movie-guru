@@ -70,6 +70,7 @@
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
     @inertiaHead
 
+    @if(app()->isProduction())
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ESD6M429K6"></script>
     <script>
@@ -83,6 +84,7 @@
         gtag('config', 'G-ESD6M429K6');
 
     </script>
+    @endif
 
 </head>
 <body class="font-sans antialiased accent-primary-500">
