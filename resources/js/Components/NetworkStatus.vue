@@ -49,7 +49,7 @@ const classes = computed(() => {
     >
         <div
             v-if="show"
-            class="w-full p-2 text-gray-100 shadow-md fixed bottom-0 right-0 z-10"
+            class="w-full text-gray-100 shadow-md fixed bottom-0 right-0 z-10"
             :class="classes"
             role="alert"
         >
