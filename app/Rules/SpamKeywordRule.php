@@ -16,6 +16,22 @@ class SpamKeywordRule implements Rule
             'make money',
             'private photos',
             'earn $100',
+            'Double your income',
+            'Get paid',
+            'Get rich',
+            'Make money fast',
+            'Make money now',
+            'Make money today',
+            'Make money while you sleep',
+            'Make money with no investment',
+            'Make money with no work',
+            'Make money with your computer',
+            'Make money with your email address',
+            'Make money with your home computer',
+            'Make money with your PC',
+            'Financial freedom',
+            'Free money',
+            'Earn extra cash',
             'Enjoy lots of targeted traffic to your site for free!',
             'QUICK WAY TO MAKE MONEY',
             'Receipt of money to your account',
@@ -42,13 +58,15 @@ class SpamKeywordRule implements Rule
             'unpublished private photos',
             'naked Kim Kardashian',
             'google listing',
-            'Respond with yes',
-            'If this interests you, respond to this email with a YES.'
+            'If this interests you, respond to this email with a YES.',
+            'Respond with YES',
+            'Respond with YES to this email',
+            'Respond with YES to this email and we will send you more information',
         ];
 
         foreach ($spamKeywords as $keyword) {
-            if (stripos(strtolower($value), strtolower($keyword)) !== false && str($value)->transliterate()->contains($keyword) !== false){
-                try{
+            if (stripos(strtolower($value), strtolower($keyword)) !== false && str($value)->transliterate()->contains($keyword) !== false) {
+                try {
                     Log::channel('spam-keyword')->info('Spam Keyword Detected: ' . $keyword . ' in ' . $value);
                 } catch (\Exception $e) {
                     Log::error('Error logging spam keyword: ' . $e->getMessage());
