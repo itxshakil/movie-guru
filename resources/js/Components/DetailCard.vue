@@ -130,7 +130,7 @@
                                             <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0"
                                                 v-text="detail.Director"></dd>
                                         </div>
-                                        <div v-if="detail.Type === 'series'"
+                                        <div v-if="detail.Type === 'series' && isValue(detail.totalSeasons)"
                                              class="p-2 sm:py-4  sm:grid sm:grid-cols-4 sm:gap-4 odd:bg-gray-100 dark:odd:bg-gray-800">
                                             <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">No.
                                                 of Seasons
