@@ -65,6 +65,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'spam-keyword' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/spam-keywork.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 365,
+            'replace_placeholders' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/app.log'),

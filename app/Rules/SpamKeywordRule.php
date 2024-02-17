@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class SpamKeywordRule implements Rule
 {
@@ -42,10 +43,16 @@ class SpamKeywordRule implements Rule
             'naked Kim Kardashian',
             'google listing',
             'Respond with yes',
+            'If this interests you, respond to this email with a YES.'
         ];
 
         foreach ($spamKeywords as $keyword) {
             if (stripos(strtolower($value), strtolower($keyword)) !== false && str($value)->transliterate()->contains($keyword) !== false){
+                try{
+                    Log::channel('spam-keyword')->info('Spam Keyword Detected: ' . $keyword . ' in ' . $value);
+                } catch (\Exception $e) {
+                    Log::error('Error logging spam keyword: ' . $e->getMessage());
+                }
                 return false;
             }
         }
