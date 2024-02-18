@@ -13,8 +13,8 @@ router.on('finish', () => {
 const addNotification = (message, level = 'info') => {
     notifications.value.push({
         key: Symbol(),
-        message: message,
-        level: level
+        message,
+        level
     });
 };
 
@@ -39,6 +39,11 @@ function addNotificationFromPage() {
 
 const remove = (index) => {
     notifications.value.splice(index, 1);
+};
+
+const broadcastChannel = new BroadcastChannel('toast-notifications');
+broadcastChannel.onmessage = (event) => {
+    addNotification(event.data.message, event.data.level);
 };
 
 </script>
