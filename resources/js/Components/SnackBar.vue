@@ -10,7 +10,7 @@
         >
             <div
                 v-if="show"
-                class="w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-400 m-2"
+                class="relative w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-400 m-2"
                 role="alert"
             >
                 <div class="flex">
@@ -42,7 +42,15 @@
                         <div class="mb-2 text-sm font-normal">
                             {{ description }}
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="w-full flex gap-2 justify-end">
+                            <div>
+                                <button
+                                    @click="onCancel"
+                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-transparent border rounded-lg hover:bg-gray-100 focus:ring-4 border-none focus:outline-none focus:ring-gray-200 dark:text-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700"
+                                >
+                                    {{ secondaryAction }}
+                                </button>
+                            </div>
                             <div v-if="primaryAction">
                                 <button
                                     @click="onConfirm"
@@ -51,20 +59,12 @@
                                     {{ primaryAction }}
                                 </button>
                             </div>
-                            <div>
-                                <button
-                                    @click="onCancel"
-                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-600 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700"
-                                >
-                                    {{ secondaryAction }}
-                                </button>
-                            </div>
                         </div>
                     </div>
                     <button
                         @click="onCancel"
                         type="button"
-                        class="ms-auto -mx-1.5 -my-1.5 bg-white items-center justify-center flex-shrink-0 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+                        class="-mx-1.5 -my-1.5 absolute bg-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white dark:text-gray-500 flex-shrink-0 focus:ring-2 focus:ring-gray-300 h-8 hover:bg-gray-100 hover:text-gray-900 inline-flex items-center justify-center ms-auto p-1.5 right-2 rounded-lg text-gray-400 top-2 w-8"
                         data-dismiss-target="#toast-interactive"
                         aria-label="Close"
                     >
