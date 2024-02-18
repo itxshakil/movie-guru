@@ -13,7 +13,6 @@ import NetworkStatus from "@/Components/NetworkStatus.vue";
     <AppFooter />
     <ToastNotifications />
     <InstallBanner />
-    <InstallBanner />
     <OfflineSearchPrompt />
     <NetworkStatus />
 
