@@ -5,20 +5,21 @@ import { ref } from "vue";
 const promptNotify = ref(false);
 const requestUrl = ref(null);
 const installAppPromptDescription = ref(
-    "You are currently offline. Enable notifications to be notified when the network is available."
+    "Offline? No problem, Movie Guru will remember your search and send you a notification when results are ready."
 );
 const primaryAction = ref("Notify Me");
 const secondaryAction = ref("Not Now");
 const promptTitle = ref("Network Unavailable");
 
-// Add code to handle NETWORK_STATUS message
-navigator.serviceWorker.addEventListener("message", (event) => { 
+// Add code to handle OFFLINE_SEARCH_DETECTED message
+navigator.serviceWorker.addEventListener("message", (event) => {
     if (
-        event.data.type === "NETWORK_STATUS" &&
+        event.data.type === "OFFLINE_SEARCH_DETECTED" &&
         event.data.status === "offline"
     ) {
         requestUrl.value = event.data.url;
         promptNotify.value = true;
+        localStorage.setItem("offlineRequestUrl", event.data.url);
     }
 });
 

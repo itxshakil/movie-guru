@@ -1,4 +1,6 @@
 const DEBUG = true;
+const broadcast = new BroadcastChannel('service-worker-channel');
+const broadcastChannel = new BroadcastChannel('toast-notifications');
 
 const APP_CACHE = 'v-0.4.0';
 const SEARCH_CACHE = 'search-cache-v-0.4.0';
@@ -114,21 +116,17 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
 
         return response;
     } catch (error) {
-        console.log('Error fetching and caching new data', error);
-        console.log('Request URL', request.url, request.url.includes('/search'), navigator.onLine);
         // if it get /search and network is not available, then we will prompt the user to check their network and notify when it is back
         if (request.url.includes('/search') && navigator.onLine === false) {
             // send message to the client
-            self.clients.matchAll().then((clients) => {
-                console.log('Clients', clients);
+            self.clients.matchAll()
+            .then((clients) => {
                 clients.forEach((client) => {
-                    console.log('Client', client);
                     client.postMessage({
-                        type: 'NETWORK_STATUS',
+                        type: 'OFFLINE_SEARCH_DETECTED',
                         status: 'offline',
                         url: request.url,
                     });
-                    console.log('Message Sent');
                 });
             });
         }
@@ -293,9 +291,23 @@ self.addEventListener('periodicsync', async (event) => {
                 if (permission === 'granted') {
                     rollOpeningCredits();
                 } else {
-                    alert('You need to allow push notifications.');
+                    broadcastChannel.postMessage({
+                        type: 'NOTIFICATION_PERMISSION_DENIED',
+                        data: {
+                            message: 'You need to allow push notifications.',
+                            level: 'danger',
+                        },
+                    });
                 }
             } catch (e) {
+                broadcastChannel.postMessage({
+                    type: 'NOTIFICATION_PERMISSION_DENIED',
+                    data: {
+                        message: 'Error while requesting and/or showing notification.',
+                        level: 'danger',
+                    },
+                });
+
                 log("Error while requesting and/or showing notification.", e);
             }
         }
@@ -304,39 +316,47 @@ self.addEventListener('periodicsync', async (event) => {
 
 self.addEventListener('sync', async (event) => {
     if (event.tag === 'offlineSync') {
-        const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
-
-        if (offlineRequestUrl) {
-            // Perform actions to notify the user about the stored offline request
-            self.registration.showNotification('Content is Ready!', {
-                body: 'The requested content is now available. Click to view.',
-                badge: '/icons/ios/152.png',
-                icon: '/icons/ios/152.png',
-                actions: [
-                    {
-                        action: 'open',
-                        title: 'View Content',
-                    },
-                    {
-                        action: 'close',
-                        title: 'Not Now',
-                    },
-                ],
-                data: {
-                    url: offlineRequestUrl,
-                },
-                requireInteraction: true,
-                vibrate: [100, 50, 100],
-                renotify: true,
-            });
-
-            // Clear the stored offline request URL
-            localStorage.removeItem('offlineRequestUrl');
-
-            cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
-        }
+        broadcast.postMessage({ type: 'OFFLINE_SYNC_EVENT' });
     }
 });
+
+broadcast.onmessage = (event) => {
+    if (event.data.type === 'OFFLINE_SYNC_REQUEST') {
+        const offlineRequestUrl = event.data.url;
+        offlinceSyncRequest(offlineRequestUrl);
+    }
+};
+
+function offlinceSyncRequest(offlineRequestUrl) {
+    if (!offlineRequestUrl) {
+        return;
+    }
+
+    // Perform actions to notify the user about the stored offline request
+    self.registration.showNotification('Content is Ready!', {
+        body: 'Your requested content is ready and waiting for you. Click to view and explore the results.🚀👀',
+        badge: '/icons/ios/152.png',
+        icon: '/icons/ios/152.png',
+        actions: [
+            {
+                action: 'close',
+                title: 'Not Now',
+            },
+            {
+                action: 'open',
+                title: 'Check Now',
+            },
+        ],
+        data: {
+            url: offlineRequestUrl,
+        },
+        requireInteraction: true,
+        vibrate: [100, 50, 100],
+    });
+
+    broadcast.postMessage({ type: 'OFFLINE_SYNC_FETCHED' });
+    cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
+}
 
 function rollOpeningCredits() {
     let sceneDescription = 'Welcome to the Weekend Movie Binge-fest! 🌟 Grab your popcorn and let\'s dive into a binge-worthy experience.';
@@ -357,12 +377,12 @@ function rollOpeningCredits() {
         icon: '/icons/ios/152.png',
         actions: [
             {
-                action: 'open',
-                title: 'Find Today\'s Binge',
-            },
-            {
                 action: 'close',
                 title: 'Not Now',
+            },
+            {
+                action: 'open',
+                title: 'Find Today\'s Binge',
             },
         ],
         data: {
@@ -373,3 +393,26 @@ function rollOpeningCredits() {
         renotify: true,
     });
 }
+
+self.addEventListener('push', (event) => {
+    if (event.data) {
+        const data = event.data.json();
+        const options = {
+            body: data.body,
+            icon: data.icon,
+            badge: data.badge,
+            image: data.image,
+            vibrate: data.vibrate,
+            data: {
+                url: data.url,
+            },
+            actions: data.actions,
+        };
+
+        event.waitUntil(
+            self.registration.showNotification(data.title, options)
+        );
+    }
+});
+
+self.addEventListener('notificationclick', handleNotificationClick);

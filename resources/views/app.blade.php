@@ -92,23 +92,103 @@
     <script type="text/javascript">
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js' )
+                navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
-                        if ("periodicSync" in registration) {
-                            registration.periodicSync.register('notificationSync', {
-                                minInterval: 5 * 60 * 60 * 1000, // 5 hours
-                            });
+                        let serviceWorker;
+                        if (registration.installing) {
+                            console.log('Service Worker installing');
+                            serviceWorker = registration.installing;
+                        } else if (registration.waiting) {
+                            console.log('Service Worker installed');
+                            serviceWorker = registration.waiting;
+                        } else if (registration.active) {
+                            console.log('Service Worker active');
+                            serviceWorker = registration.active;
                         }
 
-                        // check if there is sync manager
-                        if ('SyncManager' in window) {
-                            navigator.serviceWorker.ready
-                                .then(registration => {
-                                    return registration.sync.register('offlineSync');
-                                })
-                                .catch(error => {
-                                    console.log('Sync registration failed:', error);
+                        if (serviceWorker) {
+                            console.log('Service Worker state:', serviceWorker.state);
+                            serviceWorker.addEventListener('statechange', (e) => {
+                                console.log('Service Worker state:', e.target.state);
+
+                                if (e.target.state === 'activated') {
+                                    console.log('Service Worker activated');
+
+                                    if ("sync" in registration) {
+                                        registration.sync.register('offlineSync');
+                                    }
+
+                                    if ("periodicSync" in registration) {
+                                        registration.periodicSync.register('notificationSync', {
+                                            minInterval: 5 * 60 * 60 * 1000, // 5 hours
+                                        });
+                                    }
+
+                                    // check if there is sync manager
+                                    if ('SyncManager' in window) {
+                                        navigator.serviceWorker.ready
+                                            .then(registration => {
+                                                return registration.sync.register('offlineSync');
+                                            })
+                                            .catch(error => {
+                                                console.log('Sync registration failed:', error);
+                                            });
+                                    }
+                                }
+                            });
+
+                            serviceWorker.addEventListener('updatefound', () => {
+                                console.log('Service Worker update found');
+                                serviceWorker = registration.installing;
+                                serviceWorker.addEventListener('statechange', (e) => {
+                                    console.log('Service Worker state:', e.target.state);
                                 });
+                            });
+
+                            // Listen for the "controllerchange" event, which indicates that the service worker has become the active worker
+                            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                                console.log('Service Worker controllerchange');
+                            });
+
+                            // Listen for the "message" event, which indicates that the service worker has sent a message to the client
+                            navigator.serviceWorker.addEventListener('message', (event) => {
+                                console.log('Received a message from the service worker:', event.data);
+                            });
+
+                            // Listen for the "error" event, which indicates that the service worker has encountered an error
+                            navigator.serviceWorker.addEventListener('error', (event) => {
+                                console.log('Service Worker error:', event.error);
+                            });
+
+                            // Listen for the "offline" event, which indicates that the user has lost their internet connection
+                            window.addEventListener('offline', () => {
+                                console.log('You are offline');
+                            });
+
+                            // Listen for the "online" event, which indicates that the user has regained their internet connection
+                            window.addEventListener('online', () => {
+                                console.log('You are online');
+                            });
+
+                            // Listen for the "beforeinstallprompt" event, which indicates that the user can be prompted to install the PWA
+                            window.addEventListener('beforeinstallprompt', (e) => {
+                                console.log('beforeinstallprompt event:', e);
+                            });
+
+                            // Listen for the "appinstalled" event, which indicates that the PWA has been installed
+                            window.addEventListener('appinstalled', (e) => {
+                                console.log('appinstalled event:', e);
+                            });
+
+                            // Listen for the "fetch" event, which indicates that the browser has made a network request
+                            window.addEventListener('fetch', (e) => {
+                                console.log('fetch event:', e);
+                            });
+
+                            // Listen for the "message" event, which indicates that the browser has received a message from the service worker
+                            window.addEventListener('message', (e) => {
+                                console.log('message event:', e);
+                            });
                         }
                     })
                     .catch(error => {
@@ -168,6 +248,21 @@
             });
         })
 
+        const broadcast = new BroadcastChannel('service-worker-channel');
+        broadcast.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'OFFLINE_SYNC_EVENT') {
+                const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
+
+                if (offlineRequestUrl) {
+                    broadcast.postMessage({
+                        type: 'OFFLINE_SYNC_REQUEST'
+                        , url: offlineRequestUrl
+                    });
+                }
+            }else if( event.data && event.data.type === 'OFFLINE_SYNC_FETCHED' ){
+                localStorage.removeItem('offlineRequestUrl');
+            }
+        });
     </script>
 </body>
 </html>
