@@ -62,6 +62,10 @@ class SpamKeywordRule implements Rule
             'Respond with YES',
             'Respond with YES to this email',
             'Respond with YES to this email and we will send you more information',
+            'Get It For FREE',
+            'Foolproof Money Making',
+            'Millions Online',
+            'Once in a Lifetime',
         ];
 
         foreach ($spamKeywords as $keyword) {
