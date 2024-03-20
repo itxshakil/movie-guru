@@ -66,6 +66,7 @@ class SpamKeywordRule implements Rule
             'Foolproof Money Making',
             'Millions Online',
             'Once in a Lifetime',
+            'No Work Required',
         ];
 
         foreach ($spamKeywords as $keyword) {
