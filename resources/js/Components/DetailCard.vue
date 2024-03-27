@@ -205,11 +205,39 @@
             </div>
         </div>
     </div>
+    <Head>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "Movie",
+                "name": "{{ detail.Title }}",
+                "image": "{{ moviePoster(detail) }}",
+                "genre": "{{ Genre }}",
+                "contentRating": "{{ detail.Rated }}",
+                "datePublished": "{{ detail.Released }}",
+                "actor": "{{ detail.Actors }}",
+                "description": "{{ detail.Plot }}",
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "{{ props.detail.imdbRating }}",
+                    "bestRating": "10",
+                    "worstRating": "1",
+                    "ratingCount": "{{ props.detail.imdbVotes }}"
+                },
+                "director": {
+                    "@type": "Person",
+                    "name": "{{ detail.Director }}"
+                },
+                "duration": "{{ props.detail.Runtime }}"
+            }
+        </script>
+    </Head>
 </template>
 <script setup>
 import DetailSkeletonCard from '@/Components/DetailSkeletonCard.vue';
 import {computed} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
+import {Head} from "@inertiajs/vue3";
 
 const props = defineProps({
     detail: Object,

@@ -35,30 +35,31 @@
     <link rel="manifest" href="/app.webmanifest" />
     <script type="application/ld+json">
         {
-            "@context": "https://schema.org"
-            , "@type": "Organization"
-            , "name": "Movie Guru"
-            , "description": "Discover and explore a world of movies with Movie Guru! Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone."
-            , "url": "https://www.movieguru.com"
-            , "sameAs": [
-                "https://www.facebook.com/moviegurufb"
-                , "https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17"
-                , "https://www.instagram.com/movieguru/"
-            ]
-            , "logo": "https://www.movieguru.com/logo.png"
-            , "foundingDate": "2019-08-15"
-            , "founders": [{
-                "@type": "Person"
-                , "name": "Shakil Alam"
-                , "jobTitle": "Founder"
-            }]
-            , "contactPoint": {
-                "@type": "ContactPoint"
-                , "email": "hello@movie-guru.shakiltech.com"
-                , "contactType": "customer service"
-            }
+           "@context":"https://schema.org",
+           "@type":"Organization",
+           "name":"Movie Guru",
+           "description":"Discover and explore a world of movies with Movie Guru! Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone.",
+           "url":"https://movieguru.shakiltech.com",
+           "sameAs":[
+              "https://www.facebook.com/moviegurufb",
+              "https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17",
+              "https://www.instagram.com/movieguru/"
+           ],
+           "logo":"https://movieguru.shakiltech.com/icons/ios/64.png",
+           "foundingDate":"2019-08-15",
+           "founders":[
+              {
+                 "@type":"Person",
+                 "name" :"Shakil Alam",
+                 "jobTitle":"Founder"
+              }
+           ],
+           "contactPoint":{
+              "@type":"ContactPoint",
+              "email":"hello@movie-guru.shakiltech.com",
+              "contactType":"customer service"
+           }
         }
-
     </script>
 
     <!-- Fonts -->
@@ -147,47 +148,47 @@
 
                             // Listen for the "controllerchange" event, which indicates that the service worker has become the active worker
                             navigator.serviceWorker.addEventListener('controllerchange', () => {
-                                console.log('Service Worker controllerchange');
+                                // console.log('Service Worker controllerchange');
                             });
 
                             // Listen for the "message" event, which indicates that the service worker has sent a message to the client
                             navigator.serviceWorker.addEventListener('message', (event) => {
-                                console.log('Received a message from the service worker:', event.data);
+                                // console.log('Received a message from the service worker:', event.data);
                             });
 
                             // Listen for the "error" event, which indicates that the service worker has encountered an error
                             navigator.serviceWorker.addEventListener('error', (event) => {
-                                console.log('Service Worker error:', event.error);
+                                // console.log('Service Worker error:', event.error);
                             });
 
                             // Listen for the "offline" event, which indicates that the user has lost their internet connection
                             window.addEventListener('offline', () => {
-                                console.log('You are offline');
+                                // console.log('You are offline');
                             });
 
                             // Listen for the "online" event, which indicates that the user has regained their internet connection
                             window.addEventListener('online', () => {
-                                console.log('You are online');
+                                // console.log('You are online');
                             });
 
                             // Listen for the "beforeinstallprompt" event, which indicates that the user can be prompted to install the PWA
                             window.addEventListener('beforeinstallprompt', (e) => {
-                                console.log('beforeinstallprompt event:', e);
+                                // console.log('beforeinstallprompt event:', e);
                             });
 
                             // Listen for the "appinstalled" event, which indicates that the PWA has been installed
                             window.addEventListener('appinstalled', (e) => {
-                                console.log('appinstalled event:', e);
+                                // console.log('appinstalled event:', e);
                             });
 
                             // Listen for the "fetch" event, which indicates that the browser has made a network request
                             window.addEventListener('fetch', (e) => {
-                                console.log('fetch event:', e);
+                                // console.log('fetch event:', e);
                             });
 
                             // Listen for the "message" event, which indicates that the browser has received a message from the service worker
                             window.addEventListener('message', (e) => {
-                                console.log('message event:', e);
+                                // console.log('message event:', e);
                             });
                         }
                     })
