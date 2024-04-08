@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class SitemapGenerator extends Command
 {
-    protected $signature = 'sitemap:generate {--limit=10}';
+    protected $signature = 'sitemap:generate {--limit=50}';
 
     protected $description = 'Generate the sitemap.';
 
