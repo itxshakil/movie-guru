@@ -68,6 +68,7 @@ class SpamKeywordRule implements Rule
             'Once in a Lifetime',
             'No Work Required',
             'steamy movie',
+            'steamy sauna session',
         ];
 
         foreach ($spamKeywords as $keyword) {
