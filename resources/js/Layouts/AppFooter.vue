@@ -4,8 +4,8 @@ import {Link} from '@inertiajs/vue3';
 </script>
 
 <template>
-    <footer class="bg-white dark:bg-gray-900 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div class="mx-auto w-full max-w-screen-xl p-2 py-6 lg:py-8">
+    <footer class="bg-white dark:bg-gray-900 pt-8">
+        <div class="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div class="md:flex md:justify-between">
                 <div class="mb-6 md:mb-0 md:max-w-lg">
                     <Link href="/" class="flex items-center">

@@ -16,7 +16,7 @@ const pageDescription = 'Your privacy matters at Movie Guru. Explore our Privacy
         <meta :content="pageTitle" head-key="og:title" name="og:title"/>
         <meta :content="pageDescription" head-key="og:description" name="og:description"/>
     </Head>
-    <div class="pt-24 pb-8 bg-gray-100 dark:bg-gray-900 dark:text-white max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+    <div class="pt-24 pb-8 bg-gray-100 dark:bg-gray-900 dark:text-white">
         <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold mb-4">Privacy Policy</h1>
             <p class="mb-4">At Movie Guru, we are committed to protecting the privacy of our users. This Privacy Policy
@@ -82,4 +82,3 @@ const pageDescription = 'Your privacy matters at Movie Guru. Explore our Privacy
         </div>
     </div>
 </template>
-

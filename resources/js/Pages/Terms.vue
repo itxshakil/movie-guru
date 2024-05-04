@@ -16,7 +16,7 @@ const pageDescription = 'Navigate the world of Movie Guru with confidence, guide
         <meta :content="pageTitle" head-key="og:title" name="og:title"/>
         <meta :content="pageDescription" head-key="og:description" name="og:description"/>
     </Head>
-        <div class="pt-24 pb-8 bg-gray-100 dark:bg-gray-900 dark:text-white max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div class="pt-24 pb-8 bg-gray-100 dark:bg-gray-900 dark:text-white">
             <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
                 <h1 class="text-3xl font-bold mb-4">Terms and Conditions</h1>
                 <h3 class="text-xl font-bold mt-8 mb-4">Introduction</h3>
@@ -63,4 +63,3 @@ const pageDescription = 'Navigate the world of Movie Guru with confidence, guide
             </div>
         </div>
 </template>
-
