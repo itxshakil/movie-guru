@@ -3,26 +3,26 @@
         <div class="flex text-left text-base w-full">
             <div
                 class="relative rounded-lg flex w-full items-center overflow-hidden bg-white dark:bg-gray-900 dark:text-white px-4 pb-6 pt-6 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
-                <div v-if="detail"
+                <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="grid w-full grid-cols-1 items-start gap-x-3 gap-y-4 sm:grid-cols-12 lg:gap-x-8">
                     <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5">
                         <div class="aspect-h-3 aspect-w-2 bg-gray-100 dark:bg-gray-900">
-                            <img :alt="detail.Title + ' Poster'"
+                            <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"
                                  class="object-cover object-center">
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
-                <span v-if="trending"
-                      class="flex items-center gap-1 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-orange-900 dark:text-orange-300">
-                    Trending
-                    <svg class="h-4 w-4" fill="none" height="24" stroke="currentColor"
-                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                         width="24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                        <path d="M3 17l6 -6l4 4l8 -8"/>
-                        <path d="M14 7l7 0l0 7"/>
-                    </svg>
-                </span>
+                        <span v-if="trending"
+                            class="flex items-center gap-1 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-orange-900 dark:text-orange-300">
+                            Trending
+                            <svg class="h-4 w-4" fill="none" height="24" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path d="M3 17l6 -6l4 4l8 -8"/>
+                                <path d="M14 7l7 0l0 7"/>
+                            </svg>
+                        </span>
                             <span v-else-if="recentlyReleased"
                                   class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">New</span>
                             <span v-else-if="topRated"
@@ -59,40 +59,43 @@
                         </div>
                     </div>
                     <div class="sm:col-span-8 lg:col-span-7">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white sm:pr-12"
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white sm:pr-12" itemprop="name"
                             v-text="detail.Title"></h2>
                         <span :title="detail.Released ? 'Released on '+ detail.Released : 'Release Year'"
-                              class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400"
+                              class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" itemprop="datePublished"
                               v-text="detail.Year"></span>
-                        <span class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" title="Genre"
+                        <span class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" title="Genre" itemprop="genre"
                               v-text="Genre"></span>
                         <span v-if="detail.Type !== 'series'" class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400"
-                              title="Runtime" v-text="runtime"></span>
-                        <span v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'"
+                              title="Runtime" v-text="runtime" itemprop="duration"></span>
+                        <span v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'" itemprop="contentRating"
                               class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" title="Rated"
                               v-text="detail.Rated"></span>
 
                         <section aria-labelledby="information-heading" class="mt-2">
                             <h3 id="information-heading" class="sr-only">Product information</h3>
-                            <div class="flex items-center">
-                                <!-- Active: "text-gray-900", Default: "text-gray-200" -->
-                                <svg
-                                    v-for="i in 5"
-                                    :key="i"
-                                    :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'"
-                                    aria-hidden="true" class="h-5 w-5 flex-shrink-0" fill="currentColor"
-                                    viewBox="0 0 20 20">
-                                    <path clip-rule="evenodd"
-                                          d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                                          fill-rule="evenodd"/>
-                                </svg>
+                            <div class="mb-2" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                                <div class="flex items-center">
+                                    <svg
+                                        v-for="i in 5"
+                                        :key="i"
+                                        :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'"
+                                        aria-hidden="true" class="h-6 w-6 flex-shrink-0" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path clip-rule="evenodd"
+                                            d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                            fill-rule="evenodd"/>
+                                    </svg>
 
-                                <p class="sr-only">{{ basicRating }} out of 5 stars</p>
-                                <!--                                TODO: Redirect link to imdbID to rating page -->
-                                <a class="ml-3 text-sm font-medium text-primary-600 hover:text-primary-500" href="#">
-                                    {{ isValue(detail.imdbVotes) ?detail.imdbVotes : 'No '  }} reviews</a>
+                                    <!--                                TODO: Redirect link to imdbID to rating page -->
+                                    <a class="ml-3 text-sm font-medium text-primary-600 hover:text-primary-500" href="#">
+                                        <span itemprop="ratingCount">{{ isValue(detail.imdbVotes) ?detail.imdbVotes : 'No '  }}</span> reviews</a>
+
+                                </div>
+                                <small class="ml-1"><strong itemprop="ratingValue">{{ basicRating }}</strong> out of <strong itemprop="bestRating">5</strong> stars</small>
                             </div>
-                            <SnippetText :text="isValue(detail.Plot) ? detail.Plot : 'No Plot detail'" class="text-gray-900 dark:text-white mt-2"/>
+
+                            <SnippetText :text="isValue(detail.Plot) ? detail.Plot : 'No Plot detail'"  itemprop="description" class="text-gray-900 dark:text-white mt-2"/>
 
                             <div>
                                 <div class="py-4 pb-2">
@@ -103,31 +106,31 @@
                                 </div>
                                 <div>
                                     <dl class="">
-                                        <div
+                                        <div itemprop="actor" itemscope itemtype="https://schema.org/Person"
                                             v-if="isValue(detail.Actors)"
                                             class="p-2 sm:py-4 sm:grid sm:grid-cols-4 sm:gap-4 odd:bg-gray-100 dark:odd:bg-gray-800">
                                             <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
                                                 Actor
                                             </dt>
-                                            <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0"
+                                            <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0" itemprop="name"
                                                 v-text="detail.Actors"></dd>
                                         </div>
-                                        <div
+                                        <div itemprop="writer" itemscope itemtype="https://schema.org/Person"
                                             v-if="isValue(detail.Writer)"
                                             class="p-2 sm:py-4  sm:grid sm:grid-cols-4 sm:gap-4 odd:bg-gray-100 dark:odd:bg-gray-800">
                                             <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
                                                 Writer
                                             </dt>
-                                            <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0"
+                                            <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0" itemprop="name"
                                                 v-text="detail.Writer"></dd>
                                         </div>
-                                        <div
+                                        <div itemprop="director" itemscope itemtype="https://schema.org/Person"
                                             v-if="isValue(detail.Director)"
                                             class="p-2 sm:py-4  sm:grid sm:grid-cols-4 sm:gap-4 odd:bg-gray-100 dark:odd:bg-gray-800">
                                             <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
                                                 Director
                                             </dt>
-                                            <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0"
+                                            <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0" itemprop="name"
                                                 v-text="detail.Director"></dd>
                                         </div>
                                         <div v-if="detail.Type === 'series' && isValue(detail.totalSeasons)"
@@ -136,7 +139,7 @@
                                                 of Seasons
                                             </dt>
                                             <dd class="mt-1 text-sm leading-6 text-gray-900 dark:text-gray-200 sm:col-span-3 sm:mt-0">
-                                                {{ detail.totalSeasons }} Seasons - {{ runtime }}
+                                                {{ detail.totalSeasons }} Seasons - <span itemprop="duration">{{ runtime }}</span>
                                             </dd>
                                         </div>
                                         <div
@@ -205,39 +208,11 @@
             </div>
         </div>
     </div>
-    <Head>
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
-                "@type": "Movie",
-                "name": "{{ detail.Title }}",
-                "image": "{{ moviePoster(detail) }}",
-                "genre": "{{ Genre }}",
-                "contentRating": "{{ detail.Rated }}",
-                "datePublished": "{{ detail.Released }}",
-                "actor": "{{ detail.Actors }}",
-                "description": "{{ detail.Plot }}",
-                "aggregateRating": {
-                    "@type": "AggregateRating",
-                    "ratingValue": "{{ props.detail.imdbRating }}",
-                    "bestRating": "10",
-                    "worstRating": "1",
-                    "ratingCount": "{{ props.detail.imdbVotes }}"
-                },
-                "director": {
-                    "@type": "Person",
-                    "name": "{{ detail.Director }}"
-                },
-                "duration": "{{ props.detail.Runtime }}"
-            }
-        </script>
-    </Head>
 </template>
 <script setup>
 import DetailSkeletonCard from '@/Components/DetailSkeletonCard.vue';
 import {computed} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
-import {Head} from "@inertiajs/vue3";
 
 const props = defineProps({
     detail: Object,
