@@ -35,13 +35,13 @@ class RouteServiceProvider extends ServiceProvider
             $year = $request->get('year');
 
             $cacheKey = 'search-' . $search . '-' . $page . '-' . $movieType . '-' . $year. '-' . $request->ip();
-            return Limit::perMinute(2)->by($cacheKey);
+            return Limit::perMinute(10)->by($cacheKey);
         });
 
         RateLimiter::for('movie-show', function (Request $request) {
             $imdbId = $request->route('imdbID');
             $cacheKey = 'movie-show.' .$imdbId.'.' . $request->ip();
-            return Limit::perMinute(2)->by($cacheKey);
+            return Limit::perMinute(10)->by($cacheKey);
         });
 
         $this->routes(function () {
