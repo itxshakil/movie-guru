@@ -7,7 +7,7 @@
 
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-    <meta name="description" content="{{ $metadescription ?? "Discover and explore a world of movies with Movie Guru! Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." }}" />
+    <meta name="description" content="{{ $metadescription ?? "Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." }}" />
     <meta name="keywords" content="movie, film, ratings, reviews, movie database" />
     <meta name="subject" content="Explore Movies with Movie Guru" />
     <meta name="language" content="en" />
@@ -19,10 +19,18 @@
     <meta name="og:title" content="Discover and Explore Movies with Movie Guru" />
     <meta name="og:url" content="{{ config('app.url') }}" />
     <meta name="og:site_name" content="Movie Guru" />
-    <meta name="og:description" content="Your go-to source for movie information, ratings, and reviews. Explore a world of movies with Movie Guru. It's free and easy to use!" />
+    <meta name="og:description" content="Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." />
     <meta name="og:email" content="info@movieguru.com" />
     <meta name="og:country-name" content="India" />
-    <meta name="og:image" content="/icons/icon-96x96.png" />
+    <meta name="og:image" content="{{ asset('/icons/icon-96x96.png')}}" />
+
+    <meta name="twitter:card" content="Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." />
+    <meta property="twitter:domain" content="{{ config('app.url') }}" />
+    <meta property="twitter:url" content="{{ config('app.url') }}" />
+    <meta name="twitter:title" content="Open source alternative of IMDB" />
+    <meta name="twitter:description" content="Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." />
+    <meta name="twitter:image" content="{{ asset('/icons/icon-96x96.png')}}" />
+    
     <meta name="owner" content="Movie Guru" />
     <meta name="author" content="Movie Guru Team, info@movieguru.com" />
     <meta name="theme-color" content="#2A669F" />

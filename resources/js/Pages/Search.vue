@@ -1,7 +1,7 @@
 <script setup>
 import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
-import {ref} from 'vue';
+import {ref, computed} from 'vue';
 import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -60,11 +60,12 @@ const loadMore = () => {
             timeout.value = setTimeout(()=>{
                 loadMore()
             }, retryAfter * 1000);
-            maxRetry.value = maxRetry.value - 1;
-        }else{
-            alert(`Something went wrong. Error -RE-${response.status}`)
-            loading.value = false
+
+            maxRetry.value--;
+            return;
         }
+        alert(`Something went wrong. Error -RE-${response.status}`)
+        loading.value = false
     }).finally(() => {
         loading.value = false;
     });
@@ -76,9 +77,22 @@ const viewDetail = (imdbID) => {
 defineOptions({ layout: BaseLayout })
 
 const pageTitle = props.searchResults.Response === 'False' ?
-    'No results found for ' + props.search :
-    props.searchResults.totalResults + ' results found for ' + props.search;
-const pageDescription = 'Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Your gateway to a universe of entertainment awaits!';
+    `No results found for ${props.search}` :
+    `${props.searchResults.totalResults} results found for ` + props.search;
+const pageDescription = `Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to "${props.search}" and dive into the world of entertainment.`;
+;
+
+const ogImage = computed(() => {
+    if (movieList.value && movieList.value.length > 0) {
+        return moviePoster(movieList.value[0]);
+    } else {
+        return '/assets/images/no-poster.jpg';
+    }
+});
+
+const moviePoster = (movie) => {
+    return movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : '/assets/images/no-poster.jpg';
+}
 </script>
 
 <template>
@@ -88,6 +102,13 @@ const pageDescription = 'Explore an extensive database of movies with detailed i
         <meta :content="pageTitle" head-key="subject" name="subject"/>
         <meta :content="pageTitle" head-key="og:title" name="og:title"/>
         <meta :content="pageDescription" head-key="og:description" name="og:description"/>
+        <meta :content="ogImage" head-key="og:image" name="og:image"/>
+
+        <meta :content="pageDescription" head-key="twitter:card" name="twitter:card"/>
+        <!-- <meta :content="pageDescription" head-key="twitter:url" name="twitter:url"/> -->
+        <meta :content="pageTitle" head-key="twitter:title" name="twitter:title"/>
+        <meta :content="pageDescription" head-key="twitter:description" name="twitter:description"/>
+        <meta :content="ogImage" head-key="twitter:image" name="twitter:image"/>
     </Head>
     <div class="bg-gray-100 dark:bg-gray-900 dark:text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
