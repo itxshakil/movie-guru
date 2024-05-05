@@ -101,6 +101,8 @@
         gtag('config', 'G-ESD6M429K6');
 
     </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4132498105758259"
+     crossorigin="anonymous"></script>
     @endif
 
 </head>
