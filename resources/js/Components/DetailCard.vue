@@ -59,8 +59,8 @@
                         </div>
                     </div>
                     <div class="sm:col-span-8 lg:col-span-7">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white sm:pr-12" itemprop="name"
-                            v-text="detail.Title"></h2>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white sm:pr-12" itemprop="name"
+                            v-text="detail.Title"></h1>
                         <span :title="detail.Released ? 'Released on '+ detail.Released : 'Release Year'"
                               class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" itemprop="datePublished"
                               v-text="detail.Year"></span>

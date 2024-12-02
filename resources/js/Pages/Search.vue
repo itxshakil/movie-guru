@@ -81,6 +81,7 @@ const pageTitle = props.searchResults.Response === 'False' ?
     `${props.searchResults.totalResults} results found for ` + props.search;
 const pageDescription = `Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to "${props.search}" and dive into the world of entertainment.`;
 ;
+const pageUrl = window.location.href;
 
 const ogImage = computed(() => {
     if (movieList.value && movieList.value.length > 0) {
@@ -99,28 +100,35 @@ const moviePoster = (movie) => {
     <Head>
         <title>{{ pageTitle }}</title>
         <meta :content="pageDescription" head-key="description" name="description"/>
-        <meta :content="pageTitle" head-key="subject" name="subject"/>
-        <meta :content="pageTitle" head-key="og:title" name="og:title"/>
-        <meta :content="pageDescription" head-key="og:description" name="og:description"/>
-        <meta :content="ogImage" head-key="og:image" name="og:image"/>
+        <meta property="subject" :content="pageTitle" head-key="subject">
 
-        <meta :content="pageDescription" head-key="twitter:card" name="twitter:card"/>
-        <!-- <meta :content="pageDescription" head-key="twitter:url" name="twitter:url"/> -->
-        <meta :content="pageTitle" head-key="twitter:title" name="twitter:title"/>
-        <meta :content="pageDescription" head-key="twitter:description" name="twitter:description"/>
-        <meta :content="ogImage" head-key="twitter:image" name="twitter:image"/>
+        <meta property="og:url" :content="pageUrl" head-key="og:url">
+        <meta property="og:type" content="website">
+        <meta property="og:title" :content="pageTitle" head-key="og:title">
+        <meta property="og:description" :content="pageDescription" head-key="og:description">
+        <meta property="og:image" :content="ogImage" head-key="og:image">
+
+        <!-- Twitter Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta property="twitter:domain" content="movieguru.shakiltech.com">
+        <meta property="twitter:url" :content="pageUrl" head-key="twitter:url">
+        <meta name="twitter:title" :content="pageTitle" head-key="twitter:title">
+        <meta name="twitter:description" :content="pageDescription" head-key="twitter:description">
+        <meta name="twitter:image" :content="ogImage" head-key="twitter:image">
+
+        <link rel="canonical" :href="pageUrl" head-key="canonical" />
     </Head>
     <div class="bg-gray-100 dark:bg-gray-900 dark:text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl pt-24 sm:py-24 lg:max-w-none">
 
                 <div class="mt-2 flex flex-col-reverse lg:flex-row gap-2 justify-between w-full items-baseline">
-                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white w-full " v-if="searchResults.Response === 'False'">
+                    <h1 class="mb-4 text-xl font-bold text-gray-900 dark:text-white w-full " v-if="searchResults.Response === 'False'">
                         No results found for {{ search }}
-                    </h2>
-                    <h2 v-else class="text-xl font-bold text-gray-900 dark:text-white w-full ">
+                    </h1>
+                    <h1 v-else class="text-xl font-bold text-gray-900 dark:text-white w-full ">
                         {{ searchResults.totalResults }} results found for {{ search }}
-                    </h2>
+                    </h1>
 
                     <form class="flex flex-col sm:flex-row gap-2 items-center w-full" @submit.prevent="doSearch">
                         <div class="w-full sm:min-w-64 grow">

@@ -18,15 +18,31 @@ defineOptions({ layout: BaseLayout })
 
 const pageTitle = 'Discover. Explore. Enjoy.';
 const pageDescription = 'Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Your gateway to a universe of entertainment awaits!';
+const pageUrl = window.location.href;
+const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
 </script>
 
 <template>
     <Head>
         <title>{{ pageTitle }}</title>
         <meta :content="pageDescription" head-key="description" name="description"/>
-        <meta :content="pageTitle" head-key="subject" name="subject"/>
-        <meta :content="pageTitle" head-key="og:title" name="og:title"/>
-        <meta :content="pageDescription" head-key="og:description" name="og:description"/>
+        <meta property="subject" :content="pageTitle" head-key="subject">
+
+        <meta property="og:url" :content="pageUrl" head-key="og:url">
+        <meta property="og:type" content="website">
+        <meta property="og:title" :content="pageTitle" head-key="og:title">
+        <meta property="og:description" :content="pageDescription" head-key="og:description">
+        <meta property="og:image" :content="ogImage" head-key="og:image">
+
+        <!-- Twitter Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta property="twitter:domain" content="movieguru.shakiltech.com">
+        <meta property="twitter:url" :content="pageUrl" head-key="twitter:url">
+        <meta name="twitter:title" :content="pageTitle" head-key="twitter:title">
+        <meta name="twitter:description" :content="pageDescription" head-key="twitter:description">
+        <meta name="twitter:image" :content="ogImage" head-key="twitter:image">
+        
+        <link rel="canonical" :href="pageUrl" head-key="canonical" />
     </Head>
 
         <div class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white">

@@ -13,6 +13,7 @@ defineOptions({ layout: BaseLayout })
 const moviePoster = (movie) => {
     return movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : '/assets/images/no-poster.jpg';
 };
+const pageUrl = window.location.href;
 
 const pageTitle = `Details of ${props.detail.Title}`;
 const pageDescription = props.detail.Plot;
@@ -24,16 +25,23 @@ const ogImage = moviePoster(props.detail);
     <Head>
         <title>{{ pageTitle }}</title>
         <meta :content="pageDescription" head-key="description" name="description"/>
-        <meta :content="pageTitle" head-key="subject" name="subject"/>
-        <meta :content="pageTitle" head-key="og:title" name="og:title"/>
-        <meta :content="pageDescription" head-key="og:description" name="og:description"/>
-        <meta :content="ogImage" head-key="og:image" name="og:image"/>
+        <meta property="subject" :content="pageTitle" head-key="subject">
 
-        <meta :content="pageDescription" head-key="twitter:card" name="twitter:card"/>
-        <!-- <meta :content="pageDescription" head-key="twitter:url" name="twitter:url"/> -->
-        <meta :content="pageTitle" head-key="twitter:title" name="twitter:title"/>
-        <meta :content="pageDescription" head-key="twitter:description" name="twitter:description"/>
-        <meta :content="ogImage" head-key="twitter:image" name="twitter:image"/>
+        <meta property="og:url" :content="pageUrl" head-key="og:url">
+        <meta property="og:type" content="website">
+        <meta property="og:title" :content="pageTitle" head-key="og:title">
+        <meta property="og:description" :content="pageDescription" head-key="og:description">
+        <meta property="og:image" :content="ogImage" head-key="og:image">
+
+        <!-- Twitter Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta property="twitter:domain" content="movieguru.shakiltech.com">
+        <meta property="twitter:url" :content="pageUrl" head-key="twitter:url">
+        <meta name="twitter:title" :content="pageTitle" head-key="twitter:title">
+        <meta name="twitter:description" :content="pageDescription" head-key="twitter:description">
+        <meta name="twitter:image" :content="ogImage" head-key="twitter:image">
+
+        <link rel="canonical" :href="pageUrl" head-key="canonical" />
     </Head>
 
     <DetailCard :detail="detail" class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white" />
