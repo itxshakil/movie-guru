@@ -12,7 +12,7 @@ const secondaryAction = ref("Not Now");
 const promptTitle = ref("Network Unavailable");
 
 // Add code to handle OFFLINE_SEARCH_DETECTED message
-navigator.serviceWorker.addEventListener("message", (event) => {
+navigator.serviceWorker?.addEventListener("message", (event) => {
     if (
         event.data.type === "OFFLINE_SEARCH_DETECTED" &&
         event.data.status === "offline"

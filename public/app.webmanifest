@@ -497,14 +497,14 @@
         },
         {
             "src": "/assets/images/screenshots/MOVIE_GURU_HOME_WIDE_SCREENSHOT.png",
-            "sizes": "1098x797",
+            "sizes": "2196x1594",
             "type": "image/png",
             "form_factor": "wide",
             "label" : "Home page"
         },
         {
             "src": "/assets/images/screenshots/MOVIE_GURU_FEAURES_WIDE_SCREENSHOT.png",
-            "sizes": "1098x797",
+            "sizes": "2196x1594",
             "type": "image/png",
             "form_factor": "wide",
             "label" : "Features Section Wide"

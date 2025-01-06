@@ -79,7 +79,7 @@ defineOptions({ layout: BaseLayout })
 const pageTitle = props.searchResults.Response === 'False' ?
     `No results found for ${props.search}` :
     `${props.searchResults.totalResults} results found for ` + props.search;
-const pageDescription = `Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to "${props.search}" and dive into the world of entertainment.`;
+const pageDescription = `Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to ${props.search} and dive into the world of entertainment.`;
 ;
 const pageUrl = window.location.href;
 

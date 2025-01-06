@@ -222,11 +222,16 @@ const isValue = function(value) {
 };
 
 const basicRating = computed(() => {
+  if(props.detail.imdbRating){
     let mappedRating = Math.round(props.detail.imdbRating / 2);
 
     mappedRating = Math.max(1, Math.min(5, mappedRating));
 
     return mappedRating;
+  }
+
+  return 'No Rating';
+
 });
 
 const topRated = computed(() => {

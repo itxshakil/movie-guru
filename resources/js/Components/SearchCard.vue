@@ -5,6 +5,7 @@
           class="relative h-80 w-full overflow-hidden rounded-lg rounded-b-none bg-white dark:bg-gray-700 aspect-h-3 aspect-w-2 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
         <img itemprop="image" :alt="movie.Title + ' Poster'"
              :src="moviePoster(movie)"
+             @click="viewDetail(movie.imdbID)"
              loading="lazy"
              class="h-full w-full object-cover object-center italic">
       </div>

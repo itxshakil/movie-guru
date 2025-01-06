@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -71,5 +72,7 @@ class AppServiceProvider extends ServiceProvider
             $cacheKey = 'movie-show.' .$imdbId.'.' . $request->ip();
             return Limit::perMinute(10)->by($cacheKey);
         });
+
+        Vite::prefetch(concurrency: 3);
     }
 }
