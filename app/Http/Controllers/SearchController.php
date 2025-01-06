@@ -6,13 +6,14 @@ use App\Models\SearchQuery;
 use App\Models\ShowPageAnalytics;
 use App\OMDB\MovieType;
 use App\Services\OMDBApiService;
+use App\Services\TrendingQueryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class SearchController extends Controller
 {
-    public function index(Request $request, OMDBApiService $OMDBApiService)
+    public function index(Request $request, OMDBApiService $OMDBApiService, TrendingQueryService $trendingQueryService)
     {
         $search = $request->get('s');
         $page = $request->get('page', 1);
@@ -55,6 +56,8 @@ class SearchController extends Controller
             }
         }
 
+        $trendingQueries = $trendingQueryService->fetch();
+
         if($request->wantsJson()){
             return response()->json([
                 'searchResults' => $movies,
@@ -64,6 +67,7 @@ class SearchController extends Controller
                 'year' => $year,
                 'movieTypes' => $movieTypes,
                 'nextUrl' => $nextUrl,
+                'trendingQueries' => $trendingQueries
             ]);
         }
 
@@ -75,6 +79,7 @@ class SearchController extends Controller
             'year' => $year,
             'movieTypes' => $movieTypes,
             'nextUrl' => $nextUrl,
+            'trendingQueries' => $trendingQueries
         ]);
 
     }

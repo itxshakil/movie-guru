@@ -9,7 +9,7 @@
                         <div class="aspect-h-3 aspect-w-2 bg-gray-100 dark:bg-gray-900">
                             <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"
-                                 class="object-cover object-center">
+                                 class="object-cover object-center cursor-pointer">
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
                         <span v-if="trending"

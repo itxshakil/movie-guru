@@ -17,7 +17,7 @@ use Inertia\Inertia;
 |
 */
 
-Route::inertia('/', 'Welcome');
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 Route::inertia('/terms', 'Terms');
 Route::inertia('/privacy', 'PrivacyPolicy');
 Route::inertia('/contact', 'Contact');
