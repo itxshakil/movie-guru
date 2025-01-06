@@ -323,11 +323,11 @@ self.addEventListener('sync', async (event) => {
 broadcast.onmessage = (event) => {
     if (event.data.type === 'OFFLINE_SYNC_REQUEST') {
         const offlineRequestUrl = event.data.url;
-        offlinceSyncRequest(offlineRequestUrl);
+        offlineSyncRequest(offlineRequestUrl);
     }
 };
 
-function offlinceSyncRequest(offlineRequestUrl) {
+function offlineSyncRequest(offlineRequestUrl) {
     if (!offlineRequestUrl) {
         return;
     }
