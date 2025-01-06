@@ -146,6 +146,54 @@ self.addEventListener('install', event => {
                 throw error;
             })
     );
+
+    if(self.registration && self.registration.periodicSync){
+        self.registration.periodicSync.register('weeklyTrendingNotification', {
+            minInterval: 24 * 60 * 60 * 1000, // minimum interval (once a day)
+            tag: 'weeklyTrendingNotification',
+        });
+    }
+
+});
+
+self.addEventListener('periodicsync', async (event) => {
+    if (event.tag === 'weeklyTrendingNotification') {
+        const now = new Date();
+        const isSaturday = now.getDay() === 6; // Saturday is day 6
+        const isNotificationTime = now.getHours() > 18; // 6 PM is hour 18
+
+        if (isSaturday && isNotificationTime) {
+            // Check if notification permission is granted before showing
+            if (Notification.permission === 'granted') {
+                sendTrendingNotification();
+            } else {
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        sendTrendingNotification();
+                    } else {
+                        broadcastChannel.postMessage({
+                            type: 'NOTIFICATION_PERMISSION_DENIED',
+                            data: {
+                                message: 'You need to allow push notifications.',
+                                level: 'danger',
+                            },
+                        });
+                    }
+                } catch (error) {
+                    broadcastChannel.postMessage({
+                        type: 'NOTIFICATION_PERMISSION_DENIED',
+                        data: {
+                            message: 'Error while requesting and/or showing notification.',
+                            level: 'danger',
+                        },
+                    });
+
+                    log("Error while requesting and/or showing notification.", e);
+                }
+            }
+        }
+    }
 });
 
 self.addEventListener('activate', async (e) => {
@@ -271,49 +319,6 @@ function handleNotificationClick(event) {
     }
 }
 
-self.addEventListener('periodicsync', async (event) => {
-    if (event.tag !== 'notificationSync') {
-        // return;
-    }
-    const now = new Date();
-    const movieTimeStart = 19; // 7 PM
-    const movieTimeEnd = 21;   // 9 PM
-
-    if ((now.getDay() === 0 && now.getHours() >= movieTimeStart &&
-        now.getHours() < movieTimeEnd) ||
-        (now.getDay() === 0 && now.getHours() >= 9 && now.getHours() <
-            13)) {
-        if (Notification.permission === 'granted') {
-            rollOpeningCredits();
-        } else {
-            try {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    rollOpeningCredits();
-                } else {
-                    broadcastChannel.postMessage({
-                        type: 'NOTIFICATION_PERMISSION_DENIED',
-                        data: {
-                            message: 'You need to allow push notifications.',
-                            level: 'danger',
-                        },
-                    });
-                }
-            } catch (e) {
-                broadcastChannel.postMessage({
-                    type: 'NOTIFICATION_PERMISSION_DENIED',
-                    data: {
-                        message: 'Error while requesting and/or showing notification.',
-                        level: 'danger',
-                    },
-                });
-
-                log("Error while requesting and/or showing notification.", e);
-            }
-        }
-    }
-});
-
 self.addEventListener('sync', async (event) => {
     if (event.tag === 'offlineSync') {
         broadcast.postMessage({ type: 'OFFLINE_SYNC_EVENT' });
@@ -416,3 +421,22 @@ self.addEventListener('push', (event) => {
 });
 
 self.addEventListener('notificationclick', handleNotificationClick);
+function sendTrendingNotification() {
+    const notificationTitle = "🔥 What's Trending This Weekend?";
+    const notificationBody = "Don't miss out on the latest trends! 🍿 Tap to discover your next favorite binge-worthy experience.";
+    const notificationData = { url: '/trending' };
+
+    self.registration.showNotification(notificationTitle, {
+        body: notificationBody,
+        icon: '/icons/ios/152.png',
+        badge: '/icons/ios/152.png',
+        actions: [
+            { action: 'close', title: 'Not Now' },
+            { action: 'open', title: 'Check It Out!' },
+        ],
+        data: notificationData,
+        requireInteraction: true,
+        vibrate: [200, 100, 200],
+    });
+}
+
