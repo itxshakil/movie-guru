@@ -43,7 +43,7 @@ const remove = (index) => {
 
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 broadcastChannel.onmessage = (event) => {
-    addNotification(event.data.message, event.data.level);
+    addNotification(event.data.data.message, event.data.data.level);
 };
 
 </script>
