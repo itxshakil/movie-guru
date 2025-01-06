@@ -140,7 +140,15 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(APP_CACHE)
             .then(cache => cache.addAll(basicPathsToCache))
-            .then(() => self.skipWaiting())
+            .then(() => {
+                self.skipWaiting();
+                // Notify the clients that the app is available offline
+                broadcastChannel.postMessage({
+                    type: 'APP_AVAILABLE_OFFLINE',
+                    message: 'The app is now available offline. Enjoy your movie binge!',
+                    level: 'success',
+                });
+            })
             .catch(error => {
                 logError('Error during installation', error);
                 throw error;
@@ -207,6 +215,12 @@ self.addEventListener('activate', async (e) => {
             }
         });
         await Promise.all(promises);
+
+        broadcastChannel.postMessage({
+            type: 'APP_UPDATED',
+            message: 'The app has been updated and is ready to use.',
+            level: 'success',
+        });
     } catch (error) {
         logError('Error removing old cache', error);
     }
