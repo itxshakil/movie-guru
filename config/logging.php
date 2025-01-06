@@ -32,8 +32,8 @@ return [
     */
 
     'deprecations' => [
-        'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'stack'),
-        'trace' => false,
+        'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
+        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
     ],
 
     /*
@@ -67,7 +67,7 @@ return [
 
         'spam-keyword' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/spam-keywork.log'),
+            'path' => storage_path('logs/spam-keyword.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 365,
             'replace_placeholders' => true,
