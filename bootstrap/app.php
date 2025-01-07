@@ -29,8 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 return back()->with([
                     'error' => 'The page expired, please try again.',
                 ]);
-            } else {
-                return $exception->getPrevious() ? $exception->getPrevious()->getPrevious() : $exception;
             }
+
+            return $response;
         });
     })->create();
