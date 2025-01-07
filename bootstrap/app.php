@@ -27,8 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
                     ->setStatusCode($response->getStatusCode());
             } elseif ($response->getStatusCode() === 419) {
                 return back()->with([
-                    'message' => 'The page expired, please try again.',
+                    'error' => 'The page expired, please try again.',
                 ]);
+            } else {
+                return $exception->getPrevious() ? $exception->getPrevious()->getPrevious() : $exception;
             }
         });
     })->create();

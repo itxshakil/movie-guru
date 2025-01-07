@@ -1,7 +1,7 @@
 <script setup>
 import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
-import {ref, computed} from 'vue';
+import {computed, ref} from 'vue';
 import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -92,9 +92,21 @@ const loadMore = () => {
     });
 };
 
-const viewDetail = (imdbID) => {
-    selectedIMDBId.value = imdbID;
+const viewDetail = (imdb_id, sectionName) => {
+  selectedIMDBId.value = imdb_id;
+
+  // Google Analytics event
+  if (window.gtag) {
+    window.gtag('event', 'view_detail', {
+      event_category: 'View Detail',
+      event_label: sectionName,
+      value: imdb_id
+    });
+  } else {
+    console.warn("Google Analytics not initialized.");
+  }
 };
+
 defineOptions({ layout: BaseLayout })
 
 const pageTitle = props.searchResults.Response === 'False' ?
@@ -204,9 +216,9 @@ const moviePoster = (movie) => {
                 <div v-if="movieList && movieList.length" class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 sm:space-y-0">
                     <SearchCard
                         v-for="movie in movieList"
-                        :key="movie.imdbID"
+                        :key="movie.imdb_id"
                         :movie="movie"
-                        @selected="viewDetail(movie.imdbID)"
+                        @selected="viewDetail(movie.imdb_id, 'Search')"
                     />
                 </div>
 

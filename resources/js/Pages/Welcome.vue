@@ -5,10 +5,20 @@ import OurFeatures from '@/Components/OurFeatures.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import LoadingSpinnerIcon from '@/Components/Icons/LoadingSpinner.vue';
+import SearchCard from "@/Components/SearchCard.vue";
+import {ref} from "vue";
+import Show from "@/Components/Show.vue";
 
 const props = defineProps({
-  trendingSearchQueries: Array
+  trendingSearchQueries: Array,
+  popularMovies: Array,
+  trendingMovies: Array,
+  hiddenGemsMovies: Array,
+  recentlyReleasedMovies: Array,
+  topRatedMovies: Array,
 });
+
+const selectedIMDBId = ref(null);
 
 const form = useForm({
   s: '',
@@ -21,12 +31,30 @@ const doSearch = () => {
 // Randomize trending search queries
 const shuffledTrendingQueries = [...props.trendingSearchQueries].sort(() => Math.random() - 0.5);
 
+const viewDetail = (imdb_id, sectionName) => {
+  selectedIMDBId.value = imdb_id;
+
+  // Google Analytics event
+  if (window.gtag) {
+    window.gtag('event', 'view_detail', {
+      event_category: 'View Detail',
+      event_label: sectionName,
+      value: imdb_id
+    });
+  } else {
+    console.warn("Google Analytics not initialized.");
+  }
+};
+
+
 defineOptions({ layout: BaseLayout });
 
 const pageTitle = 'Discover. Explore. Enjoy.';
 const pageDescription = 'Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Your gateway to a universe of entertainment awaits!';
 const pageUrl = window.location.href;
 const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
+
+
 </script>
 
 <template>
@@ -98,5 +126,97 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
     </div>
   </div>
   <OurFeatures/>
+
+  <div v-if="popularMovies && popularMovies.length" class="bg-white dark:bg-gray-900 py-8">
+    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">Popular Movies</h2>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Explore What's Popular Right Now</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SearchCard
+            v-for="movie in popularMovies"
+            :key="movie.imdb_id"
+            :movie="movie"
+            @selected="viewDetail(movie.imdb_id, 'Popular Movies')"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div v-if="trendingMovies && trendingMovies.length" class="bg-white dark:bg-gray-900 py-8">
+    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🔥 Trending Now</h2>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Discover what everyone is watching right now
+          and join the buzz.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SearchCard
+            v-for="movie in trendingMovies"
+            :key="movie.imdb_id"
+            :movie="movie"
+            @selected="viewDetail(movie.imdb_id, 'Trending Movies')"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div v-if="hiddenGemsMovies && hiddenGemsMovies.length" class="bg-white dark:bg-gray-900 py-8">
+    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">💎 Hidden Gems</h2>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Uncover underrated masterpieces waiting to be
+          explored.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SearchCard
+            v-for="movie in hiddenGemsMovies"
+            :key="movie.imdb_id"
+            :movie="movie"
+            @selected="viewDetail(movie.imdb_id, 'Hidden Gems')"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎉 Fresh Releases</h2>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Stay up-to-date with the latest movies hitting
+          the screens.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SearchCard
+            v-for="movie in recentlyReleasedMovies"
+            :key="movie.imdb_id"
+            :movie="movie"
+            @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div v-if="topRatedMovies && topRatedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">⭐ Top Rated of All Time</h2>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Watch the highest-rated films as voted by movie
+          enthusiasts.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SearchCard
+            v-for="movie in topRatedMovies"
+            :key="movie.imdb_id"
+            :movie="movie"
+            @selected="viewDetail(movie.imdb_id, 'Top Rated Movies')"
+        />
+      </div>
+    </div>
+  </div>
+
   <NewsletterForm/>
+
+  <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" @close="selectedIMDBId = null;"/>
 </template>

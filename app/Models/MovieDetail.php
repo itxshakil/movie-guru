@@ -70,7 +70,7 @@ class MovieDetail extends Model
 
     public function scopePopular(Builder $query)
     {
-        $query->where('imdb_votes', '>', 1_000_000);
+        $query->orderBy('views', 'desc');
     }
 
     public function showPageAnalytics(): HasMany

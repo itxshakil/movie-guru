@@ -72,6 +72,22 @@ class OMDBApiService
         // TODO: Different level of log to check response time
         Log::channel('omdb')->info("'OMDB API took $responseTime ms to respond $url");
 
+        if (isset($response['Response']) && $response['Response'] === 'True' && isset($response['Search']) && count(
+                $response['Search']
+            ) > 0) {
+            $result = array_map(function ($item) {
+                return [
+                    'title' => $item['Title'],
+                    'year' => $item['Year'],
+                    'type' => $item['Type'],
+                    'imdb_id' => $item['imdbID'],
+                    'poster' => $item['Poster'],
+                ];
+            }, $response['Search']);
+
+            $response['Search'] = $result;
+        }
+
         return $response;
     }
 

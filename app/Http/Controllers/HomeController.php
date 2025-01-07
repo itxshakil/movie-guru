@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SearchQuery;
-use App\Services\TitleCleaner;
+use App\Models\MovieDetail;
 use App\Services\TrendingQueryService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -15,7 +13,82 @@ class HomeController extends Controller
     {
         $trendingSearchQueries = $trendingQueryService->fetch();
 
-        return Inertia::render('Welcome', compact('trendingSearchQueries'));
+        $popularMovies = Cache::remember('popular-movies', now()->endOfDay(), function () {
+            return MovieDetail::popular()->take(4)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+            ]);
+        });
+
+        $trendingMovies = Cache::remember('trending-movies', now()->endOfDay(), function () {
+            return MovieDetail::trending()->take(4)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+            ]);
+        });
+
+        $hiddenGemsMovies = Cache::remember('hidden-gems-movies', now()->endOfDay(), function () {
+            return MovieDetail::hiddenGems()->take(4)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+            ]);
+        });
+
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
+            return MovieDetail::recentlyReleased()->take(4)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+            ]);
+        });
+
+        $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), function () {
+            return MovieDetail::topRated()->take(4)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+            ]);
+        });
+
+        return Inertia::render(
+            'Welcome',
+            compact(
+                'trendingSearchQueries',
+                'popularMovies',
+                'trendingMovies',
+                'hiddenGemsMovies',
+                'recentlyReleasedMovies',
+                'topRatedMovies'
+            )
+        );
     }
 
 }
