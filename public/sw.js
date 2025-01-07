@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-0.7.1';
-const SEARCH_CACHE = 'search-cache-v-0.7.1';
-const INFO_CACHE = 'info-cache-v-0.7.1';
-const DYNAMIC_CACHE = 'dynamic-cache-v-0.7.1';
-const POSTER_CACHE = 'poster-cache-v-0.7.1';
+const APP_CACHE = 'v-0.8.0';
+const SEARCH_CACHE = 'search-cache-v-0.8.0';
+const INFO_CACHE = 'info-cache-v-0.8.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-0.8.0';
+const POSTER_CACHE = 'poster-cache-v-0.8.0';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -22,39 +22,41 @@ const basicPathsToCache = [
     '/',
     '/?utmsource=homescreen',
     '/build/manifest.json',
-    '/build/assets/Search-XwdKt7ki.css',
-    '/build/assets/app-Za2D-uMs.css',
-    '/build/assets/LoadingSpinner-KTs4mTOI.js',
-    '/build/assets/ApplicationLogo-yzTyuj5s.js',
-    '/build/assets/InputError-lfdbTMis.js',
-    '/build/assets/InputLabel-O9sjzfWp.js',
-    '/build/assets/GuestLayout-FkOHIXow.js',
-    '/build/assets/Dashboard-rbBhH_gS.js',
-    '/build/assets/LoadingSpinnerButton-nBuo98p1.js',
-    '/build/assets/PrimaryButton-hmnJjFjD.js',
-    '/build/assets/TextInput-qI8MFL9j.js',
-    '/build/assets/Edit-r_5WTGjH.js',
-    '/build/assets/ConfirmPassword-whRa6Ocz.js',
-    '/build/assets/Show-k6jZPAN-.js',
-    '/build/assets/ForgotPassword-B9nj9OUW.js',
-    '/build/assets/VerifyEmail-uvZIOcPE.js',
-    '/build/assets/ResetPassword-ZhMVXmBF.js',
-    '/build/assets/Error-49wLHI1K.js',
-    '/build/assets/Register-9UjOOp3o.js',
-    '/build/assets/UpdatePasswordForm-zAqck_Fg.js',
-    '/build/assets/UpdateProfileInformationForm-bo-DrJZ4.js',
-    '/build/assets/Login-aOKS0al8.js',
-    '/build/assets/NewsletterForm-O9lCdapT.js',
-    '/build/assets/Terms-7_HlxsrL.js',
-    '/build/assets/PrivacyPolicy-d5eRQTsf.js',
-    '/build/assets/DeleteUserForm-EBA9O8xQ.js',
-    '/build/assets/Contact-9YoPMjNK.js',
-    '/build/assets/AuthenticatedLayout-5s6nQkvY.js',
-    '/build/assets/Welcome-gTEuuvYf.js',
-    '/build/assets/Search-kou748i2.js',
-    '/build/assets/DetailCard-rmHLPqge.js',
-    '/build/assets/BaseLayout-Sza-4NnZ.js',
-    '/build/assets/app-3AdIlejC.js',
+    '/build/assets/Search-DSwcpwDw.css',
+    '/build/assets/SearchCard-XTlQ7yWv.css',
+    '/build/assets/app-DT4hyhpE.css',
+    '/build/assets/LoadingSpinner-BNYQJ8OZ.js',
+    '/build/assets/ApplicationLogo-Dx3A1nlk.js',
+    '/build/assets/InputError-CS6nyyTC.js',
+    '/build/assets/InputLabel-HZuMtdB_.js',
+    '/build/assets/GuestLayout-wNdwCbw9.js',
+    '/build/assets/LoadingSpinnerButton-BglJgzbk.js',
+    '/build/assets/PrimaryButton-BFY3EZrV.js',
+    '/build/assets/Dashboard-Df3zf_Ae.js',
+    '/build/assets/TextInput-BYkCj03w.js',
+    '/build/assets/Edit-DBuNRGMc.js',
+    '/build/assets/ConfirmPassword-P2xvWxf_.js',
+    '/build/assets/ForgotPassword-CDWsRdMw.js',
+    '/build/assets/VerifyEmail-DhlGLX1n.js',
+    '/build/assets/Show-DJFBSCqM.js',
+    '/build/assets/ResetPassword-Bm6LOX55.js',
+    '/build/assets/Error-CdqLiCYN.js',
+    '/build/assets/Register-MxdlVyGL.js',
+    '/build/assets/UpdatePasswordForm-0o5t8ooO.js',
+    '/build/assets/UpdateProfileInformationForm-C4hOP0eB.js',
+    '/build/assets/Login-BgPSYPIe.js',
+    '/build/assets/NewsletterForm-DUnhOA9S.js',
+    '/build/assets/Terms-BZn_nFiO.js',
+    '/build/assets/PrivacyPolicy-CPjrL45M.js',
+    '/build/assets/DeleteUserForm-DvhlGgnl.js',
+    '/build/assets/SearchCard-B3MTNpoy.js',
+    '/build/assets/Contact-HvnLOnu6.js',
+    '/build/assets/AuthenticatedLayout-Ddb7EGJA.js',
+    '/build/assets/Search-uXou8dcb.js',
+    '/build/assets/Welcome-CrWCNek5.js',
+    '/build/assets/DetailCard-BKk4LiRy.js',
+    '/build/assets/BaseLayout-RxA_v8gj.js',
+    '/build/assets/app-B0J5mrvd.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -120,15 +122,15 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
         if (request.url.includes('/search') && navigator.onLine === false) {
             // send message to the client
             self.clients.matchAll()
-            .then((clients) => {
-                clients.forEach((client) => {
-                    client.postMessage({
-                        type: 'OFFLINE_SEARCH_DETECTED',
-                        status: 'offline',
-                        url: request.url,
+                .then((clients) => {
+                    clients.forEach((client) => {
+                        client.postMessage({
+                            type: 'OFFLINE_SEARCH_DETECTED',
+                            status: 'offline',
+                            url: request.url,
+                        });
                     });
                 });
-            });
         }
 
         logError('Error fetching and caching new data', error);
@@ -155,7 +157,7 @@ self.addEventListener('install', event => {
             })
     );
 
-    if(self.registration && self.registration.periodicSync){
+    if (self.registration && self.registration.periodicSync) {
         self.registration.periodicSync.register('weeklyTrendingNotification', {
             minInterval: 24 * 60 * 60 * 1000, // minimum interval (once a day)
             tag: 'weeklyTrendingNotification',
@@ -335,7 +337,7 @@ function handleNotificationClick(event) {
 
 self.addEventListener('sync', async (event) => {
     if (event.tag === 'offlineSync') {
-        broadcast.postMessage({ type: 'OFFLINE_SYNC_EVENT' });
+        broadcast.postMessage({type: 'OFFLINE_SYNC_EVENT'});
     }
 });
 
@@ -373,7 +375,7 @@ function offlineSyncRequest(offlineRequestUrl) {
         vibrate: [100, 50, 100],
     });
 
-    broadcast.postMessage({ type: 'OFFLINE_SYNC_FETCHED' });
+    broadcast.postMessage({type: 'OFFLINE_SYNC_FETCHED'});
     cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
 }
 
@@ -435,18 +437,19 @@ self.addEventListener('push', (event) => {
 });
 
 self.addEventListener('notificationclick', handleNotificationClick);
+
 function sendTrendingNotification() {
     const notificationTitle = "🔥 What's Trending This Weekend?";
     const notificationBody = "Don't miss out on the latest trends! 🍿 Tap to discover your next favorite binge-worthy experience.";
-    const notificationData = { url: '/trending' };
+    const notificationData = {url: '/'};
 
     self.registration.showNotification(notificationTitle, {
         body: notificationBody,
         icon: '/icons/ios/152.png',
         badge: '/icons/ios/152.png',
         actions: [
-            { action: 'close', title: 'Not Now' },
-            { action: 'open', title: 'Check It Out!' },
+            {action: 'close', title: 'Not Now'},
+            {action: 'open', title: 'Check It Out!'},
         ],
         data: notificationData,
         requireInteraction: true,
