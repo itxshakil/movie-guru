@@ -2,7 +2,7 @@
     <div class="flex min-h-full items-stretch justify-center text-center md:items-center">
         <div class="flex text-left text-base w-full">
             <div
-                class="relative rounded-lg flex w-full items-center overflow-hidden bg-white dark:bg-gray-900 dark:text-white px-4 pb-6 pt-6 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
+                class="relative rounded-lg flex w-full items-center overflow-hidden bg-white dark:bg-gray-900 dark:text-white px-2 pb-6 pt-6 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="grid w-full grid-cols-1 items-start gap-x-3 gap-y-4 sm:grid-cols-12 lg:gap-x-8">
                     <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5">

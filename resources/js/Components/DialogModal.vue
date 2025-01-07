@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import TimesIcon from '@/Components/Icons/Times.vue';
 
 defineProps({
@@ -17,7 +17,7 @@ onMounted(() => {
 
 <template>
     <dialog ref="dialog" :class="maxWidth" scroll-region
-        class="inset-0 w-full overflow-x-hidden bg-transparent p-4 modal-dialog sm:p-0 transform transition-500 transition-opacity"
+            class="inset-0 w-full overflow-x-hidden bg-transparent p-2 md:p-4 modal-dialog sm:p-0 transform transition-500 transition-opacity"
         modal-menu="mega">
         <div class="relative rounded-lg bg-white shadow dark:bg-gray-700">
             <button
