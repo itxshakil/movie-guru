@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MovieDetail;
 use App\Models\SearchQuery;
 use App\Models\ShowPageAnalytics;
 use App\OMDB\MovieType;
@@ -35,7 +36,8 @@ class SearchController extends Controller
 
         $searchQuery->update([
             'response_at' => now(),
-            'response' => $movies['Response'] === 'True'
+            'response' => $movies['Response'] === 'True',
+            'response_result' => $movies
         ]);
 
         $movieTypes = MovieType::cases();
@@ -94,6 +96,19 @@ class SearchController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' =>  $request->userAgent()
         ]);
+
+        MovieDetail::updateOrCreate([
+            'imdb_id' => $imdbId,
+        ], [
+            'title' => $detail['Title'],
+            'year' => $detail['Year'],
+            'release_date' => $detail['Released'],
+            'poster' => $detail['Poster'],
+            'type' => $detail['Type'],
+            'imdb_rating' => $detail['imdbRating'],
+            'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
+            'details' => $detail
+        ])->incrementViews();
 
         if($request->wantsJson()){
             return response()->json(['detail' => $detail]);

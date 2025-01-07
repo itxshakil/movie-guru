@@ -17,11 +17,13 @@ class SearchQuery extends Model
         'ip_address',
         'user_agent',
         'response_at',
-        'response'
+        'response',
+        'response_result',
     ];
 
     protected $casts = [
         'response_at' => 'datetime',
-        'response' => 'boolean'
+        'response' => 'boolean',
+        'response_result' => 'json',
     ];
 }
