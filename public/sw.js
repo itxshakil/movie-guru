@@ -156,14 +156,6 @@ self.addEventListener('install', event => {
                 throw error;
             })
     );
-
-    if (self.registration && self.registration.periodicSync) {
-        self.registration.periodicSync.register('weeklyTrendingNotification', {
-            minInterval: 24 * 60 * 60 * 1000, // minimum interval (once a day)
-            tag: 'weeklyTrendingNotification',
-        });
-    }
-
 });
 
 self.addEventListener('periodicsync', async (event) => {
