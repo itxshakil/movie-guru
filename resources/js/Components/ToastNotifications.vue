@@ -1,7 +1,7 @@
 <script setup>
-import { usePage } from '@inertiajs/vue3';
-import { router } from '@inertiajs/core';
-import { ref } from 'vue';
+import {usePage} from '@inertiajs/vue3';
+import {router} from '@inertiajs/core';
+import {ref} from 'vue';
 import ToastNotificationItem from '@/Components/ToastNotificationItem.vue';
 
 const notifications = ref([]);
@@ -43,7 +43,7 @@ const remove = (index) => {
 
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 broadcastChannel.onmessage = (event) => {
-    addNotification(event.data.data.message, event.data.data.level);
+  addNotification(event.data.message, event.data.level);
 };
 
 </script>
