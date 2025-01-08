@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import {computed, onMounted} from 'vue';
 import WarningTriangle from '@/Components/Icons/WarningTriangle.vue';
 import TimesCircle from '@/Components/Icons/TimesCircle.vue';
 import TickCircle from '@/Components/Icons/TickCircle.vue';
@@ -17,7 +17,7 @@ const props = defineProps({
     },
     duration: {
         type: Number,
-        default: () => 3000
+      default: () => 10_000
     },
     dimissable: {
         type: Boolean,
