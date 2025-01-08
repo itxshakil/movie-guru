@@ -21,18 +21,22 @@ class SearchController extends Controller
         $movieType = $request->get('type');
         $year = $request->get('year');
 
-        $defaultSearches = ['sholay', 'batman', 'spiderman','game of thrones', 'don', '3 idiots'];
+        $defaultSearches = ['sholay', 'batman', 'spiderman', 'game of thrones', 'don', '3 idiots'];
 
-        if(empty($search)){
+        if (empty($search)) {
             $search = $defaultSearches[array_rand($defaultSearches)];
         }
 
         $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
 
-        $cacheKey = 'search-' . $search . '-' . $page . '-' . $movieType . '-' . $year;
-        $movies = Cache::remember($cacheKey, now()->addHours(4), function () use ($OMDBApiService, $search, $page, $movieType, $year) {
-            return $OMDBApiService->searchByTitle($search, $page, $movieType, $year);
-        });
+        $cacheKey = 'search-'.$search.'-'.$page.'-'.$movieType.'-'.$year;
+        $movies = Cache::remember(
+            $cacheKey,
+            now()->addHours(4),
+            function () use ($OMDBApiService, $search, $page, $movieType, $year) {
+                return $OMDBApiService->searchByTitle($search, $page, $movieType, $year);
+            }
+        );
 
         $searchQuery->update([
             'response_at' => now(),
@@ -43,11 +47,11 @@ class SearchController extends Controller
         $movieTypes = MovieType::cases();
 
         $nextUrl = null;
-        if($movies['Response'] === 'True'){
+        if ($movies['Response'] === 'True') {
             $totalResults = $movies['totalResults'];
             $currentPage = $page;
 
-            if($totalResults > ($currentPage * 10)){
+            if ($totalResults > ($currentPage * 10)) {
                 $nextPage = $currentPage + 1;
                 $nextUrl = route('search', [
                     's' => $search,
@@ -60,7 +64,7 @@ class SearchController extends Controller
 
         $trendingQueries = $trendingQueryService->fetch();
 
-        if($request->wantsJson()){
+        if ($request->wantsJson()) {
             return response()->json([
                 'searchResults' => $movies,
                 'search' => $search,
@@ -83,18 +87,22 @@ class SearchController extends Controller
             'nextUrl' => $nextUrl,
             'trendingQueries' => $trendingQueries
         ]);
-
     }
 
-    public function show(Request $request, string $imdbId, OMDBApiService $OMDBApiService){
-        $detail = Cache::remember('detail.' . $imdbId, now()->addMinutes(120), function () use ($OMDBApiService, $imdbId) {
-            return $OMDBApiService->getById($imdbId);
-        });
+    public function show(Request $request, string $imdbId, OMDBApiService $OMDBApiService)
+    {
+        $detail = Cache::remember(
+            'detail.'.$imdbId,
+            now()->addMinutes(120),
+            function () use ($OMDBApiService, $imdbId) {
+                return $OMDBApiService->getById($imdbId);
+            }
+        );
 
         ShowPageAnalytics::create([
             'imdb_id' => $imdbId,
             'ip_address' => $request->ip(),
-            'user_agent' =>  $request->userAgent()
+            'user_agent' => $request->userAgent()
         ]);
 
         MovieDetail::updateOrCreate([
@@ -110,7 +118,7 @@ class SearchController extends Controller
             'details' => $detail
         ])->incrementViews();
 
-        if($request->wantsJson()){
+        if ($request->wantsJson()) {
             return response()->json(['detail' => $detail]);
         }
 
@@ -120,16 +128,21 @@ class SearchController extends Controller
     }
 
     /**
-     * @param string|null $search
-     * @param int|null $page
-     * @param string|null $movieType
-     * @param int|null $year
-     * @param Request $request
+     * @param  string|null  $search
+     * @param  int|null  $page
+     * @param  string|null  $movieType
+     * @param  int|null  $year
+     * @param  Request  $request
      *
      * @return SearchQuery
      */
-    public function logSearchQuery(?string $search, ?int $page, ?string $movieType, ?int $year, Request $request): SearchQuery
-    {
+    public function logSearchQuery(
+        ?string $search,
+        ?int $page,
+        ?string $movieType,
+        ?int $year,
+        Request $request
+    ): SearchQuery {
         return SearchQuery::create([
             'query' => $search ?? 'empty',
             'page' => $page,
