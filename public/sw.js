@@ -336,7 +336,7 @@ broadcast.onmessage = (event) => {
     }
 };
 
-function offlineSyncRequest(offlineRequestUrl) {
+async function offlineSyncRequest(offlineRequestUrl) {
     if (!offlineRequestUrl) {
         return;
     }
@@ -363,8 +363,13 @@ function offlineSyncRequest(offlineRequestUrl) {
         vibrate: [100, 50, 100],
     });
 
-    broadcast.postMessage({type: 'OFFLINE_SYNC_FETCHED'});
-    cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
+    broadcast.postMessage({
+        type: 'OFFLINE_SYNC_FETCHED',
+        message: 'Your requested content is ready and waiting for you. Check notification to view and explore the results.🚀👀',
+        level: 'success',
+    });
+
+    await cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
 }
 
 function rollOpeningCredits() {
