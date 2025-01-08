@@ -290,18 +290,23 @@
         const broadcast = new BroadcastChannel('service-worker-channel');
         broadcast.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'OFFLINE_SYNC_EVENT') {
-                const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
 
-                if (offlineRequestUrl) {
-                    broadcast.postMessage({
-                        type: 'OFFLINE_SYNC_REQUEST'
-                        , url: offlineRequestUrl
-                    });
-                }
             }else if( event.data && event.data.type === 'OFFLINE_SYNC_FETCHED' ){
                 localStorage.removeItem('offlineRequestUrl');
             }
         });
+
+        const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
+
+        if (offlineRequestUrl) {
+            console.log('offlineRequestUrl', offlineRequestUrl);
+            broadcast.postMessage({
+                type: 'OFFLINE_SYNC_REQUEST'
+                , url: offlineRequestUrl
+            });
+        } else {
+            console.log('offlineRequestUrl not found');
+        }
     </script>
 </body>
 </html>
