@@ -161,6 +161,11 @@
                                             minInterval: 24 * 60 * 60 * 1000, // minimum interval (once a day)
                                             tag: 'weeklyTrendingNotification',
                                         });
+
+                                        registration.periodicSync.register('notificationSync', {
+                                            minInterval: 2 * 24 * 60 * 60 * 1000, // minimum interval (once every two day)
+                                            tag: 'notificationSync',
+                                        });
                                     }
 
                                     // check if there is sync manager

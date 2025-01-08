@@ -191,6 +191,8 @@ self.addEventListener('periodicsync', async (event) => {
                 }
             }
         }
+    } else if (event.tag === 'notificationSync') {
+        rollOpeningCredits();
     }
 });
 
