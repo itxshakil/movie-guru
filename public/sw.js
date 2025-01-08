@@ -176,19 +176,15 @@ self.addEventListener('periodicsync', async (event) => {
                     } else {
                         broadcastChannel.postMessage({
                             type: 'NOTIFICATION_PERMISSION_DENIED',
-                            data: {
-                                message: 'You need to allow push notifications.',
-                                level: 'danger',
-                            },
+                            message: 'You need to allow push notifications.',
+                            level: 'danger',
                         });
                     }
                 } catch (error) {
                     broadcastChannel.postMessage({
                         type: 'NOTIFICATION_PERMISSION_DENIED',
-                        data: {
-                            message: 'Error while requesting and/or showing notification.',
-                            level: 'danger',
-                        },
+                        message: 'Error while requesting and/or showing notification.',
+                        level: 'danger',
                     });
 
                     log("Error while requesting and/or showing notification.", e);
