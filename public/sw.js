@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-0.8.1';
-const SEARCH_CACHE = 'search-cache-v-0.8.1';
-const INFO_CACHE = 'info-cache-v-0.8.1';
-const DYNAMIC_CACHE = 'dynamic-cache-v-0.8.1';
-const POSTER_CACHE = 'poster-cache-v-0.8.1';
+const APP_CACHE = 'v-0.8.2';
+const SEARCH_CACHE = 'search-cache-v-0.8.2';
+const INFO_CACHE = 'info-cache-v-0.8.2';
+const DYNAMIC_CACHE = 'dynamic-cache-v-0.8.2';
+const POSTER_CACHE = 'poster-cache-v-0.8.2';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -21,42 +21,42 @@ const STATIC_ASSETS = [
 const basicPathsToCache = [
     '/',
     '/?utmsource=homescreen',
-    'build/manifest.json',
-    'build/assets/Search-DSwcpwDw.css',
-    'build/assets/SearchCard-XTlQ7yWv.css',
-    'build/assets/app-DT4hyhpE.css',
-    'build/assets/LoadingSpinner-B7VDOYbT.js',
-    'build/assets/ApplicationLogo-Cd5mRNxv.js',
-    'build/assets/InputError-B-MW7z1e.js',
-    'build/assets/InputLabel-Bo1WwX9U.js',
-    'build/assets/GuestLayout-clrxiytF.js',
-    'build/assets/LoadingSpinnerButton-ByZe5WSz.js',
-    'build/assets/PrimaryButton-BySWGk05.js',
-    'build/assets/Dashboard-Bg6Ziseo.js',
-    'build/assets/TextInput-CKk6HCER.js',
-    'build/assets/Edit-BmwNJoVm.js',
-    'build/assets/ConfirmPassword-nMtrsJo5.js',
-    'build/assets/ForgotPassword-DUCUutjB.js',
-    'build/assets/VerifyEmail-BJME4YWC.js',
-    'build/assets/Show-Lze5B5jr.js',
-    'build/assets/ResetPassword-DQDKb8th.js',
-    'build/assets/Error-BCVeqYNB.js',
-    'build/assets/Register-DyxElNIf.js',
-    'build/assets/UpdatePasswordForm-DH6LBFqJ.js',
-    'build/assets/UpdateProfileInformationForm-B-NMPMhU.js',
-    'build/assets/Login-BQSajFO4.js',
-    'build/assets/NewsletterForm-CJEvTu2D.js',
-    'build/assets/Terms-CEVM85xo.js',
-    'build/assets/PrivacyPolicy-Cgxm6VC1.js',
-    'build/assets/DeleteUserForm-D8myPq9i.js',
-    'build/assets/SearchCard-D-dTx76w.js',
-    'build/assets/Contact-DHdoHQaW.js',
-    'build/assets/AuthenticatedLayout-CXuiGs4i.js',
-    'build/assets/Search-DLf_Zi-5.js',
-    'build/assets/Welcome-CnANa5EG.js',
-    'build/assets/DetailCard-B4WzS3cv.js',
-    'build/assets/BaseLayout-DD5Zz7Fj.js',
-    'build/assets/app-BYIunPQJ.j',
+    '/build/manifest.json',
+    '/build/assets/Search-DSwcpwDw.css',
+    '/build/assets/SearchCard-XTlQ7yWv.css',
+    '/build/assets/app-BD8FcARt.css',
+    '/build/assets/LoadingSpinner-CwQ5YHse.js',
+    '/build/assets/ApplicationLogo-c2gyKtBZ.js',
+    '/build/assets/InputError-DW_1TLkb.js',
+    '/build/assets/InputLabel-BF_Yo0r9.js',
+    '/build/assets/GuestLayout-0uT3qZuJ.js',
+    '/build/assets/LoadingSpinnerButton-Sa1RdY0G.js',
+    '/build/assets/PrimaryButton-Bw34MSVL.js',
+    '/build/assets/Dashboard-BXbQzoe9.js',
+    '/build/assets/TextInput-DEBM_uqq.js',
+    '/build/assets/Edit-CXxdSvfv.js',
+    '/build/assets/ConfirmPassword-B8IVoPwZ.js',
+    '/build/assets/ForgotPassword-BPRreGn7.js',
+    '/build/assets/VerifyEmail-oqgbD-JE.js',
+    '/build/assets/Show-BJeRykXm.js',
+    '/build/assets/ResetPassword-Do2V0VXB.js',
+    '/build/assets/Error-Dj2kscMM.js',
+    '/build/assets/Register-DL3b4aZE.js',
+    '/build/assets/UpdatePasswordForm-BbMvEuto.js',
+    '/build/assets/UpdateProfileInformationForm-DOOx_G0z.js',
+    '/build/assets/Login-BwSlXBLr.js',
+    '/build/assets/NewsletterForm-Cxj4U2x3.js',
+    '/build/assets/Terms-BZpWt6ae.js',
+    '/build/assets/PrivacyPolicy-iInS6_kQ.js',
+    '/build/assets/DeleteUserForm-CKv7H4Rf.js',
+    '/build/assets/SearchCard-kapo46kg.js',
+    '/build/assets/Contact-CoAm6f_f.js',
+    '/build/assets/AuthenticatedLayout-4iZwswr7.js',
+    '/build/assets/Search-8D6qJYw0.js',
+    '/build/assets/Welcome-twFh38I5.js',
+    '/build/assets/DetailCard-B6eaMyLn.js',
+    '/build/assets/BaseLayout-Bj1apBss.js',
+    '/build/assets/app-C_O_QEh2.js',
     '/assets/images/no-poster.jpg',
 ];
 
