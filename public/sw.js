@@ -355,8 +355,8 @@ async function offlineSyncRequest(offlineRequestUrl) {
         // Perform actions to notify the user about the stored offline request
         self.registration.showNotification('Content is Ready!', {
             body: 'Your requested content is ready and waiting for you. Click to view and explore the results.🚀👀',
-            badge: '/icons/ios/152.png',
-            icon: '/icons/ios/152.png',
+            badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
+            icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
             actions: [
                 {
                     action: 'close',
