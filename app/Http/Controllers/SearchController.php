@@ -41,7 +41,7 @@ class SearchController extends Controller
         $searchQuery->update([
             'response_at' => now(),
             'response' => $movies['Response'] === 'True',
-            'response_result' => $movies
+            'response_result' => $movies,
         ]);
 
         $movieTypes = MovieType::cases();
@@ -73,7 +73,7 @@ class SearchController extends Controller
                 'year' => $year,
                 'movieTypes' => $movieTypes,
                 'nextUrl' => $nextUrl,
-                'trendingQueries' => $trendingQueries
+                'trendingQueries' => $trendingQueries,
             ]);
         }
 
@@ -85,57 +85,10 @@ class SearchController extends Controller
             'year' => $year,
             'movieTypes' => $movieTypes,
             'nextUrl' => $nextUrl,
-            'trendingQueries' => $trendingQueries
+            'trendingQueries' => $trendingQueries,
         ]);
     }
 
-    public function show(Request $request, string $imdbId, OMDBApiService $OMDBApiService)
-    {
-        $detail = Cache::remember(
-            'detail.'.$imdbId,
-            now()->addMinutes(120),
-            function () use ($OMDBApiService, $imdbId) {
-                return $OMDBApiService->getById($imdbId);
-            }
-        );
-
-        ShowPageAnalytics::create([
-            'imdb_id' => $imdbId,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent()
-        ]);
-
-        MovieDetail::updateOrCreate([
-            'imdb_id' => $imdbId,
-        ], [
-            'title' => $detail['Title'],
-            'year' => $detail['Year'],
-            'release_date' => $detail['Released'],
-            'poster' => $detail['Poster'],
-            'type' => $detail['Type'],
-            'imdb_rating' => $detail['imdbRating'],
-            'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
-            'details' => $detail
-        ])->incrementViews();
-
-        if ($request->wantsJson()) {
-            return response()->json(['detail' => $detail]);
-        }
-
-        return Inertia::render('Show', [
-            'detail' => $detail
-        ]);
-    }
-
-    /**
-     * @param  string|null  $search
-     * @param  int|null  $page
-     * @param  string|null  $movieType
-     * @param  int|null  $year
-     * @param  Request  $request
-     *
-     * @return SearchQuery
-     */
     public function logSearchQuery(
         ?string $search,
         ?int $page,
@@ -151,5 +104,76 @@ class SearchController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+    }
+
+    public function show(Request $request, string $imdbId, OMDBApiService $OMDBApiService)
+    {
+        $cacheKey = 'detail.'.$imdbId;
+        $detail = Cache::remember($cacheKey, now()->addHours(6), function () use ($imdbId, $OMDBApiService) {
+            // Check for the movie in the database
+            $movie = MovieDetail::where('imdb_id', $imdbId)->first();
+
+            if ($movie) {
+                $movie->incrementViews();
+                $this->updateMovieDetailsInBackground($imdbId);
+
+                return $movie->details;
+            }
+
+            // If not found in the database, fetch from the API
+            $detail = $OMDBApiService->getById($imdbId);
+
+            // Save the details to the database
+            MovieDetail::updateOrCreate([
+                'imdb_id' => $imdbId,
+            ], [
+                'title' => $detail['Title'],
+                'year' => $detail['Year'],
+                'release_date' => $detail['Released'],
+                'poster' => $detail['Poster'],
+                'type' => $detail['Type'],
+                'imdb_rating' => $detail['imdbRating'],
+                'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
+                'details' => $detail,
+            ])->incrementViews();
+
+            return $detail; // Return fetched details
+        });
+
+        // Log the analytics
+        ShowPageAnalytics::create([
+            'imdb_id' => $imdbId,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['detail' => $detail]);
+        }
+
+        return Inertia::render('Show', [
+            'detail' => $detail,
+        ]);
+    }
+
+    private function updateMovieDetailsInBackground(string $imdbId): void
+    {
+        defer(function () use ($imdbId) {
+            $OMDBApiService = app(OMDBApiService::class);
+            $updatedDetail = $OMDBApiService->getById($imdbId);
+
+            MovieDetail::updateOrCreate([
+                'imdb_id' => $imdbId,
+            ], [
+                'title' => $updatedDetail['Title'],
+                'year' => $updatedDetail['Year'],
+                'release_date' => $updatedDetail['Released'],
+                'poster' => $updatedDetail['Poster'],
+                'type' => $updatedDetail['Type'],
+                'imdb_rating' => $updatedDetail['imdbRating'],
+                'imdb_votes' => str_replace(',', '', $updatedDetail['imdbVotes']),
+                'details' => $updatedDetail,
+            ]);
+        });
     }
 }
