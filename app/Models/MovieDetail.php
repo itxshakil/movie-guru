@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\MovieDetailFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 
 class MovieDetail extends Model
@@ -24,7 +25,7 @@ class MovieDetail extends Model
         'imdb_rating',
         'imdb_votes',
         'details',
-        'views'
+        'views',
     ];
 
     public function incrementViews(): void
@@ -38,7 +39,7 @@ class MovieDetail extends Model
         }
     }
 
-    public function scopeTopRated(Builder $query)
+    public function scopeTopRated(Builder $query): void
     {
         $query->where(function ($query) {
             $query->where('imdb_rating', '>', 8)
@@ -49,17 +50,12 @@ class MovieDetail extends Model
         });
     }
 
-    public function scopeRecentlyReleased(Builder $query)
-    {
-        $query->where('release_date', '<', now()->subDays(30));
-    }
-
-    public function scopeTrending(Builder $query)
+    public function scopeTrending(Builder $query): void
     {
         $query->topRated()->recentlyReleased();
     }
 
-    public function scopeHiddenGems(Builder $query)
+    public function scopeHiddenGems(Builder $query): void
     {
         $query->where(function ($query) {
             $query->where('imdb_rating', '>', 8.5)
@@ -68,20 +64,15 @@ class MovieDetail extends Model
         });
     }
 
-    public function scopePopular(Builder $query)
+    public function scopePopular(Builder $query): void
     {
         $query->orderBy('views', 'desc');
-    }
-
-    public function showPageAnalytics(): HasMany
-    {
-        return $this->hasMany(ShowPageAnalytics::class, 'imdb_id', 'imdb_id');
     }
 
     protected function casts(): array
     {
         return [
-            'details' => 'json'
+            'details' => 'json',
         ];
     }
 }

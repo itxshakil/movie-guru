@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
@@ -17,11 +21,11 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index']);
 Route::inertia('/terms', 'Terms');
 Route::inertia('/privacy', 'PrivacyPolicy');
 Route::inertia('/contact', 'Contact');
-Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search')->middleware('throttle:search');
 Route::get('/i/{imdbID}', [SearchController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
