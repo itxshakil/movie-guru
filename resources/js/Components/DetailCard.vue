@@ -88,8 +88,12 @@
                                     </svg>
 
                                     <!--                                TODO: Redirect link to imdbID to rating page -->
-                                    <a class="ml-3 text-sm font-medium text-primary-600 hover:text-primary-500" href="#">
-                                        <span itemprop="ratingCount">{{ isValue(detail.imdbVotes) ?detail.imdbVotes : 'No '  }}</span> reviews</a>
+                                  <a class="ml-3 text-sm font-medium text-primary-200 hover:text-primary-100" href="#">
+                                    <span class="sr-only" itemprop="ratingCount">{{
+                                        isValue(detail.imdbVotes) ? detail.imdbVotes.replaceAll(',', '').trim() : 0
+                                      }}</span>
+                                    <span>{{ isValue(detail.imdbVotes) ? detail.imdbVotes : 'No ' }}</span> reviews
+                                  </a>
 
                                 </div>
                                 <small class="ml-1"><strong itemprop="ratingValue">{{ basicRating }}</strong> out of <strong itemprop="bestRating">5</strong> stars</small>
@@ -191,7 +195,7 @@
                                                         <span class="flex-shrink-0 text-gray-900 dark:text-gray-200"
                                                               v-text="rating.Source"></span>
                                                         <span
-                                                            class="font-medium text-primary-600 hover:text-primary-500"
+                                                            class="font-medium  text-primary-200 hover:text-primary-100"
                                                             v-text="rating.Value"></span>
                                                     </li>
                                                 </ul>
