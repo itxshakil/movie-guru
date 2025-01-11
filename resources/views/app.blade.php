@@ -153,10 +153,6 @@
                                     }
 
                                     if ("periodicSync" in registration) {
-                                        registration.periodicSync.register('notificationSync', {
-                                            minInterval: 5 * 60 * 60 * 1000, // 5 hours
-                                        });
-
                                         registration.periodicSync.register('weeklyTrendingNotification', {
                                             minInterval: 24 * 60 * 60 * 1000, // minimum interval (once a day)
                                             tag: 'weeklyTrendingNotification',
@@ -295,7 +291,13 @@
         const broadcast = new BroadcastChannel('service-worker-channel');
         broadcast.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'OFFLINE_SYNC_EVENT') {
-
+                const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
+                if (offlineRequestUrl) {
+                    broadcast.postMessage({
+                        type: 'OFFLINE_SYNC_REQUEST'
+                        , url: offlineRequestUrl
+                    });
+                }
             }else if( event.data && event.data.type === 'OFFLINE_SYNC_FETCHED' ){
                 localStorage.removeItem('offlineRequestUrl');
             }
@@ -303,7 +305,7 @@
 
         const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
 
-        if (offlineRequestUrl) {
+        if (offlineRequestUrl && navigator.onLine) {
             console.log('offlineRequestUrl', offlineRequestUrl);
             broadcast.postMessage({
                 type: 'OFFLINE_SYNC_REQUEST'

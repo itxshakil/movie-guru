@@ -343,35 +343,40 @@ async function offlineSyncRequest(offlineRequestUrl) {
         return;
     }
 
-    // Perform actions to notify the user about the stored offline request
-    self.registration.showNotification('Content is Ready!', {
-        body: 'Your requested content is ready and waiting for you. Click to view and explore the results.🚀👀',
-        badge: '/icons/ios/152.png',
-        icon: '/icons/ios/152.png',
-        actions: [
-            {
-                action: 'close',
-                title: 'Not Now',
-            },
-            {
-                action: 'open',
-                title: 'Check Now',
-            },
-        ],
-        data: {
-            url: offlineRequestUrl,
-        },
-        requireInteraction: true,
-        vibrate: [100, 50, 100],
-    });
+    try {
+        await cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
 
-    broadcast.postMessage({
-        type: 'OFFLINE_SYNC_FETCHED',
-        message: 'Your requested content is ready and waiting for you. Check notification to view and explore the results.🚀👀',
-        level: 'success',
-    });
+        broadcast.postMessage({
+            type: 'OFFLINE_SYNC_FETCHED',
+            message: 'Your requested content is ready and waiting for you. Check notification to view and explore the results.🚀👀',
+            level: 'success',
+        });
 
-    await cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
+        // Perform actions to notify the user about the stored offline request
+        self.registration.showNotification('Content is Ready!', {
+            body: 'Your requested content is ready and waiting for you. Click to view and explore the results.🚀👀',
+            badge: '/icons/ios/152.png',
+            icon: '/icons/ios/152.png',
+            actions: [
+                {
+                    action: 'close',
+                    title: 'Not Now',
+                },
+                {
+                    action: 'open',
+                    title: 'Check Now',
+                },
+            ],
+            data: {
+                url: offlineRequestUrl,
+            },
+            requireInteraction: true,
+            vibrate: [100, 50, 100],
+        });
+    } catch (error) {
+        logError('Error occurred while fetching offline request', error);
+    }
+
 }
 
 function rollOpeningCredits() {
