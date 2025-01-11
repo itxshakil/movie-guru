@@ -1,41 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
 use App\Models\SearchQuery;
 use App\Models\ShowPageAnalytics;
+use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 
 class SitemapGenerator extends Command
 {
-    protected $signature = 'sitemap:generate {--limit=50}';
+    protected $signature = 'sitemap:generate {--limit=100}';
 
     protected $description = 'Generate the sitemap.';
 
-    public function handle()
+    public function handle(): void
     {
         $sitemap = Sitemap::create();
 
         // Add static pages
         $sitemap->add(Url::create('/'))
-                ->add(Url::create('/privacy'))
-                ->add(Url::create('/terms'))
-                ->add(Url::create('/contact'));
+            ->add(Url::create('/privacy'))
+            ->add(Url::create('/terms'))
+            ->add(Url::create('/contact'));
 
         // Add top queries
         $limit = $this->option('limit');
-        $topQueries = $this->getTopSearches($limit);
+        $topQueries = $this->getTopSearches((int)$limit);
         foreach ($topQueries as $searchQuery) {
-            $sitemap->add(Url::create("/search?s={$searchQuery->query}"));
+            $sitemap->add(Url::create("/search?s=$searchQuery->query"));
         }
 
         // Add top movies
-        $topMovies = $this->getTopMovies($limit);
+        $topMovies = $this->getTopMovies((int)$limit);
         foreach ($topMovies as $topMovie) {
-            $sitemap->add(Url::create("/i/{$topMovie->imdb_id}"));
+            $sitemap->add(Url::create("/i/$topMovie->imdb_id"));
         }
 
         $sitemap->writeToFile(public_path('sitemap.xml'));
@@ -43,7 +46,7 @@ class SitemapGenerator extends Command
         $this->info('Sitemap has been generated!');
     }
 
-    private function getTopSearches(int $limit)
+    private function getTopSearches(int $limit): Collection
     {
         return SearchQuery::select('query', DB::raw('count(query) as total'))
             ->groupBy('query')
@@ -52,7 +55,7 @@ class SitemapGenerator extends Command
             ->get();
     }
 
-    private function getTopMovies(int $limit)
+    private function getTopMovies(int $limit): Collection
     {
         return ShowPageAnalytics::select('imdb_id', DB::raw('count(imdb_id) as total'))
             ->groupBy('imdb_id')
