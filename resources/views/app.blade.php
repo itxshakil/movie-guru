@@ -126,133 +126,89 @@
     <script type="text/javascript">
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        let serviceWorker;
-                        if (registration.installing) {
-                            console.log('Service Worker installing');
-                            serviceWorker = registration.installing;
-                        } else if (registration.waiting) {
-                            console.log('Service Worker installed');
-                            serviceWorker = registration.waiting;
-                        } else if (registration.active) {
-                            console.log('Service Worker active');
-                            serviceWorker = registration.active;
-                        }
-
-                        if (serviceWorker) {
-                            console.log('Service Worker state:', serviceWorker.state);
-                            serviceWorker.addEventListener('statechange', (e) => {
-                                console.log('Service Worker state:', e.target.state);
-
-                                if (e.target.state === 'activated') {
-                                    console.log('Service Worker activated');
-
-                                    if ("sync" in registration) {
-                                        registration.sync.register('offlineSync');
-                                    }
-
-                                    if ("periodicSync" in registration) {
-                                        registration.periodicSync.register('weeklyTrendingNotification', {
-                                            minInterval: 24 * 60 * 60 * 1000, // minimum interval (once a day)
-                                            tag: 'weeklyTrendingNotification',
-                                        });
-
-                                        registration.periodicSync.register('notificationSync', {
-                                            minInterval: 2 * 24 * 60 * 60 * 1000, // minimum interval (once every two day)
-                                            tag: 'notificationSync',
-                                        });
-                                    }
-
-                                    // check if there is sync manager
-                                    if ('SyncManager' in window) {
-                                        navigator.serviceWorker.ready
-                                            .then(registration => {
-                                                return registration.sync.register('offlineSync');
-                                            })
-                                            .catch(error => {
-                                                console.log('Sync registration failed:', error);
-                                            });
-                                    }
-                                }
-                            });
-
-                            serviceWorker.addEventListener('updatefound', () => {
-                                console.log('Service Worker update found');
-                                serviceWorker = registration.installing;
-                                serviceWorker.addEventListener('statechange', (e) => {
-                                    console.log('Service Worker state:', e.target.state);
-                                });
-                            });
-
-                            // Listen for the "controllerchange" event, which indicates that the service worker has become the active worker
-                            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                                // console.log('Service Worker controllerchange');
-                            });
-
-                            // Listen for the "message" event, which indicates that the service worker has sent a message to the client
-                            navigator.serviceWorker.addEventListener('message', (event) => {
-                                // console.log('Received a message from the service worker:', event.data);
-                            });
-
-                            // Listen for the "error" event, which indicates that the service worker has encountered an error
-                            navigator.serviceWorker.addEventListener('error', (event) => {
-                                // console.log('Service Worker error:', event.error);
-                            });
-
-                            // Listen for the "offline" event, which indicates that the user has lost their internet connection
-                            window.addEventListener('offline', () => {
-                                // console.log('You are offline');
-                            });
-
-                            // Listen for the "online" event, which indicates that the user has regained their internet connection
-                            window.addEventListener('online', () => {
-                                // console.log('You are online');
-                            });
-
-                            // Listen for the "beforeinstallprompt" event, which indicates that the user can be prompted to install the PWA
-                            window.addEventListener('beforeinstallprompt', (e) => {
-                                // console.log('beforeinstallprompt event:', e);
-                            });
-
-                            // Listen for the "appinstalled" event, which indicates that the PWA has been installed
-                            window.addEventListener('appinstalled', (e) => {
-                                // console.log('appinstalled event:', e);
-                            });
-
-                            // Listen for the "fetch" event, which indicates that the browser has made a network request
-                            window.addEventListener('fetch', (e) => {
-                                // console.log('fetch event:', e);
-                            });
-
-                            // Listen for the "message" event, which indicates that the browser has received a message from the service worker
-                            window.addEventListener('message', (e) => {
-                                // console.log('message event:', e);
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.log('Service Worker registration failed:', error);
-                    });
+                registerServiceWorker();
             });
         }
 
-        // Save the installation prompt
-        let deferredPrompt;
+        // Modular function for registering the Service Worker
+        async function registerServiceWorker() {
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                handleServiceWorkerState(registration);
+            } catch (error) {
+                console.error('Service Worker registration failed:', error);
+            }
+        }
 
-        // Listen for the beforeinstallprompt event
+        function handleServiceWorkerState(registration) {
+            let serviceWorker = registration.installing || registration.waiting || registration.active;
+
+            if (serviceWorker) {
+                console.log('Service Worker state:', serviceWorker.state);
+                serviceWorker.addEventListener('statechange', (e) => {
+                    console.log('Service Worker state:', e.target.state);
+
+                    if (e.target.state === 'activated') {
+                        console.log('Service Worker activated');
+                        setupSyncAndPeriodicSync(registration);
+                    }
+                });
+            }
+
+            // Listen for updates to the Service Worker
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    console.log('Service Worker update state:', newWorker.state);
+                });
+            });
+        }
+
+        function setupSyncAndPeriodicSync(registration) {
+            // Sync Manager
+            if ('SyncManager' in window) {
+                registration.sync.register('offlineSync').catch(error => {
+                    console.error('Offline sync registration failed:', error);
+                });
+            }
+
+            // Periodic Sync
+            if ('periodicSync' in registration) {
+                registerPeriodicSync(registration, 'weeklyTrendingNotification', 24 * 60 * 60 * 1000); // Once a day
+                registerPeriodicSync(registration, 'notificationSync', 2 * 24 * 60 * 60 * 1000); // Every two days
+            }
+        }
+
+        async function registerPeriodicSync(registration, tag, minInterval) {
+            try {
+                await registration.periodicSync.register(tag, {minInterval});
+                console.log(`Periodic Sync registered for ${tag}`);
+            } catch (error) {
+                console.error(`Periodic Sync registration failed for ${tag}:`, error);
+            }
+        }
+
+        // PWA Install Prompt Management
+        let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
-            // Stash the event so it can be triggered later.
             deferredPrompt = e;
         });
 
-        // Function to show the install prompt
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.addEventListener('click', (e) => {
+                if (e.target.classList.contains('install-prompt')) {
+                    if (!isAppInstalled()) {
+                        e.preventDefault();
+                        showInstallPrompt();
+                    }
+                }
+            });
+        });
+
         function showInstallPrompt() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted the install prompt');
@@ -264,56 +220,32 @@
             }
         }
 
-        // Function to check if the app is already installed
         function isAppInstalled() {
-            // Check the navigator.standalone property for iOS devices
-            if ('standalone' in navigator && navigator.standalone) {
-                return true;
-            }
-            // Check the display-mode media query for Android devices
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                return true;
-            }
-            return false;
+            return (
+                ('standalone' in navigator && navigator.standalone) ||
+                window.matchMedia('(display-mode: standalone)').matches
+            );
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.addEventListener('click', (e) => {
-                if (e.target.classList.contains('install-prompt')) {
-                    if (!isAppInstalled()) {
-                        e.preventDefault();
-                        showInstallPrompt();
-                    }
-                }
-            });
-        })
-
+        // Broadcast Channel for Offline Sync
         const broadcast = new BroadcastChannel('service-worker-channel');
         broadcast.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'OFFLINE_SYNC_EVENT') {
+            if (event.data?.type === 'OFFLINE_SYNC_EVENT') {
                 const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
                 if (offlineRequestUrl) {
-                    broadcast.postMessage({
-                        type: 'OFFLINE_SYNC_REQUEST'
-                        , url: offlineRequestUrl
-                    });
+                    broadcast.postMessage({type: 'OFFLINE_SYNC_REQUEST', url: offlineRequestUrl});
                 }
-            }else if( event.data && event.data.type === 'OFFLINE_SYNC_FETCHED' ){
+            } else if (event.data?.type === 'OFFLINE_SYNC_FETCHED') {
                 localStorage.removeItem('offlineRequestUrl');
             }
         });
 
+        // Handle stored offline requests
         const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
-
         if (offlineRequestUrl && navigator.onLine) {
-            console.log('offlineRequestUrl', offlineRequestUrl);
-            broadcast.postMessage({
-                type: 'OFFLINE_SYNC_REQUEST'
-                , url: offlineRequestUrl
-            });
-        } else {
-            console.log('offlineRequestUrl not found');
+            broadcast.postMessage({type: 'OFFLINE_SYNC_REQUEST', url: offlineRequestUrl});
         }
     </script>
+
 </body>
 </html>
