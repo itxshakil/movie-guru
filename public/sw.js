@@ -347,15 +347,18 @@ async function offlineSyncRequest(offlineRequestUrl) {
     try {
         await cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
 
+        const url = new URL(offlineRequestUrl);
+        const searchParams = new URLSearchParams(url.search);
+        const searchQuery = searchParams.get('s') || 'search';
         broadcast.postMessage({
             type: 'OFFLINE_SYNC_FETCHED',
-            message: 'Your requested content is ready and waiting for you. Check notification to view and explore the results.🚀👀',
+            message: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
             level: 'success',
         });
 
         // Perform actions to notify the user about the stored offline request
         self.registration.showNotification('Content is Ready!', {
-            body: 'Your requested content is ready and waiting for you. Click to view and explore the results.🚀👀',
+            body: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
             badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
             icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
             actions: [
