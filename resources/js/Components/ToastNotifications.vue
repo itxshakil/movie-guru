@@ -50,7 +50,8 @@ broadcastChannel.onmessage = (event) => {
 
 <template>
     <TransitionGroup tag="div" aria-live="polite"
-        class="flex flex-col fixed bottom-4 right-4 z-50 pointer-events-none w-full max-w-sm space-y-4" role="status"
+                     class="flex flex-col-reverse gap-4 fixed bottom-4 right-4 z-50 pointer-events-none w-full max-w-80"
+                     role="status"
         enter-from-class="translate-x-full opacity-0" enter-active-class="duration-500" leave-active-class="duration-500"
         leave-to-class="translate-x-full opacity-0">
         <ToastNotificationItem v-for="(notification, index) in notifications" :key="notification.key"
