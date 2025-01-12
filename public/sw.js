@@ -127,6 +127,7 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
                         client.postMessage({
                             type: 'OFFLINE_SEARCH_DETECTED',
                             status: 'offline',
+                            message: 'You appear to be offline. Your search request will be processed once you\'re back online.',
                             url: request.url,
                         });
                     });
