@@ -395,8 +395,8 @@ function rollOpeningCredits() {
     self.registration.showNotification('My Binge', {
         tag: 'alert',
         body: sceneDescription,
-        badge: '/icons/ios/152.png',
-        icon: '/icons/ios/152.png',
+        badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
+        icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
         actions: [
             {
                 action: 'close',
@@ -446,8 +446,8 @@ function sendTrendingNotification() {
 
     self.registration.showNotification(notificationTitle, {
         body: notificationBody,
-        icon: '/icons/ios/152.png',
-        badge: '/icons/ios/152.png',
+        icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
+        badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
         actions: [
             {action: 'close', title: 'Not Now'},
             {action: 'open', title: 'Check It Out!'},
