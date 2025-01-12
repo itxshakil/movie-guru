@@ -55,6 +55,11 @@ class MovieDetail extends Model
         $query->topRated()->recentlyReleased();
     }
 
+    public function scopeRecentlyReleased(Builder $query): void
+    {
+        $query->where('year', now()->format('Y'));
+    }
+
     public function scopeHiddenGems(Builder $query): void
     {
         $query->where(function ($query) {
