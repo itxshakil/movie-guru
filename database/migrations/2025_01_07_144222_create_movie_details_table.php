@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('imdb_id', 10)->unique();
             $table->string('title');
-            $table->unsignedSmallInteger('year');
+            $table->string('year', 10)->index();
             $table->string('release_date');
             $table->string('poster');
             $table->string('type');
