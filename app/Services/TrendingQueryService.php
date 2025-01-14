@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\SearchQuery;
@@ -8,9 +10,12 @@ use Illuminate\Support\Str;
 
 class TrendingQueryService
 {
-    public function fetch(){
-        return Cache::remember('trending-search-queries', now()->endOfDay(), function (){
-            $queries =  SearchQuery::where('created_at', '>', now()->subDays(7)->startOfDay())->distinct()->pluck('query');
+    public function fetch()
+    {
+        return Cache::remember('trending-search-queries', now()->endOfDay(), function () {
+            $queries = SearchQuery::where('created_at', '>', now()->subDays(7)->startOfDay())->distinct()->pluck(
+                'query'
+            );
 
             $titleCleaner = app(TitleCleaner::class);
 
