@@ -38,11 +38,13 @@ class SearchController extends Controller
             }
         );
 
-        $searchQuery->update([
-            'response_at' => now(),
-            'response' => $movies['Response'] === 'True',
-            'response_result' => $movies,
-        ]);
+        defer(function () use ($searchQuery, $movies) {
+            $searchQuery->update([
+                'response_at' => now(),
+                'response' => $movies['Response'] === 'True',
+                'response_result' => $movies,
+            ]);
+        });
 
         $movieTypes = MovieType::cases();
 
@@ -114,7 +116,7 @@ class SearchController extends Controller
             $movie = MovieDetail::where('imdb_id', $imdbId)->first();
 
             if ($movie) {
-                $movie->incrementViews();
+                defer(fn() => $movie->incrementViews());
                 $this->updateMovieDetailsInBackground($imdbId);
 
                 return $movie->details;
@@ -123,19 +125,21 @@ class SearchController extends Controller
             // If not found in the database, fetch from the API
             $detail = $OMDBApiService->getById($imdbId);
 
-            // Save the details to the database
-            MovieDetail::updateOrCreate([
-                'imdb_id' => $imdbId,
-            ], [
-                'title' => $detail['Title'],
-                'year' => $detail['Year'],
-                'release_date' => $detail['Released'],
-                'poster' => $detail['Poster'],
-                'type' => $detail['Type'],
-                'imdb_rating' => $detail['imdbRating'],
-                'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
-                'details' => $detail,
-            ])->incrementViews();
+            defer(function () use ($detail, $imdbId) {
+                // Save the details to the database
+                MovieDetail::updateOrCreate([
+                    'imdb_id' => $imdbId,
+                ], [
+                    'title' => $detail['Title'],
+                    'year' => $detail['Year'],
+                    'release_date' => $detail['Released'],
+                    'poster' => $detail['Poster'],
+                    'type' => $detail['Type'],
+                    'imdb_rating' => $detail['imdbRating'],
+                    'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
+                    'details' => $detail,
+                ])->incrementViews();
+            });
 
             return $detail; // Return fetched details
         });
