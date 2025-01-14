@@ -144,12 +144,14 @@ class SearchController extends Controller
             return $detail; // Return fetched details
         });
 
-        // Log the analytics
-        ShowPageAnalytics::create([
-            'imdb_id' => $imdbId,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        defer(function () use ($request, $imdbId) {
+            // Log the analytics
+            ShowPageAnalytics::create([
+                'imdb_id' => $imdbId,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        });
 
         if ($request->wantsJson()) {
             return response()->json(['detail' => $detail]);
