@@ -5,7 +5,7 @@
                 <h2
                     class="text-base font-semibold leading-7 text-primary-600 dark:text-primary-500"
                 >
-                    One stop binge hunt solution
+                  Super-fast, minimal and reliable
                 </h2>
                 <p
                     class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
@@ -15,10 +15,9 @@
                 <p
                     class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400"
                 >
-                    Welcome to Movie Guru, the open movie database that offers a
-                    seamless movie-watching experience with a range of features
-                    that make it a great alternative to traditional movie
-                    databases like IMDB.
+                  Movie detail app where you can <strong>explore movies, series, and episodes.</strong> Find ratings
+                  from major platforms like <strong>Rotten Tomatoes and IMDB</strong>—all in one place! Movie Guru is
+                  designed to be efficient, reliable, and easy to use.
                 </p>
             </div>
             <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
@@ -150,12 +149,12 @@
                                     />
                                 </svg>
                             </div>
-                            Simple UI
+                          Blazing Fast & Simple UI
                         </dt>
                         <dd
                             class="mt-2 text-base leading-7 text-gray-600 dark:text-gray-400"
                         >
-                            Enjoy an intuitive and straightforward user
+                          It’s a super-fast and minimalistic. Straightforward user
                             interface that makes navigating through the vast
                             world of movies a breeze. No clutter, no
                             confusion—just a clean and user-friendly design.
@@ -189,15 +188,14 @@
                                     />
                                 </svg>
                             </div>
-                            Lightweight
+                          Always There for You
                         </dt>
                         <dd
                             class="mt-2 text-base leading-7 text-gray-600 dark:text-gray-400"
                         >
                             Movie Guru is designed to be light on resources,
-                            ensuring a swift and efficient experience. Access
-                            information about your favorite movies without any
-                            unnecessary lags or delays.
+                          ensuring a swift and efficient experience. No internet? No problem! Search offline, and get
+                          notified with results as soon as you're back online.
                         </dd>
                     </div>
                 </dl>
