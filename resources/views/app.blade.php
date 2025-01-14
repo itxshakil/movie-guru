@@ -240,6 +240,13 @@
             }
         });
 
+        window.addEventListener('online', () => {
+            const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
+            if (offlineRequestUrl && navigator.onLine) {
+                broadcast.postMessage({type: 'OFFLINE_SYNC_REQUEST', url: offlineRequestUrl});
+            }
+        });
+
         // Handle stored offline requests
         const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
         if (offlineRequestUrl && navigator.onLine) {
