@@ -69,6 +69,8 @@ class SpamKeywordRule implements Rule
             'No Work Required',
             'steamy movie',
             'steamy sauna session',
+            'your account has been dormant',
+            'visit our telegram group',
         ];
 
         foreach ($spamKeywords as $keyword) {
