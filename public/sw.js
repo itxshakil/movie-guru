@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-1';
-const SEARCH_CACHE = 'search-cache-v-1';
-const INFO_CACHE = 'info-cache-v-1';
-const DYNAMIC_CACHE = 'dynamic-cache-v-1';
-const POSTER_CACHE = 'poster-cache-v-1';
+const APP_CACHE = 'v-2';
+const SEARCH_CACHE = 'search-cache-v-2';
+const INFO_CACHE = 'info-cache-v-2';
+const DYNAMIC_CACHE = 'dynamic-cache-v-2';
+const POSTER_CACHE = 'poster-cache-v-2';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
