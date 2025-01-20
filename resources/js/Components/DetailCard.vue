@@ -105,7 +105,10 @@
                             <ul class="space-y-4 flex flex-wrap items-center gap-2">
                               <!-- Netflix -->
                               <li class="flex items-center space-x-2">
-                                <a :href="netflixLink" class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                <a
+                                    :href="netflixLink"
+                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                    @click="sendAnalytics('Netflix', netflixLink)"
                                    target="_blank">
                                   <img alt="Netflix Logo" class="h-16 w-8" src="/assets/netflix-logo.png">
                                   <span class="sr-only">Watch on Netflix</span>
@@ -113,7 +116,10 @@
                               </li>
                               <!-- Amazon Prime -->
                               <li class="flex items-center space-x-2">
-                                <a :href="amazonAffiliateLink" class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                <a
+                                    :href="amazonAffiliateLink"
+                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                    @click="sendAnalytics('Amazon Prime', amazonAffiliateLink)"
                                    target="_blank">
                                   <img alt="Amazon Prime Logo" class="h-8 w-8" src="/assets/prime-logo.png">
                                   <span class="sr-only">Watch on Amazon Prime</span>
@@ -121,7 +127,9 @@
                               </li>
                               <!-- Hulu -->
                               <li class="flex items-center space-x-2">
-                                <a :href="huluLink" class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                <a :href="huluLink"
+                                   class="text-primary-500 hover:underline"
+                                   rel="noopener noreferrer" @click="sendAnalytics('Hulu', huluLink)"
                                    target="_blank">
                                   <img alt="Hulu Logo" class="h-8 w-12" src="/assets/hulu-logo.svg">
                                   <span class="sr-only">Watch on Hulu</span>
@@ -129,7 +137,10 @@
                               </li>
                               <!-- Disney+ -->
                               <li class="flex items-center space-x-2">
-                                <a :href="disneyPlusLink" class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                <a
+                                    :href="disneyPlusLink"
+                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                    @click="sendAnalytics('Disney+', disneyPlusLink)"
                                    target="_blank">
                                   <img alt="Disney+ Logo" class="h-9 w-16" src="/assets/disney-logo.jpg">
                                   <span class="sr-only">Watch on Disney+</span>
@@ -137,7 +148,10 @@
                               </li>
                               <!-- HBO Max -->
                               <li class="flex items-center space-x-2">
-                                <a :href="hboMaxLink" class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                <a
+                                    :href="hboMaxLink"
+                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                    @click="sendAnalytics('HBO Max', hboMaxLink)"
                                    target="_blank">
                                   <img alt="HBO Max Logo" class="h-8 w-12" src="/assets/hbo-logo.png">
                                   <span class="sr-only">Watch on HBO Max</span>
@@ -145,7 +159,10 @@
                               </li>
                               <!-- Download Max -->
                               <li class="flex items-center space-x-2">
-                                <a :href="googleDownloadLink" class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                <a
+                                    :href="googleDownloadLink"
+                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
+                                    @click="sendAnalytics('Google Download', googleDownloadLink)"
                                    target="_blank">
                                   <img alt="HBO Max Logo" class="h-8 w-8" src="/assets/google-logo.png">
                                   <span class="sr-only">Search Download Links on Googlex</span>
@@ -283,7 +300,7 @@ const amazonAffiliateLink = computed(() => props.detail ? `https://primevideo.co
 const huluLink = computed(() => props.detail ? `https://www.hulu.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const disneyPlusLink = computed(() => props.detail ? `https://www.disneyplus.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const hboMaxLink = computed(() => props.detail ? `https://play.hbomax.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
-const googleDownloadLink = computed(() => props.detail ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+download+filetype:mkv+OR+filetype:mp4` : '');
+const googleDownloadLink = computed(() => props.detail ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+download+filetype:mkv+OR+filetype:mp4+intitle:index.of` : '');
 
 const isValue = function(value) {
     return value && value !== 'N/A';
@@ -354,5 +371,16 @@ const runtime = computed(() => {
 const moviePoster = (movie) => {
     return movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : '/assets/images/no-poster.jpg';
 };
+
+function sendAnalytics(platform, link) {
+  if (window.gtag) {
+    gtag('event', 'click', {
+      event_category: 'Link',
+      event_label: platform,
+      value: link,
+    });
+  }
+  console.log(`Analytics Event Sent: Platform - ${platform}, Link - ${link}`);
+}
 
 </script>
