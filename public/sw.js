@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4';
-const SEARCH_CACHE = 'search-cache-v-4';
-const INFO_CACHE = 'info-cache-v-4';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4';
-const POSTER_CACHE = 'poster-cache-v-4';
+const APP_CACHE = 'v-4.1';
+const SEARCH_CACHE = 'search-cache-v-4.1';
+const INFO_CACHE = 'info-cache-v-4.1';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.1';
+const POSTER_CACHE = 'poster-cache-v-4.1';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -57,7 +57,7 @@ const basicPathsToCache = [
     '/build/assets/Welcome-bWUlid5g.js',
     '/build/assets/BaseLayout-BJsFVTV-.js',
     '/build/assets/DetailCard-DV_HMACu.js',
-    '/build/assets/app-CbWZ1K2B.j',
+    '/build/assets/app-CbWZ1K2B.js',
     '/build/assets/Search-DSwcpwDw.css',
     '/assets/images/no-poster.jpg',
 ];
