@@ -58,7 +58,6 @@ const basicPathsToCache = [
     '/build/assets/BaseLayout-BJsFVTV-.js',
     '/build/assets/DetailCard-DV_HMACu.js',
     '/build/assets/app-CbWZ1K2B.js',
-    '/build/assets/Search-DSwcpwDw.css',
     '/assets/images/no-poster.jpg',
 ];
 
