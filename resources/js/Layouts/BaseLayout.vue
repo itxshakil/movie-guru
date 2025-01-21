@@ -5,6 +5,7 @@ import InstallBanner from "@/Components/InstallBanner.vue";
 import AppHeader from "@/Layouts/AppHeader.vue";
 import OfflineSearchPrompt from "@/Components/OfflineSearchPrompt.vue";
 import NetworkStatus from "@/Components/NetworkStatus.vue";
+import NotificationBanner from "@/Components/NotificationBanner.vue";
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import NetworkStatus from "@/Components/NetworkStatus.vue";
     <AppFooter />
     <ToastNotifications />
     <InstallBanner />
+  <NotificationBanner/>
     <OfflineSearchPrompt />
     <NetworkStatus />
 
