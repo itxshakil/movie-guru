@@ -65,6 +65,19 @@ class HomeController extends Controller
             ]);
         });
 
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
+            return MovieDetail::recommended()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+            ]);
+        });
+
         $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), function () {
             return MovieDetail::topRated()->take(6)->get([
                 'imdb_id',
@@ -86,9 +99,9 @@ class HomeController extends Controller
                 'trendingMovies',
                 'hiddenGemsMovies',
                 'recentlyReleasedMovies',
-                'topRatedMovies'
+                'topRatedMovies',
+                'recommendedMovies',
             )
         );
     }
-
 }

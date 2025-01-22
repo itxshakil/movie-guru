@@ -62,6 +62,14 @@ class MovieDetail extends Model
         $query->where('year', now()->format('Y'));
     }
 
+    public function scopeRecommended(Builder $query): void
+    {
+        $query->where(function (Builder $query) {
+            $query->where('imdb_rating', '>', 7.5)
+                ->where('imdb_votes', '>', 30_000);
+        });
+    }
+
     public function scopeHiddenGems(Builder $query): void
     {
         $query->where(function ($query) {
