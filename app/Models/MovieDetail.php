@@ -64,8 +64,8 @@ class MovieDetail extends Model
     {
         $query->where(function ($query) {
             $query->where('imdb_rating', '>', 8.5)
-                ->where('imdb_votes', '<', 1_00_000)
-                ->where('imdb_votes', '>', 30_000);
+                ->where('imdb_votes', '<', 80_000)
+                ->where('imdb_votes', '>', 3_000);
         });
     }
 
