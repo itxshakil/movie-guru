@@ -19,9 +19,9 @@ class SearchController extends Controller
     public function index(Request $request, OMDBApiService $OMDBApiService, TrendingQueryService $trendingQueryService)
     {
         $search = $request->get('s');
-        $page = $request->get('page', 1);
+        $page = $request->integer('page', 1);
         $movieType = $request->get('type');
-        $year = $request->get('year');
+        $year = $request->integer('year', null);
 
         $defaultSearches = ['sholay', 'batman', 'spiderman', 'game of thrones', 'don', '3 idiots'];
 
