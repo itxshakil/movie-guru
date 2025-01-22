@@ -307,7 +307,7 @@ const isValue = function(value) {
 };
 
 const basicRating = computed(() => {
-  if(props.detail.imdbRating){
+  if (isValue(props.detail.imdbRating)) {
     let mappedRating = Math.round(props.detail.imdbRating / 2);
 
     mappedRating = Math.max(1, Math.min(5, mappedRating));
@@ -316,18 +316,20 @@ const basicRating = computed(() => {
   }
 
   return 'No Rating';
-
 });
 
 const topRated = computed(() => {
+  if (!isValue(props.detail.imdbRating)) {
+    return false;
+  }
+
     const imdbVotes = parseInt(props.detail.imdbVotes.replaceAll(',', ''));
-    return (props.detail.imdbRating > 8 && imdbVotes > 1_00_000) || imdbVotes > 3_00_000 && props.detail.imdbRating ===
-        8;
+  return (props.detail.imdbRating >= 8.5 && imdbVotes > 80_000) || imdbVotes > 1_00_000 && props.detail.imdbRating >= 8;
 });
 
 const hiddenGems = computed(() => {
     const imdbVotes = parseInt(props.detail.imdbVotes.replaceAll(',', ''));
-    return props.detail.imdbRating > 8.5 && imdbVotes < 1_00_000 && imdbVotes > 30_000;
+  return props.detail.imdbRating > 8.5 && imdbVotes < 80_000 && imdbVotes > 3_000;
 });
 
 const recentlyReleased = computed(() => {
