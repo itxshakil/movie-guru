@@ -96,7 +96,10 @@
                                   </a>
 
                                 </div>
-                                <small class="ml-1"><strong itemprop="ratingValue">{{ basicRating }}</strong> out of <strong itemprop="bestRating">5</strong> stars</small>
+                              <small v-if="isValue(isValue(detail.imdbVotes))" class="ml-1"><strong
+                                  itemprop="ratingValue">{{ basicRating }}</strong> out of <strong
+                                  itemprop="bestRating">5</strong> stars</small>
+                              <small v-else class="ml-1"><strong itemprop="ratingValue">No Rating Yet</strong></small>
                             </div>
 
                           <!-- Watch Now Section -->
