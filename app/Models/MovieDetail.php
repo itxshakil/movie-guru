@@ -42,11 +42,13 @@ class MovieDetail extends Model
     public function scopeTopRated(Builder $query): void
     {
         $query->where(function ($query) {
-            $query->where('imdb_rating', '>', 8)
-                ->orWhere(function ($query) {
-                    $query->where('imdb_rating', '=', 8)
-                        ->where('imdb_votes', '>', 1_00_000);
-                });
+            $query->where(function (Builder $query) {
+                $query->where('imdb_rating', '>=', 8.5)
+                    ->where('imdb_votes', '>', 80_000);
+            })->orWhere(function (Builder $query) {
+                $query->whereBetween('imdb_rating', [8.0, 8.5])
+                    ->where('imdb_votes', '>', 1_00_000);
+            });
         });
     }
 
@@ -64,8 +66,7 @@ class MovieDetail extends Model
     {
         $query->where(function ($query) {
             $query->where('imdb_rating', '>', 8.5)
-                ->where('imdb_votes', '<', 80_000)
-                ->where('imdb_votes', '>', 3_000);
+                ->whereBetween('imdb_votes', [3_000, 80_000]);
         });
     }
 
