@@ -178,10 +178,19 @@ class SearchController extends Controller
                 'release_date' => $updatedDetail['Released'],
                 'poster' => $updatedDetail['Poster'],
                 'type' => $updatedDetail['Type'],
-                'imdb_rating' => $updatedDetail['imdbRating'],
-                'imdb_votes' => str_replace(',', '', $updatedDetail['imdbVotes']),
+                'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
+                'imdb_votes' => $this->isValue($updatedDetail['imdbVotes']) ? str_replace(
+                    ',',
+                    '',
+                    $updatedDetail['imdbVotes']
+                ) : 0,
                 'details' => $updatedDetail,
             ]);
         });
+    }
+
+    private function isValue($value)
+    {
+        return $value && $value != 'N/A';
     }
 }
