@@ -66,7 +66,7 @@ class SearchController extends Controller
             }
         }
 
-        $trendingQueries = $trendingQueryService->fetch();
+        $trendingQueries = $trendingQueryService->fetch()->random(5);
 
         if ($request->wantsJson()) {
             return response()->json([
