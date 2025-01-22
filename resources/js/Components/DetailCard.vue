@@ -303,7 +303,7 @@ const amazonAffiliateLink = computed(() => props.detail ? `https://primevideo.co
 const huluLink = computed(() => props.detail ? `https://www.hulu.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const disneyPlusLink = computed(() => props.detail ? `https://www.disneyplus.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const hboMaxLink = computed(() => props.detail ? `https://play.hbomax.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
-const googleDownloadLink = computed(() => props.detail ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+download+filetype:mkv+OR+filetype:mp4+intitle:index.of` : '');
+const googleDownloadLink = computed(() => props.detail ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+download+filetype:mkv+OR+filetype:mp4` : '');
 
 const isValue = function(value) {
     return value && value !== 'N/A';
