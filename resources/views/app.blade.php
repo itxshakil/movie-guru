@@ -175,7 +175,7 @@
             // Periodic Sync
             if ('periodicSync' in registration) {
                 registerPeriodicSync(registration, 'weeklyTrendingNotification', 24 * 60 * 60 * 1000); // Once a day
-                registerPeriodicSync(registration, 'notificationSync', 2 * 24 * 60 * 60 * 1000); // Every two days
+                registerPeriodicSync(registration, 'movieNotificationSync', 17 * 59 * 59 * 1000); // Random
             }
         }
 

@@ -193,8 +193,8 @@ self.addEventListener('periodicsync', async (event) => {
                 }
             }
         }
-    } else if (event.tag === 'notificationSync') {
-        rollOpeningCredits();
+    } else if (event.tag === 'movieNotificationSync') {
+        rollMovieNotifications();
     }
 });
 
@@ -360,8 +360,8 @@ async function offlineSyncRequest(offlineRequestUrl) {
         // Perform actions to notify the user about the stored offline request
         self.registration.showNotification('Content is Ready!', {
             body: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
-            badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
-            icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
+            badge: 'https://movieguru.shakiltech.com/icons/ios/192.png',
+            icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
             actions: [
                 {
                     action: 'close',
@@ -384,23 +384,159 @@ async function offlineSyncRequest(offlineRequestUrl) {
 
 }
 
-function rollOpeningCredits() {
-    let sceneDescription = 'Welcome to the Weekend Movie Binge-fest! 🌟 Grab your popcorn and let\'s dive into a binge-worthy experience.';
-
+function rollMovieNotifications() {
     const now = new Date();
-    if (now.getHours() >= 12 && now.getHours() < 16) {
-        sceneDescription = 'Afternoon Binge: Which movie are stealing the spotlight in your life today? 🎥';
-    } else if (now.getHours() >= 16 && now.getHours() < 20) {
-        sceneDescription = 'Evening Marathon: It\'s showtime! Time to binge in the starring role. 🌟';
-    } else {
-        sceneDescription = 'Late Night Binge: Plan your tomorrow and cue the dreams. Good night, star! 🌙';
-    }
+    const hourOfDay = now.getHours();
+    const dayOfWeek = now.getDay();
+    const month = now.getMonth();
+    const date = now.getDate();
 
-    self.registration.showNotification('My Binge', {
+    // Time-of-day specific messages
+    const morningMessages = [
+        "🌅 Morning Glory! Time to kickstart your day with some cinematic magic! 🎬",
+        "☀️ Rise and Shine! Your movie adventure begins now. Grab your coffee! ☕",
+        "🌞 Good Morning! The screen is set for your next movie masterpiece. 🍿",
+        "🎬 Movie time, before the world wakes up. Start your day with a plot twist! 😎",
+        "🛋️ Who needs a gym when you have a couch? Let's binge! 💪",
+        "☕ Morning fuel: Coffee + Movie! What’s your choice today? 🎥",
+        "🌅 Let’s make today legendary—start with a movie! 🍿",
+        "👀 Morning movie magic is the best way to wake up. Let’s go! 🎬",
+        "⏰ Early bird catches the best flicks. Grab your popcorn! 🍿",
+        "🎥 Good vibes and good movies—because mornings should be epic!"
+    ];
+
+    const afternoonMessages = [
+        "🎥 Afternoon Delights: The perfect time to unwind with a great movie. 🌟",
+        "🌤️ Midday Marvels: The movie world is waiting—what's on your watchlist today?",
+        "🍿 Afternoon Binge: The spotlight's on you, star! Which movie are you craving today?",
+        "☕ Coffee break? More like movie break! 🎬 Time to relax!",
+        "⏳ The afternoon slump just met its match: Movie time! 🎥",
+        "🛋️ Take a break, press play, and let the movie marathon begin. 🍿",
+        "🌞 The afternoon sun is setting, but the binge session is just beginning. 🌇",
+        "🎬 Afternoon movie therapy is the best kind of therapy. Let’s do this!",
+        "📅 Your afternoon just got better: Movie marathon mode activated!",
+        "🍫 Afternoon treat: A little movie magic for your soul!"
+    ];
+
+    const eveningMessages = [
+        "🌇 Evening Vibes: It's showtime! Let the marathon begin! 🌟",
+        "🌙 Prime Time: Your perfect movie companion for the evening is just a click away. 🎬",
+        "✨ Evening Rush: The movies are calling! Ready for your next great binge? 🍿",
+        "🍿 Movie night just got real—who's ready for the first feature? 🎥",
+        "🎬 The night is young and so are the movies. Get comfy and press play!",
+        "🛋️ Time for your evening relaxation therapy. Movies await! 🎥",
+        "🌙 Evening lights, movie nights. What's on your watchlist tonight?",
+        "🎥 From sunset to screen: Your perfect movie awaits! 🌇",
+        "✨ The night belongs to movie lovers. What’s your pick tonight?",
+        "🌌 The stars are out, the movie is about to start. Let’s go, movie lover! 🍿"
+    ];
+
+    const lateNightMessages = [
+        "🌙 Late Night Cinematic Bliss: Perfect time to dream with a great film. 🌙",
+        "🌌 Night Owl's Binge: Your late-night movie escape awaits... 🎬",
+        "🌑 Nighttime Flicks: Time to unwind and let the movie magic happen. ✨",
+        "🎬 Who needs sleep when there's a movie marathon waiting? 🌙",
+        "🦉 Late night movies: Because who doesn't want to live on the edge? 🎥",
+        "🌠 Stars on the screen and stars in the sky—perfect time for a late-night binge! 🍿",
+        "🎥 The night calls for a good flick. Get comfy, the show’s about to start. 🌙",
+        "🌌 Midnight movie vibes—popcorn in hand, movie on screen. 🎬",
+        "🌙 No better time to let the screen take you to another world. Movie time!",
+        "🛏️ Late night, movie lights. Time to end the day with a film!"
+    ];
+
+    // Special Day Messages (New Year, Christmas, Weekend, Sunday, Monday)
+    const holidayMessages = {
+        newYear: [
+            "🎉 New Year, New Flicks! Time to kick off the year with a movie binge! 🍿",
+            "🎆 Happy New Year! What better way to start than with a movie marathon? 🎬",
+            "✨ Cheers to new beginnings! Ring in the new year with your favorite films! 🍾"
+        ],
+        christmas: [
+            "🎄 Ho Ho Ho! It’s Christmas movie time! Grab the eggnog and let’s go! 🍿",
+            "🎅 Tis the season for a movie marathon! What’s your holiday classic? 🎥",
+            "🌟 Merry Christmas! Cozy up with a movie and enjoy the magic of the season! 🎬"
+        ],
+        fridayEvening: [
+            "🎉 Friday night’s here! Time to put the workweek to rest and press play on some epic movies. 🍿",
+            "✨ The weekend's calling, and it starts with a movie marathon. Get comfy, it's showtime! 🎬",
+            "🥳 Friday feels: It’s time to kick back with popcorn and let the movie magic take over! 🍿",
+            "🌟 Friday night vibes = Movie mode activated. What’s your first flick? 🍿🎥",
+            "🕺 The work week’s done! Time to dive into a movie binge that lasts all night. Who's in? 🍿",
+            "🎥 Friday’s here to save you from reality. Choose your movie and get comfy! 🛋️",
+            "🍿 Start your weekend off right: Great movies, cozy vibes, and no alarms tomorrow! 🎬",
+            "🎉 It’s Friday night! Time to do absolutely nothing except watch movies. Let’s go! 🛋️",
+            "📅 Weekend = movies + popcorn. Let’s make this Friday night unforgettable! 🎥🍿",
+            "⚡ The weekend begins NOW! Movies, snacks, and zero responsibilities. 🛋️🍿"
+        ],
+        weekend: [
+            "🎉 Weekend vibes: Time to kick back, relax, and enjoy a movie marathon! 🍿",
+            "🛋️ The weekend is here—let’s get comfy and binge-watch all the movies! 🎬",
+            "🍿 It’s the weekend! Movie time, snack time, all the good times! 🎥",
+            "🌞 Saturday's here! Perfect day for an all-day movie binge. What’s first on the list? 🍿",
+            "🎬 Saturday vibes: Settle in, relax, and let the movie magic begin! ✨",
+            "🍿 It’s Saturday, let’s get comfy with a marathon! Who’s in for movie madness? 🎥",
+            "🎉 Saturdays are for doing nothing... except watching movies. Ready to roll? 🎬",
+            "🕶️ Lazy Saturday = Movie marathon day! Grab the popcorn and hit play. 🍿",
+            "🎥 Saturday mood: Movies, popcorn, and zero plans. Who needs them anyway? 🍿🍿",
+            "🎬 Ready for the weekend binge fest? Saturday's perfect for it! Grab your popcorn! 🍿",
+            "☀️ Saturday morning movie vibes are calling... and you MUST answer. 🎥",
+            "🍕 Saturday = Movie night all day long. Ready to get cozy and indulge? 🎬",
+            "🍿 Saturday's calling: The best way to spend it is in front of the screen. Let’s roll!"
+        ],
+        sunday: [
+            "🌞 Sunday Funday: The perfect day for a movie binge. Let’s do this! 🍿",
+            "🎬 Sunday means movie day. Ready to end your weekend in cinematic style? 🍿",
+            "🛋️ Cozy Sunday, popcorn in hand. Movie marathon, here we come! 🎥",
+            "🌞 Sunday chill mode: Let’s get comfy with some movies, snacks, and zero stress! 🍿",
+            "🎬 Sunday Funday starts now! Ready for some cozy movie magic? 🍿",
+            "☕ Sunday mornings + movies = Perfection. Grab your popcorn and start the show! 🍿",
+            "🎉 Sunday is for movie marathons. Who's in for the ultimate binge session? 🍿🎥",
+            "🌟 Sunday + movies = The ultimate relaxation recipe. Get ready to dive in! 🎬",
+            "🍿 Sundays were made for lazy movie days. Let’s start your binge right. 🎥",
+            "🎥 Sunday vibes: Relax, rewind, and enjoy a movie marathon. 🛋️🍿",
+            "🍕 Sunday + movies = The perfect combination. Are you ready to binge-watch? 🎬",
+            "🎬 Sundays are for unwinding and watching the best flicks. Grab the popcorn! 🍿",
+            "🌙 Sunday night = A good movie, good food, and good vibes. Let’s do this! 🎥🍿"
+        ],
+        monday: [
+            "⏰ Monday Motivation: Get ready to conquer the week with a movie escape! 🎬",
+            "📅 It’s Monday—time to start the week with a bang! Movie time! 🍿",
+            "🌞 Monday blues? Turn them into movie gold. What’s on today’s list? 🎥"
+        ]
+    };
+
+    // Function to pick a random message based on the time of day and special days
+    const messages = (function () {
+        if (month === 11 && date === 25) {  // Christmas
+            return holidayMessages.christmas;
+        } else if (month === 0 && date === 1) {  // New Year
+            return holidayMessages.newYear;
+        } else if (dayOfWeek === 5 && hourOfDay >= 18) {  // Friday Evening
+            return holidayMessages.fridayEvening;
+        } else if (dayOfWeek === 0) {  // Sunday
+            return holidayMessages.sunday;
+        } else if (dayOfWeek === 6) {  // Saturday (Weekend)
+            return holidayMessages.weekend;
+        } else if (dayOfWeek === 1) {  // Monday
+            return holidayMessages.monday;
+        } else if (hourOfDay >= 5 && hourOfDay < 12) {
+            return morningMessages;
+        } else if (hourOfDay >= 12 && hourOfDay < 16) {
+            return afternoonMessages;
+        } else if (hourOfDay >= 16 && hourOfDay < 20) {
+            return eveningMessages;
+        } else {
+            return lateNightMessages;
+        }
+    })();
+
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+    self.registration.showNotification('🎬 Your Movie Awaits!', {
         tag: 'alert',
-        body: sceneDescription,
-        badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
-        icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
+        body: randomMessage,
+        badge: 'https://movieguru.shakiltech.com/icons/ios/192.png',
+        icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
         actions: [
             {
                 action: 'close',
@@ -408,6 +544,7 @@ function rollOpeningCredits() {
             },
             {
                 action: 'open',
+                type: 'button',
                 title: 'Find Today\'s Binge',
             },
         ],
@@ -419,6 +556,14 @@ function rollOpeningCredits() {
         renotify: true,
     });
 }
+
+// Call this function periodically or on-demand
+self.addEventListener('periodicsync', (event) => {
+    if (event.tag === 'movieNotificationSync') {
+        rollMovieNotifications();
+    }
+});
+
 
 self.addEventListener('push', (event) => {
     if (event.data) {
@@ -450,8 +595,8 @@ function sendTrendingNotification() {
 
     self.registration.showNotification(notificationTitle, {
         body: notificationBody,
-        icon: 'https://movieguru.shakiltech.com/icons/ios/152.png',
-        badge: 'https://movieguru.shakiltech.com/icons/ios/152.png',
+        icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
+        badge: 'https://movieguru.shakiltech.com/icons/ios/192.png',
         actions: [
             {action: 'close', title: 'Not Now'},
             {action: 'open', title: 'Check It Out!'},
