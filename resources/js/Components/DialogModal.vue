@@ -17,7 +17,7 @@ onMounted(() => {
 
 <template>
     <dialog ref="dialog" :class="maxWidth" scroll-region
-            class="inset-0 w-full overflow-x-hidden bg-transparent p-2 md:p-4 modal-dialog sm:p-0 transform transition-500 transition-opacity"
+            class="m-auto inset-0 w-full overflow-x-hidden bg-transparent p-2 md:p-4 modal-dialog sm:p-0 transform transition-500 transition-opacity"
         modal-menu="mega">
       <div class="relative rounded-lg bg-white shadow-sm dark:bg-gray-700">
             <button
@@ -35,23 +35,6 @@ onMounted(() => {
 dialog::backdrop {
     backdrop-filter: blur(5px) brightness(0.5) contrast(1.5);
     transition: backdrop-filter 5s ease;
-}
-
-@keyframes modal-enter {
-  0% {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-dialog {
-    @apply transform opacity-100;
-    animation: modal-enter .5s ease-out forwards;
 }
 
 </style>
