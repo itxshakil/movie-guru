@@ -66,7 +66,7 @@ class HomeController extends Controller
         });
 
         $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
-            return MovieDetail::recommended()->take(6)->get([
+            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
