@@ -599,7 +599,7 @@ function rollMovieNotifications() {
         renotify: true,
     });
 
-    / Get the time of day as a label (morning, afternoon, evening, etc.)
+    // Get the time of day as a label (morning, afternoon, evening, etc.)
     let timeOfDayLabel = '';
     if (hourOfDay >= 5 && hourOfDay < 12) {
         timeOfDayLabel = 'Morning';
