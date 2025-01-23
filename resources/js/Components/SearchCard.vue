@@ -1,5 +1,6 @@
 <template>
-  <div class="dark:bg-gray-900 dark:text-white border rounded-lg shadow group relative flex flex-col justify-between" itemscope itemprop="mainEntity" itemtype="https://schema.org/Movie">
+  <div class="dark:bg-gray-900 dark:text-white border rounded-lg shadow-sm group relative flex flex-col justify-between"
+       itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie">
     <div>
       <div
           class="relative h-80 w-full overflow-hidden rounded-lg rounded-b-none bg-white dark:bg-gray-700 aspect-h-3 aspect-w-2 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
@@ -22,7 +23,7 @@
             v-for="i in 5"
             :key="i"
             :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'"
-            aria-hidden="true" class="h-4 w-4 flex-shrink-0" fill="currentColor"
+            aria-hidden="true" class="h-4 w-4 shrink-0" fill="currentColor"
             viewBox="0 0 20 20">
           <path clip-rule="evenodd"
                 d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"

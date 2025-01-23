@@ -15,7 +15,7 @@
             >
                 <div class="flex">
                     <div
-                        class="hidden inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-primary-500 bg-primary-100 rounded-lg dark:text-primary-300 dark:bg-primary-900"
+                        class="hidden inline-flex items-center justify-center shrink-0 w-8 h-8 text-primary-500 bg-primary-100 rounded-lg dark:text-primary-300 dark:bg-primary-900"
                     >
                         <svg
                             class="w-4 h-4"
@@ -46,7 +46,7 @@
                             <div>
                                 <button
                                     @click="onCancel"
-                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-transparent border rounded-lg hover:bg-gray-100 focus:ring-4 border-none focus:outline-none focus:ring-gray-200 dark:text-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700"
+                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-transparent border rounded-lg hover:bg-gray-100 focus:ring-4 border-none focus:outline-hidden focus:ring-gray-200 dark:text-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700"
                                 >
                                     {{ secondaryAction }}
                                 </button>
@@ -54,7 +54,7 @@
                             <div v-if="primaryAction">
                                 <button
                                     @click="onConfirm"
-                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800"
+                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:outline-hidden focus:ring-primary-300 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800"
                                 >
                                     {{ primaryAction }}
                                 </button>
@@ -64,7 +64,7 @@
                     <button
                         @click="onCancel"
                         type="button"
-                        class="-mx-1.5 -my-1.5 absolute bg-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white dark:text-gray-500 flex-shrink-0 focus:ring-2 focus:ring-gray-300 h-8 hover:bg-gray-100 hover:text-gray-900 inline-flex items-center justify-center ms-auto p-1.5 right-2 rounded-lg text-gray-400 top-2 w-8"
+                        class="-mx-1.5 -my-1.5 absolute bg-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white dark:text-gray-500 shrink-0 focus:ring-2 focus:ring-gray-300 h-8 hover:bg-gray-100 hover:text-gray-900 inline-flex items-center justify-center ms-auto p-1.5 right-2 rounded-lg text-gray-400 top-2 w-8"
                         data-dismiss-target="#toast-interactive"
                         aria-label="Close"
                     >
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from "vue";
+import {nextTick, onMounted, ref} from "vue";
 
 const props = defineProps({
     title: String,

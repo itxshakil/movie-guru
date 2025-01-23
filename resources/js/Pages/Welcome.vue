@@ -97,7 +97,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
               <InputLabel class="sr-only" for="search-input">Search movies and series</InputLabel>
               <input id="search-input" v-model="form.s" enterkeyhint="search"
                      aria-label="Search Movie or Series"
-                     class="sm:text-xl w-full rounded-full py-3 px-5 sm:py-5 sm:px-10 bg-gray-300 text-gray-900 focus:outline-none sm:pr-36 border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-sm bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200"
+                     class="sm:text-xl w-full rounded-full py-3 px-5 sm:py-5 sm:px-10 bg-gray-300 text-gray-900 focus:outline-hidden sm:pr-36 border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200"
                      name="s"
                      placeholder="Search movies and series"
                      required autofocus autocomplete="off"

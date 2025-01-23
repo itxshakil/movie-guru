@@ -19,7 +19,7 @@ onMounted(() => {
     <dialog ref="dialog" :class="maxWidth" scroll-region
             class="inset-0 w-full overflow-x-hidden bg-transparent p-2 md:p-4 modal-dialog sm:p-0 transform transition-500 transition-opacity"
         modal-menu="mega">
-        <div class="relative rounded-lg bg-white shadow dark:bg-gray-700">
+      <div class="relative rounded-lg bg-white shadow-sm dark:bg-gray-700">
             <button
                 tabindex="-1"
                 class="absolute top-2 right-2 ml-auto inline-flex items-center rounded-lg bg-transparent bg-gray-200 p-1 text-sm text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-600 dark:text-gray-100 z-10"

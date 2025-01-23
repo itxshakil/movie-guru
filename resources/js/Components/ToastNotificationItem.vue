@@ -51,7 +51,7 @@ const emit = defineEmits(['remove']);
 <template>
     <div
         :class="iconClasses"
-        class="animate-shake flex items-start px-3 py-2 space-x-2 backdrop-blur-xl backdrop-saturate-150 rtl:space-x-reverse text-xs shadow ring-1 rounded-xl"
+        class="animate-shake flex items-start px-3 py-2 space-x-2 backdrop-blur-xl backdrop-saturate-150 rtl:space-x-reverse text-xs shadow-sm ring-1 rounded-xl"
     >
         <TimesCircle
             v-if="level === 'danger'"

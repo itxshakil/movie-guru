@@ -4,7 +4,7 @@
     >
         <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5">
             <div
-                class="flex items-center justify-center h-48 bg-gray-300 rounded dark:bg-gray-700 aspect-h-3 aspect-w-2 mx-w-64 w-full">
+                class="flex items-center justify-center h-48 bg-gray-300 rounded-sm dark:bg-gray-700 aspect-h-3 aspect-w-2 mx-w-64 w-full">
                 <svg aria-hidden="true" class="w-full h-full text-gray-200 dark:text-gray-600"
                      fill="currentColor"
                      viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +28,7 @@
                 <div class="flex items-center">
                     <svg v-for="i in 5"
                          :key="i" :class="i <= 4 ? 'text-gray-300 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'"
-                         aria-hidden="true" class="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                         aria-hidden="true" class="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path clip-rule="evenodd"
                               d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
                               fill-rule="evenodd"/>

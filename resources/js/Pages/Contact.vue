@@ -73,7 +73,10 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                         </div>
                         <div class="col-span-2">
                             <InputLabel for="message" required value="Message" class="font-bold text-medium mb-2" />
-                            <textarea id="message" placeholder="Your Message" v-model="form.message" name="message" rows="6" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-sm bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 rounded-lg focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200" required></textarea>
+                          <textarea id="message" v-model="form.message" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 rounded-lg focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200" name="message"
+                                    placeholder="Your Message"
+                                    required
+                                    rows="6"></textarea>
                             <InputError :message="form.errors.message" />
                         </div>
                         <div class="col-span-2">

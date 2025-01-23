@@ -13,7 +13,7 @@
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
                         <span v-if="trending"
-                            class="flex items-center gap-1 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-orange-900 dark:text-orange-300">
+                              class="flex items-center gap-1 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-sm dark:bg-orange-900 dark:text-orange-300">
                             Trending
                             <svg class="h-4 w-4" fill="none" height="24" stroke="currentColor"
                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
@@ -24,9 +24,9 @@
                             </svg>
                         </span>
                             <span v-else-if="recentlyReleased"
-                                  class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">New</span>
+                                  class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">New</span>
                             <span v-else-if="topRated"
-                                  class="flex items-center gap-1 bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                                  class="flex items-center gap-1 bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-sm dark:bg-primary-900 dark:text-primary-300">
                         <svg class="w-4 h-4" fill="none" height="24" stroke="currentColor"
                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                              width="24" xmlns="http://www.w3.org/2000/svg">
@@ -41,7 +41,7 @@
                                     Top Rated
                                 </span>
                             <span v-else-if="hiddenGems"
-                                  class="flex items-center gap-1 bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                                  class="flex items-center gap-1 bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-sm dark:bg-primary-900 dark:text-primary-300">
                                     <svg class="w-4 h-4" fill="none" height="24" stroke="currentColor"
                                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                          viewBox="0 0 24 24"
@@ -80,7 +80,7 @@
                                         v-for="i in 5"
                                         :key="i"
                                         :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'"
-                                        aria-hidden="true" class="h-6 w-6 flex-shrink-0" fill="currentColor"
+                                        aria-hidden="true" class="h-6 w-6 shrink-0" fill="currentColor"
                                         viewBox="0 0 20 20">
                                         <path clip-rule="evenodd"
                                             d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
@@ -267,7 +267,7 @@
                                                     role="list">
                                                     <li v-for="(rating, index) in detail.Ratings" :key="index"
                                                         class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                                                        <span class="flex-shrink-0 text-gray-900 dark:text-gray-200"
+                                                        <span class="shrink-0 text-gray-900 dark:text-gray-200"
                                                               v-text="rating.Source"></span>
                                                         <span
                                                             class="font-medium  text-primary-200 hover:text-primary-100"
