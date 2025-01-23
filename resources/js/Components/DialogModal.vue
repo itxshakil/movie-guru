@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue';
+import {onMounted, onUnmounted, ref} from 'vue';
 import TimesIcon from '@/Components/Icons/Times.vue';
 
 defineProps({
@@ -13,6 +13,10 @@ const dialog = ref(null);
 onMounted(() => {
     dialog.value?.showModal();
 });
+
+onUnmounted(() => {
+  dialog.value?.hide();
+})
 </script>
 
 <template>
