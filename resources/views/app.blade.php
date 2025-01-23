@@ -237,6 +237,12 @@
                 }
             } else if (event.data?.type === 'OFFLINE_SYNC_FETCHED') {
                 localStorage.removeItem('offlineRequestUrl');
+            } else if (event.data?.type === 'EVENT_TRACKING') {
+                if (window.gtag) {
+                    const title = event.data.title;
+                    const details = event.data.details ?? {};
+                    window.gtag('event', title, details);
+                }
             }
         });
 

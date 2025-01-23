@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.5';
-const SEARCH_CACHE = 'search-cache-v-4.5';
-const INFO_CACHE = 'info-cache-v-4.5';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.5';
-const POSTER_CACHE = 'poster-cache-v-4.5';
+const APP_CACHE = 'v-4.6';
+const SEARCH_CACHE = 'search-cache-v-4.6';
+const INFO_CACHE = 'info-cache-v-4.6';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.6';
+const POSTER_CACHE = 'poster-cache-v-4.6';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -215,6 +215,11 @@ self.addEventListener('activate', async (e) => {
             message: 'The app has been updated and is ready to use.',
             level: 'success',
         });
+
+        broadcastTrackingEvent(`APP_UPDATED`, {
+            event_category: 'APP_UPDATED',
+            event_label: APP_CACHE,
+        });
     } catch (error) {
         logError('Error removing old cache', error);
     }
@@ -296,6 +301,12 @@ self.addEventListener('message', event => {
 function handleNotificationClick(event) {
     if (event.action === 'close') {
         event.notification.close();
+
+        broadcastTrackingEvent('notification_closed', {
+            event_category: 'notification_closed',
+            event_label: "Notify closed",
+        });
+        
     } else {
         event.waitUntil(clients.matchAll({
             type: 'window',
@@ -304,6 +315,28 @@ function handleNotificationClick(event) {
             const data = notification.data || {};
             const urlToOpen = data.url || '/';
 
+            broadcastTrackingEvent('notification_opened', {
+                event_category: 'notification_opened',
+                event_label: "Notify opened",
+            });
+
+            // Get the time of day as a label (morning, afternoon, evening, etc.)
+            let timeOfDayLabel = '';
+            if (hourOfDay >= 5 && hourOfDay < 12) {
+                timeOfDayLabel = 'Morning';
+            } else if (hourOfDay >= 12 && hourOfDay < 16) {
+                timeOfDayLabel = 'Afternoon';
+            } else if (hourOfDay >= 16 && hourOfDay < 20) {
+                timeOfDayLabel = 'Evening';
+            } else {
+                timeOfDayLabel = 'Late Night';
+            }
+
+            broadcastTrackingEvent(`noti_op ${timeOfDayLabel}`, {
+                event_category: 'noti_op',
+                event_label: timeOfDayLabel,
+            });
+            
             // Check if clients.openWindow is available
             if (clients.openWindow) {
                 // Check if the URL is valid before trying to open a window
@@ -377,6 +410,16 @@ async function offlineSyncRequest(offlineRequestUrl) {
             },
             requireInteraction: true,
             vibrate: [100, 50, 100],
+        });
+
+        broadcastTrackingEvent(`OFFLINE_SYNCED_SUCCESS`, {
+            event_category: 'OFFLINE_SYNCED_SUCCESS',
+            event_label: searchQuery,
+        });
+
+        broadcastTrackingEvent(`${searchQuery}offline`, {
+            event_category: 'OFFLINE_SYNCED_SUCCESS',
+            event_label: searchQuery,
         });
     } catch (error) {
         logError('Error occurred while fetching offline request', error);
@@ -555,6 +598,28 @@ function rollMovieNotifications() {
         vibrate: [200, 100, 200, 200, 100, 200, 200, 100, 200],
         renotify: true,
     });
+
+    / Get the time of day as a label (morning, afternoon, evening, etc.)
+    let timeOfDayLabel = '';
+    if (hourOfDay >= 5 && hourOfDay < 12) {
+        timeOfDayLabel = 'Morning';
+    } else if (hourOfDay >= 12 && hourOfDay < 16) {
+        timeOfDayLabel = 'Afternoon';
+    } else if (hourOfDay >= 16 && hourOfDay < 20) {
+        timeOfDayLabel = 'Evening';
+    } else {
+        timeOfDayLabel = 'Late Night';
+    }
+
+    broadcastTrackingEvent('notification_sent', {
+        event_category: 'notification_sent',
+        event_label: "Notify sent",
+    });
+
+    broadcastTrackingEvent(timeOfDayLabel, {
+        event_category: timeOfDayLabel,
+        event_label: timeOfDayLabel,
+    });
 }
 
 // Call this function periodically or on-demand
@@ -605,5 +670,18 @@ function sendTrendingNotification() {
         requireInteraction: true,
         vibrate: [200, 100, 200],
     });
+
+    broadcastTrackingEvent('trending_notification_sent', {
+        event_category: 'trending_notification_sent',
+        event_label: "Trending Notify sent",
+    });
 }
 
+function broadcastTrackingEvent(eventType, details) {
+    broadcast.postMessage({
+        type: 'EVENT_TRACKING',
+        title: eventType,
+        details: details,
+        timestamp: new Date().toISOString(),
+    });
+}
