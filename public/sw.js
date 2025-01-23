@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.6';
-const SEARCH_CACHE = 'search-cache-v-4.6';
-const INFO_CACHE = 'info-cache-v-4.6';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.6';
-const POSTER_CACHE = 'poster-cache-v-4.6';
+const APP_CACHE = 'v-4.7';
+const SEARCH_CACHE = 'search-cache-v-4.7';
+const INFO_CACHE = 'info-cache-v-4.7';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.7';
+const POSTER_CACHE = 'poster-cache-v-4.7';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -22,42 +22,42 @@ const basicPathsToCache = [
     '/',
     '/?utm_source=homescreen',
     '/build/manifest.json',
-    '/build/assets/Search-DSwcpwDw.css',
+    '/build/assets/Search-Bv2ed5QB.css',
     '/build/assets/BaseLayout-pP2Wt1YA.css',
-    '/build/assets/SearchCard-XTlQ7yWv.css',
-    '/build/assets/app-Do2fUH22.css',
-    '/build/assets/LoadingSpinner-BeTD29SV.js',
-    '/build/assets/ApplicationLogo-DbBjg7sL.js',
-    '/build/assets/InputError-D_nTjBrm.js',
-    '/build/assets/InputLabel-Cdfavl5x.js',
-    '/build/assets/GuestLayout-CluZlusS.js',
-    '/build/assets/LoadingSpinnerButton-jyDxP8sa.js',
-    '/build/assets/PrimaryButton-BQn-AwVm.js',
-    '/build/assets/Dashboard-hzVPL9iT.js',
-    '/build/assets/TextInput-DGQuor_G.js',
-    '/build/assets/Edit-DXsI7LzP.js',
-    '/build/assets/ConfirmPassword-DxgGT6_I.js',
-    '/build/assets/ForgotPassword-_0Mc9YRg.js',
-    '/build/assets/VerifyEmail-C8Sud8WC.js',
-    '/build/assets/Show-9VKWqTwE.js',
-    '/build/assets/ResetPassword-B9_Hzx-U.js',
-    '/build/assets/Error-LjmLdIAo.js',
-    '/build/assets/Register-MUKI0VYB.js',
-    '/build/assets/UpdatePasswordForm-4DVixJnb.js',
-    '/build/assets/UpdateProfileInformationForm-CM5zxrhL.js',
-    '/build/assets/Login-CXaMd-4j.js',
-    '/build/assets/NewsletterForm-BpNeCtxW.js',
-    '/build/assets/Terms-CxQmyw1B.js',
-    '/build/assets/PrivacyPolicy-xB9riVju.js',
-    '/build/assets/DeleteUserForm-D_aJHZOw.js',
-    '/build/assets/SearchCard-CPZc1xOf.js',
-    '/build/assets/Contact-Wt_Uw1Do.js',
-    '/build/assets/AuthenticatedLayout-DLYxV9-c.js',
-    '/build/assets/Search-WEH2qq-j.js',
-    '/build/assets/Welcome-BJhkKI44.js',
-    '/build/assets/BaseLayout-DR8c7Jsa.js',
-    '/build/assets/DetailCard-ChCgYUMg.js',
-    '/build/assets/app-C4ZvdjJo.js',
+    '/build/assets/SearchCard-BkBkBA4i.css',
+    '/build/assets/app-CEX60OPJ.css',
+    '/build/assets/LoadingSpinner-B823bXti.js',
+    '/build/assets/ApplicationLogo-BIQlIehL.js',
+    '/build/assets/InputError-BQfOUHcM.js',
+    '/build/assets/InputLabel-BrE8AOtI.js',
+    '/build/assets/GuestLayout-CoR6Cx8u.js',
+    '/build/assets/LoadingSpinnerButton-B6czXKDC.js',
+    '/build/assets/PrimaryButton-DwRyXStX.js',
+    '/build/assets/Dashboard-BF0Vv5K_.js',
+    '/build/assets/TextInput-6mFpanH_.js',
+    '/build/assets/Edit-XgQdIAUj.js',
+    '/build/assets/ConfirmPassword-RCMKDWqn.js',
+    '/build/assets/ForgotPassword-DgRU9J7w.js',
+    '/build/assets/VerifyEmail-JjR2OYrJ.js',
+    '/build/assets/Show-CBQ-EsVU.js',
+    '/build/assets/ResetPassword-2pmDD3oD.js',
+    '/build/assets/Error-Bhux__ik.js',
+    '/build/assets/Register-DXHzBPWH.js',
+    '/build/assets/UpdatePasswordForm-Dc48qSm8.js',
+    '/build/assets/UpdateProfileInformationForm-CdrLWm1m.js',
+    '/build/assets/Login-BRcLlQFC.js',
+    '/build/assets/NewsletterForm-DtwQ8Wp4.js',
+    '/build/assets/Terms-D9mAuio8.js',
+    '/build/assets/PrivacyPolicy-DYC1dNxp.js',
+    '/build/assets/DeleteUserForm-B3pkCEFo.js',
+    '/build/assets/SearchCard-DFTSv5xP.js',
+    '/build/assets/Contact-DNfDbMkX.js',
+    '/build/assets/AuthenticatedLayout-DtqD4jPr.js',
+    '/build/assets/Search-ofmK6a2v.js',
+    '/build/assets/Welcome-hLChWWVg.js',
+    '/build/assets/BaseLayout-CanxmSwI.js',
+    '/build/assets/DetailCard-D7SIEAZt.js',
+    '/build/assets/app-Dzz6lof0.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -306,7 +306,7 @@ function handleNotificationClick(event) {
             event_category: 'notification_closed',
             event_label: "Notify closed",
         });
-        
+
     } else {
         event.waitUntil(clients.matchAll({
             type: 'window',
@@ -336,7 +336,7 @@ function handleNotificationClick(event) {
                 event_category: 'noti_op',
                 event_label: timeOfDayLabel,
             });
-            
+
             // Check if clients.openWindow is available
             if (clients.openWindow) {
                 // Check if the URL is valid before trying to open a window

@@ -38,13 +38,15 @@ dialog::backdrop {
 }
 
 @keyframes modal-enter {
-    0% {
-        @apply opacity-0 translate-y-4;
-    }
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
 
-    100% {
-        @apply opacity-100 translate-y-0;
-    }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-dialog {
