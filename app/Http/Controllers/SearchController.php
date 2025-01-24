@@ -32,9 +32,9 @@ class SearchController extends Controller
         $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
 
         $cacheKey = 'search-'.$search.'-'.$page.'-'.$movieType.'-'.$year;
-        $movies = Cache::remember(
+        $movies = Cache::flexible(
             $cacheKey,
-            now()->addHours(4),
+            [now()->addHours(16), now()->addHours(24)],
             function () use ($OMDBApiService, $search, $page, $movieType, $year) {
                 return $OMDBApiService->searchByTitle($search, $page, $movieType, $year);
             }
@@ -113,38 +113,42 @@ class SearchController extends Controller
     public function show(Request $request, string $imdbId, OMDBApiService $OMDBApiService)
     {
         $cacheKey = 'detail.'.$imdbId;
-        $detail = Cache::remember($cacheKey, now()->addHours(6), function () use ($imdbId, $OMDBApiService) {
-            // Check for the movie in the database
-            $movie = MovieDetail::where('imdb_id', $imdbId)->first();
+        $detail = Cache::flexible(
+            $cacheKey,
+            [now()->addHours(18), now()->addHours(24)],
+            function () use ($imdbId, $OMDBApiService) {
+                // Check for the movie in the database
+                $movie = MovieDetail::where('imdb_id', $imdbId)->first();
 
-            if ($movie) {
-                defer(fn() => $movie->incrementViews());
-                $this->updateMovieDetailsInBackground($imdbId);
+                if ($movie) {
+                    defer(fn() => $movie->incrementViews());
+                    $this->updateMovieDetailsInBackground($imdbId);
 
-                return $movie->details;
+                    return $movie->details;
+                }
+
+                // If not found in the database, fetch from the API
+                $detail = $OMDBApiService->getById($imdbId);
+
+                defer(function () use ($detail, $imdbId) {
+                    // Save the details to the database
+                    MovieDetail::updateOrCreate([
+                        'imdb_id' => $imdbId,
+                    ], [
+                        'title' => $detail['Title'],
+                        'year' => $detail['Year'],
+                        'release_date' => $detail['Released'],
+                        'poster' => $detail['Poster'],
+                        'type' => $detail['Type'],
+                        'imdb_rating' => $detail['imdbRating'],
+                        'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
+                        'details' => $detail,
+                    ])->incrementViews();
+                });
+
+                return $detail; // Return fetched details
             }
-
-            // If not found in the database, fetch from the API
-            $detail = $OMDBApiService->getById($imdbId);
-
-            defer(function () use ($detail, $imdbId) {
-                // Save the details to the database
-                MovieDetail::updateOrCreate([
-                    'imdb_id' => $imdbId,
-                ], [
-                    'title' => $detail['Title'],
-                    'year' => $detail['Year'],
-                    'release_date' => $detail['Released'],
-                    'poster' => $detail['Poster'],
-                    'type' => $detail['Type'],
-                    'imdb_rating' => $detail['imdbRating'],
-                    'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
-                    'details' => $detail,
-                ])->incrementViews();
-            });
-
-            return $detail; // Return fetched details
-        });
+        );
 
         defer(function () use ($request, $imdbId) {
             // Log the analytics
