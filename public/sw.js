@@ -161,7 +161,8 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('periodicsync', async (event) => {
-    if (event.tag === 'weeklyTrendingNotification') {
+    log('Periodic sync', event);
+    if (event.tag === 'weekly-trending-notification') {
         const now = new Date();
         const isSaturday = now.getDay() === 6; // Saturday is day 6
         const isNotificationTime = now.getHours() > 18; // 6 PM is hour 18
@@ -193,8 +194,8 @@ self.addEventListener('periodicsync', async (event) => {
                 }
             }
         }
-    } else if (event.tag === 'movieNotificationSync') {
-        rollMovieNotifications();
+    } else if (event.tag === 'daily-notification') {
+        dailyNotification();
     }
 });
 
@@ -361,7 +362,7 @@ function handleNotificationClick(event) {
 }
 
 self.addEventListener('sync', async (event) => {
-    if (event.tag === 'offlineSync') {
+    if (event.tag === 'offline-search-sync') {
         broadcast.postMessage({type: 'OFFLINE_SYNC_EVENT'});
     }
 });
@@ -427,7 +428,7 @@ async function offlineSyncRequest(offlineRequestUrl) {
 
 }
 
-function rollMovieNotifications() {
+function dailyNotification() {
     const now = new Date();
     const hourOfDay = now.getHours();
     const dayOfWeek = now.getDay();
@@ -621,13 +622,6 @@ function rollMovieNotifications() {
         event_label: timeOfDayLabel,
     });
 }
-
-// Call this function periodically or on-demand
-self.addEventListener('periodicsync', (event) => {
-    if (event.tag === 'movieNotificationSync') {
-        rollMovieNotifications();
-    }
-});
 
 
 self.addEventListener('push', (event) => {

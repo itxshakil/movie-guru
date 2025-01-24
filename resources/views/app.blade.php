@@ -167,15 +167,15 @@
         function setupSyncAndPeriodicSync(registration) {
             // Sync Manager
             if ('SyncManager' in window) {
-                registration.sync.register('offlineSync').catch(error => {
+                registration.sync.register('offline-search-sync').catch(error => {
                     console.error('Offline sync registration failed:', error);
                 });
             }
 
             // Periodic Sync
             if ('periodicSync' in registration) {
-                registerPeriodicSync(registration, 'weeklyTrendingNotification', 24 * 60 * 60 * 1000); // Once a day
-                registerPeriodicSync(registration, 'movieNotificationSync', 17 * 59 * 59 * 1000); // Random
+                registerPeriodicSync(registration, 'weekly-trending-notification', 24 * 60 * 60 * 1000); // Once a day
+                registerPeriodicSync(registration, 'daily-notification', ((25 * 60 * 60 * 1000) + (1 * 60 * 60 * 1000) + (7 * 60 * 100))); // Random
             }
         }
 
