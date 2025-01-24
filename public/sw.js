@@ -2,11 +2,11 @@ const DEBUG = true;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.8';
-const SEARCH_CACHE = 'search-cache-v-4.8';
-const INFO_CACHE = 'info-cache-v-4.8';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.8';
-const POSTER_CACHE = 'poster-cache-v-4.8';
+const APP_CACHE = 'v-4.9';
+const SEARCH_CACHE = 'search-cache-v-4.9';
+const INFO_CACHE = 'info-cache-v-4.9';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.9';
+const POSTER_CACHE = 'poster-cache-v-4.9';
 const STATIC_ASSETS = [
     '/app.webmanifest',
     '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
@@ -309,55 +309,71 @@ function handleNotificationClick(event) {
         });
 
     } else {
-        event.waitUntil(clients.matchAll({
-            type: 'window',
-        }).then((clientList) => {
-            const notification = event.notification;
-            const data = notification.data || {};
-            const urlToOpen = data.url || '/';
+        event.waitUntil(
+            (async () => {
+                const notification = event.notification;
+                const data = notification.data || {};
+                const urlToOpen = data.url || '/';
 
-            broadcastTrackingEvent('notification_opened', {
-                event_category: 'notification_opened',
-                event_label: "Notify opened",
-            });
-
-            // Get the time of day as a label (morning, afternoon, evening, etc.)
-            let timeOfDayLabel = '';
-            if (hourOfDay >= 5 && hourOfDay < 12) {
-                timeOfDayLabel = 'Morning';
-            } else if (hourOfDay >= 12 && hourOfDay < 16) {
-                timeOfDayLabel = 'Afternoon';
-            } else if (hourOfDay >= 16 && hourOfDay < 20) {
-                timeOfDayLabel = 'Evening';
-            } else {
-                timeOfDayLabel = 'Late Night';
-            }
-
-            broadcastTrackingEvent(`noti_op ${timeOfDayLabel}`, {
-                event_category: 'noti_op',
-                event_label: timeOfDayLabel,
-            });
-
-            // Check if clients.openWindow is available
-            if (clients.openWindow) {
-                // Check if the URL is valid before trying to open a window
-                if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
-                    return clients.openWindow(urlToOpen);
+                // Get the time of day for event label (morning, afternoon, etc.)
+                const hourOfDay = new Date().getHours();
+                let timeOfDayLabel = '';
+                if (hourOfDay >= 5 && hourOfDay < 12) {
+                    timeOfDayLabel = 'Morning';
+                } else if (hourOfDay >= 12 && hourOfDay < 16) {
+                    timeOfDayLabel = 'Afternoon';
+                } else if (hourOfDay >= 16 && hourOfDay < 20) {
+                    timeOfDayLabel = 'Evening';
                 } else {
-                    // Fallback to opening the home URL
-                    return clients.openWindow('/');
+                    timeOfDayLabel = 'Late Night';
                 }
-            } else {
-                // Fallback to opening the home URL using a different method if clients.openWindow is not available
-                if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
-                    // Use a different method to open the URL if clients.openWindow is not available
-                    window.open(urlToOpen, '_blank');
-                } else {
-                    // Fallback to opening the home URL
-                    window.open('/', '_blank');
+
+                // Broadcast tracking event for notification opened
+                broadcastTrackingEvent('notification_opened', {
+                    event_category: 'notification_opened',
+                    event_label: "Notify opened",
+                });
+
+                broadcastTrackingEvent(`noti_op ${timeOfDayLabel}`, {
+                    event_category: 'noti_op',
+                    event_label: timeOfDayLabel,
+                });
+
+                // Check if there's an open window client
+                try {
+                    const clientList = await clients.matchAll({type: 'window', includeUncontrolled: true});
+                    const openWindow = clientList.find(client => client.url === urlToOpen && client.visibilityState === 'visible');
+
+                    if (openWindow) {
+                        // If there's already an open window, focus it
+                        openWindow.focus();
+                    } else {
+                        // If no open window, open a new window
+                        if (clients.openWindow) {
+                            if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
+                                await clients.openWindow(urlToOpen);
+                            } else {
+                                await clients.openWindow('/');
+                            }
+                        } else {
+                            // Fallback for non-Service Worker environments (e.g., browser window)
+                            if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
+                                window.open(urlToOpen, '_blank');
+                            } else {
+                                window.open('/', '_blank');
+                            }
+                        }
+                    }
+                } catch (err) {
+                    // Handle potential errors, e.g., if clients.matchAll fails
+                    console.error('Error matching client windows:', err);
+                    // Fallback to opening the home URL if there's an issue
+                    if (clients.openWindow) {
+                        await clients.openWindow('/');
+                    }
                 }
-            }
-        }));
+            })()
+        );
     }
 }
 
