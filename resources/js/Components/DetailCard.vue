@@ -6,10 +6,10 @@
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="grid w-full grid-cols-1 items-start gap-x-3 gap-y-4 sm:grid-cols-12 lg:gap-x-8">
                     <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5">
-                        <div class="aspect-h-3 aspect-w-2 bg-gray-100 dark:bg-gray-900">
+                      <div class="bg-gray-100 dark:bg-gray-900">
                             <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"
-                                 class="object-cover object-center cursor-pointer">
+                                 class="object-cover object-center cursor-pointer w-full">
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
                         <span v-if="trending"
@@ -79,7 +79,7 @@
                                     <svg
                                         v-for="i in 5"
                                         :key="i"
-                                        :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'"
+                                        :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-400'"
                                         aria-hidden="true" class="h-6 w-6 shrink-0" fill="currentColor"
                                         viewBox="0 0 20 20">
                                         <path clip-rule="evenodd"
@@ -88,11 +88,14 @@
                                     </svg>
 
                                     <!--                                TODO: Redirect link to imdbID to rating page -->
-                                  <a class="ml-3 text-sm font-medium text-primary-200 hover:text-primary-100" href="#">
+                                  <a class="ml-3 text-sm font-medium text-primary-800 dark:text-primary-200 hover:text-primary-100"
+                                     href="#">
                                     <span class="sr-only" itemprop="ratingCount">{{
                                         isValue(detail.imdbVotes) ? detail.imdbVotes.replaceAll(',', '').trim() : 0
                                       }}</span>
-                                    <span>{{ isValue(detail.imdbVotes) ? detail.imdbVotes : 'No ' }}</span> reviews
+                                    <span class="text-xs">(<span>{{
+                                        isValue(detail.imdbVotes) ? detail.imdbVotes : 'No '
+                                      }}</span> reviews)</span>
                                   </a>
 
                                 </div>
@@ -161,7 +164,7 @@
                                 </a>
                               </li>
                               <!-- Download Max -->
-                              <li class="flex items-center space-x-2">
+                              <li class="flex items-center space-x-2 mb-4">
                                 <a
                                     :href="googleDownloadLink"
                                     class="text-primary-500 hover:underline" rel="noopener noreferrer"
@@ -270,7 +273,7 @@
                                                         <span class="shrink-0 text-gray-900 dark:text-gray-200"
                                                               v-text="rating.Source"></span>
                                                         <span
-                                                            class="font-medium  text-primary-200 hover:text-primary-100"
+                                                            class="font-medium  text-primary-600 hover:text-primary-100"
                                                             v-text="rating.Value"></span>
                                                     </li>
                                                 </ul>
@@ -283,7 +286,7 @@
                     </div>
                 </div>
 
-                <DetailSkeletonCard v-else/>
+              <DetailSkeletonCard v-else :title="title"/>
             </div>
         </div>
     </div>
@@ -295,6 +298,10 @@ import SnippetText from '@/Components/SnippetText.vue';
 
 const props = defineProps({
     detail: Object,
+  title: {
+    type: String,
+    required: false,
+  }
 });
 
 const associateTrackingID = "itxshakil0ec-21"; // Replace with your actual tracking ID

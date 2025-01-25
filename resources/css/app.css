@@ -136,3 +136,10 @@ because the nesting selector cannot represent pseudo-elements. */
         background-color: rgb(0 0 0 / 0%);
     }
 }
+
+@media all and (display-mode: fullscreen) {
+    .install-prompt-container {
+        display: none;
+    }
+}
+

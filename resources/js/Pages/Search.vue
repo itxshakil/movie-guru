@@ -55,6 +55,7 @@ const nextURLLink = ref(props.nextUrl);
 const movieList = ref(props.searchResults.Search);
 const loading = ref(false);
 const selectedIMDBId = ref(null);
+const selectedTitle = ref(null);
 const timeout = ref(0);
 const maxRetry  = ref(3);
 
@@ -92,8 +93,11 @@ const loadMore = () => {
     });
 };
 
-const viewDetail = (imdb_id, sectionName) => {
+const viewDetail = (imdb_id, sectionName, title = null) => {
   selectedIMDBId.value = imdb_id;
+  if (title) {
+    selectedTitle.value = title;
+  }
 
   // Google Analytics event
   if (window.gtag) {
@@ -218,11 +222,11 @@ const moviePoster = (movie) => {
                         v-for="movie in movieList"
                         :key="movie.imdb_id"
                         :movie="movie"
-                        @selected="viewDetail(movie.imdb_id, 'Search')"
+                        @selected="viewDetail(movie.imdb_id, 'Search', movie.title)"
                     />
                 </div>
 
-                <div class="flex justify-center mt-2" v-show="nextURLLink">
+              <div v-show="nextURLLink" class="flex justify-center my-2">
                     <button v-show="nextURLLink && loading === false"
                             class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-sm"
                             @click="loadMore">Load More
@@ -268,7 +272,7 @@ const moviePoster = (movie) => {
         </div>
     </div>
 
-    <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" @close="selectedIMDBId = null;"/>
+  <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" :title="selectedTitle" @close="selectedIMDBId = null;"/>
 </template>
 <style scoped>
     @media (display-mode: standalone) {

@@ -1,10 +1,14 @@
 <script setup>
-import { onMounted, ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import DetailCard from '@/Components/DetailCard.vue';
 
 const props = defineProps({
-    imdbID : String
+  imdbID: String,
+  title: {
+    type: String,
+    required: false
+  }
 })
 
 const emit = defineEmits(['close']);
@@ -80,7 +84,7 @@ const onClose = () => {
 
 <template>
     <DialogModal @close="onClose" max-width=" w-full md:max-w-2xl lg:max-w-4xl">
-        <DetailCard :detail="detail"/>
+      <DetailCard :detail="detail" :title="title"/>
     </DialogModal>
 </template>
 

@@ -18,7 +18,9 @@
             </div>
         </div>
         <div class="sm:col-span-8 lg:col-span-7">
-            <h2 class="sm:pr-12 mb-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-56 p-2 sm:py-4"></h2>
+          <h1 v-if="title" class="text-2xl font-bold text-gray-900 dark:text-white sm:pr-12" itemprop="name"
+              v-text="title"></h1>
+          <h2 v-else class="sm:pr-12 mb-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-56 p-2 sm:py-4"></h2>
             <span class="inline-flex mr-2 w-12 mb-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-16 p-1 sm:py-2 h-1"></span>
             <span class="inline-flex mr-2 w-16 mb-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-16 p-1 sm:py-2 h-1"></span>
             <span class="inline-flex mr-2 w-8 mb-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-16 p-1 sm:py-2 h-1"></span>
@@ -68,8 +70,11 @@
         <span class="sr-only">Loading...</span>
     </div>
 </template>
-<script>
-export default {
-    name: 'DetailSkeletonCard',
-};
+<script setup>
+const props = defineProps({
+  title: {
+    type: String,
+    required: false,
+  }
+});
 </script>

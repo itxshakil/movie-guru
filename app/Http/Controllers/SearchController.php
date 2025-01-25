@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Search;
 use App\Models\SearchQuery;
 use App\OMDB\MovieType;
 use App\Services\OMDBApiService;
@@ -21,7 +22,8 @@ class SearchController extends Controller
         $movieType = $request->get('type');
         $year = $request->integer('year', null);
 
-        $defaultSearches = ['sholay', 'batman', 'spiderman', 'game of thrones', 'don', '3 idiots'];
+        $trendingQueries = $trendingQueryService->fetch()->random(5);
+        $defaultSearches = $trendingQueries->toArray();
 
         if (empty($search)) {
             $search = $defaultSearches[array_rand($defaultSearches)];
@@ -38,12 +40,18 @@ class SearchController extends Controller
             }
         );
 
-        defer(function () use ($searchQuery, $movies) {
+        defer(function () use ($search, $searchQuery, $movies) {
             $searchQuery->update([
                 'response_at' => now(),
                 'response' => $movies['Response'] === 'True',
                 'response_result' => $movies,
             ]);
+
+            Search::updateOrCreate([
+                'query' => $search,
+            ], [
+                'total_results' => $movies['TotalResults'],
+            ])->incrementViews();
         });
 
         $movieTypes = MovieType::cases();
@@ -63,8 +71,6 @@ class SearchController extends Controller
                 ]);
             }
         }
-
-        $trendingQueries = $trendingQueryService->fetch()->random(5);
 
         if ($request->wantsJson()) {
             return response()->json([

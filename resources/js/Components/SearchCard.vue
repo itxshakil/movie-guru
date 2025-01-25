@@ -3,7 +3,7 @@
        itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie">
     <div>
       <div
-          class="relative h-80 w-full overflow-hidden rounded-lg rounded-b-none bg-white dark:bg-gray-700 aspect-h-3 aspect-w-2 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+          class="relative h-80 w-full overflow-hidden rounded-lg rounded-b-none bg-white dark:bg-gray-700 aspect-2/3 sm:aspect-16/9 lg:aspect-video group-hover:opacity-75 sm:h-64">
         <img :alt="movie.title + ' Poster'" itemprop="image"
              :src="moviePoster(movie)"
              @click="viewDetail(movie.imdb_id)"
@@ -22,7 +22,7 @@
         <svg
             v-for="i in 5"
             :key="i"
-            :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'"
+            :class="i <= basicRating ? 'text-yellow-500 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-400'"
             aria-hidden="true" class="h-4 w-4 shrink-0" fill="currentColor"
             viewBox="0 0 20 20">
           <path clip-rule="evenodd"
