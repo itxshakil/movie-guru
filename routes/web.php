@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DetailController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
@@ -28,8 +29,7 @@ Route::inertia('/contact', 'Contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search')->middleware('throttle:search');
-Route::get('/i/{imdbID}', [SearchController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
-Route::get('/i/{imdbID}', [SearchController::class, 'show'])->middleware('throttle:movie-show');
+Route::get('/i/{imdbID}', [DetailController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
 
 Route::post('/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('subscribe')->middleware('throttle:api');
 Route::post('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscribe'])->name('unsubscribe')->middleware('throttle:api');
