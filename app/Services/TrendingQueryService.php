@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\SearchQuery;
+use App\Models\Search;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -17,9 +17,7 @@ class TrendingQueryService
     public function fetch(): Collection
     {
         return Cache::remember('trending-search-queries', now()->endOfDay(), function () {
-            $queries = SearchQuery::where('created_at', '>', now()->subDays(7)->startOfDay())->distinct()->pluck(
-                'query'
-            );
+            $queries = Search::recentOnly()->hasResults()->popular()->pluck('query');
 
             $titleCleaner = app(TitleCleaner::class);
 
