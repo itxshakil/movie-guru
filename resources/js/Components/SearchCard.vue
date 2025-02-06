@@ -3,7 +3,7 @@
        itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie">
     <div>
       <div
-          class="relative h-80 w-full overflow-hidden rounded-lg rounded-b-none bg-white dark:bg-gray-700 aspect-2/3 sm:aspect-16/9 lg:aspect-video group-hover:opacity-75 sm:h-64">
+          class="relative h-96 w-full overflow-hidden rounded-lg rounded-b-none bg-white dark:bg-gray-700 aspect-2/3 sm:aspect-16/9 lg:aspect-video group-hover:opacity-75">
         <img :alt="movie.title + ' Poster'" itemprop="image"
              :src="moviePoster(movie)"
              @click="viewDetail(movie.imdb_id)"
