@@ -318,9 +318,9 @@ const isValue = function(value) {
 
 const basicRating = computed(() => {
   if (isValue(props.detail.imdbRating)) {
-    let mappedRating = Math.round(props.detail.imdbRating / 2);
+    let mappedRating = (props.detail.imdbRating / 2).toFixed(1);
 
-    mappedRating = Math.max(1, Math.min(5, mappedRating));
+    mappedRating = Math.max(.1, Math.min(5, mappedRating));
 
     return mappedRating;
   }
