@@ -9,7 +9,15 @@ const subscribe = () => {
     form.post(route("subscribe"), {
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => form.reset(),
+      onSuccess: () => () => {
+        form.reset();
+
+        const broadcastChannel = new BroadcastChannel('toast-notifications');
+        broadcastChannel.postMessage({
+          message: 'Thanks for subscribing!',
+          level: 'success',
+        });
+      },
     });
 };
 </script>
@@ -17,9 +25,9 @@ const subscribe = () => {
     <div
         class="bg-white dark:bg-gray-900 py-4"
     >
-        <div class="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+      <div class=" w-full max-w-7xl mx-auto rounded-lg p-2">
             <div
-                class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2"
+                class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 sm:p-6 lg:p-8 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2"
             >
                 <div class="max-w-xl lg:max-w-lg">
                     <h2
@@ -51,11 +59,15 @@ const subscribe = () => {
                         <button
                             type="submit"
                             :disabled="form.processing"
+                            v-text="form.processing ? 'Subscribing...' : 'Subscribe'"
                             class="flex-none rounded-md bg-primary-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-primary-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                         >
-                            Subscribe
                         </button>
                     </form>
+
+                  <p v-if="form.recentlySuccessful" class="mt-4 text-green-500 dark:text-green-400">
+                    Thank you for subscribing!
+                  </p>
                 </div>
                 <dl
                     class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2"
