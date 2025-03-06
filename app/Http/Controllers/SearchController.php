@@ -22,8 +22,8 @@ class SearchController extends Controller
         $movieType = $request->get('type');
         $year = $request->integer('year', null);
 
-        $trendingQueries = $trendingQueryService->fetch()->random(5);
-        $defaultSearches = $trendingQueries->toArray();
+        $trendingQueries = $trendingQueryService->fetch();
+        $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(5)->toArray() : [];
 
         if (empty($search)) {
             $search = $defaultSearches[array_rand($defaultSearches)];
