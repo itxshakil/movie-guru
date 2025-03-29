@@ -310,7 +310,11 @@ const amazonAffiliateLink = computed(() => props.detail ? `https://primevideo.co
 const huluLink = computed(() => props.detail ? `https://www.hulu.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const disneyPlusLink = computed(() => props.detail ? `https://www.disneyplus.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const hboMaxLink = computed(() => props.detail ? `https://play.hbomax.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
-const googleDownloadLink = computed(() => props.detail ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+download+filetype:mkv+OR+filetype:mp4` : '');
+const googleDownloadLink = computed(() =>
+    props.detail
+        ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+("download" OR "watch online") OR (filetype:mkv OR filetype:mp4) OR (inurl:drive.google.com OR inurl:mega.nz OR inurl:mediafire.com)`
+        : ''
+);
 
 const isValue = function(value) {
     return value && value !== 'N/A';

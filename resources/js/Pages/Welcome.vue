@@ -50,7 +50,7 @@ const viewDetail = (imdb_id, sectionName) => {
 
 defineOptions({ layout: BaseLayout });
 
-const pageTitle = 'Discover. Explore. Enjoy.';
+const pageTitle = 'Explore the Best Movies & Series – Hidden Gems & Popular Picks!';
 const pageDescription = 'Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Your gateway to a universe of entertainment awaits!';
 const pageUrl = window.location.href;
 const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
