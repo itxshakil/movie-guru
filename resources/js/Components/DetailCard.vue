@@ -132,37 +132,37 @@
                                 </a>
                               </li>
                               <!-- Hulu -->
-                              <li class="flex items-center space-x-2">
-                                <a :href="huluLink"
-                                   class="text-primary-500 hover:underline"
-                                   rel="noopener noreferrer" @click="sendAnalytics('Hulu', huluLink)"
-                                   target="_blank">
-                                  <img alt="Hulu Logo" class="h-8 w-12" src="/assets/hulu-logo.svg">
-                                  <span class="sr-only">Watch on Hulu</span>
-                                </a>
-                              </li>
+                              <!--                              <li class="flex items-center space-x-2">-->
+                              <!--                                <a :href="huluLink"-->
+                              <!--                                   class="text-primary-500 hover:underline"-->
+                              <!--                                   rel="noopener noreferrer" @click="sendAnalytics('Hulu', huluLink)"-->
+                              <!--                                   target="_blank">-->
+                              <!--                                  <img alt="Hulu Logo" class="h-8 w-12" src="/assets/hulu-logo.svg">-->
+                              <!--                                  <span class="sr-only">Watch on Hulu</span>-->
+                              <!--                                </a>-->
+                              <!--                              </li>-->
                               <!-- Disney+ -->
-                              <li class="flex items-center space-x-2">
-                                <a
-                                    :href="disneyPlusLink"
-                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
-                                    @click="sendAnalytics('Disney+', disneyPlusLink)"
-                                   target="_blank">
-                                  <img alt="Disney+ Logo" class="h-9 w-16" src="/assets/disney-logo.jpg">
-                                  <span class="sr-only">Watch on Disney+</span>
-                                </a>
-                              </li>
+                              <!--                              <li class="flex items-center space-x-2">-->
+                              <!--                                <a-->
+                              <!--                                    :href="disneyPlusLink"-->
+                              <!--                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"-->
+                              <!--                                    @click="sendAnalytics('Disney+', disneyPlusLink)"-->
+                              <!--                                   target="_blank">-->
+                              <!--                                  <img alt="Disney+ Logo" class="h-9 w-16" src="/assets/disney-logo.jpg">-->
+                              <!--                                  <span class="sr-only">Watch on Disney+</span>-->
+                              <!--                                </a>-->
+                              <!--                              </li>-->
                               <!-- HBO Max -->
-                              <li class="flex items-center space-x-2">
-                                <a
-                                    :href="hboMaxLink"
-                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
-                                    @click="sendAnalytics('HBO Max', hboMaxLink)"
-                                   target="_blank">
-                                  <img alt="HBO Max Logo" class="h-8 w-12" src="/assets/hbo-logo.png">
-                                  <span class="sr-only">Watch on HBO Max</span>
-                                </a>
-                              </li>
+                              <!--                              <li class="flex items-center space-x-2">-->
+                              <!--                                <a-->
+                              <!--                                    :href="hboMaxLink"-->
+                              <!--                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"-->
+                              <!--                                    @click="sendAnalytics('HBO Max', hboMaxLink)"-->
+                              <!--                                   target="_blank">-->
+                              <!--                                  <img alt="HBO Max Logo" class="h-8 w-12" src="/assets/hbo-logo.png">-->
+                              <!--                                  <span class="sr-only">Watch on HBO Max</span>-->
+                              <!--                                </a>-->
+                              <!--                              </li>-->
                               <!-- Download Max -->
                               <li class="flex items-center space-x-2 mb-4">
                                 <a
@@ -307,9 +307,9 @@ const props = defineProps({
 const associateTrackingID = "itxshakil0ec-21"; // Replace with your actual tracking ID
 const netflixLink = computed(() => props.detail ? `https://www.netflix.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const amazonAffiliateLink = computed(() => props.detail ? `https://primevideo.com?tag=${associateTrackingID}&searchTerm=${encodeURIComponent(props.detail.Title)}` : '');
-const huluLink = computed(() => props.detail ? `https://www.hulu.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
-const disneyPlusLink = computed(() => props.detail ? `https://www.disneyplus.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
-const hboMaxLink = computed(() => props.detail ? `https://play.hbomax.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
+// const huluLink = computed(() => props.detail ? `https://www.hulu.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
+// const disneyPlusLink = computed(() => props.detail ? `https://www.disneyplus.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
+// const hboMaxLink = computed(() => props.detail ? `https://play.hbomax.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const googleDownloadLink = computed(() =>
     props.detail
         ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+("download" OR "watch online") OR (filetype:mkv OR filetype:mp4) OR (inurl:drive.google.com OR inurl:mega.nz OR inurl:mediafire.com)`
