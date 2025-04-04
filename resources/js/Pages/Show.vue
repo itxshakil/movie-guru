@@ -15,8 +15,30 @@ const moviePoster = (movie) => {
 };
 const pageUrl = window.location.href;
 
-const pageTitle = `Details of ${props.detail.Title}`;
-const pageDescription = props.detail.Plot;
+const generateMetaTitle = (detail) => {
+  if (!detail || !detail.Title) {
+    return 'MovieGuru - Find Your Next Favorite'; // Fallback
+  }
+  const year = detail.Year ? `(${detail.Year})` : '';
+
+  return `Watch ${detail.Title} ${year} Online: Cast, Plot & Info`;
+};
+
+const generateMetaDescription = (detail) => {
+  if (!detail || !detail.Title || !detail.Plot) {
+    return 'Explore a vast library of movies and series. Find details, ratings, and where to watch your favorites.';
+  }
+  const year = detail.Year ? `(${detail.Year})` : '';
+  const genre = detail.Genre ? `Genre: ${detail.Genre.split(', ')[0]}. ` : '';
+  const cast = detail.Actors ? `Starring: ${detail.Actors.split(', ').slice(0, 2).join(', ')}. ` : '';
+
+  const plotSnippet = detail.Plot.substring(0, 100) + (detail.Plot.length > 100 ? '...' : '');
+
+  return `${detail.Title} ${year}: ${genre}${cast}${plotSnippet} Find streaming options and detailed information on MovieGuru.`;
+};
+
+const pageTitle = generateMetaTitle(props.detail);
+const pageDescription = generateMetaDescription(props.detail);
 const ogImage = moviePoster(props.detail);
 
 </script>
