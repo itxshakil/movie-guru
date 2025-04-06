@@ -11,7 +11,14 @@
              class="h-full w-full object-cover object-center italic">
       </div>
       <h3 class="mt-2 p-2 pb-1 text-sm text-gray-500 dark:text-gray-400">
-        <span class="capitalize">{{ movie.type }}  </span> - {{ movie.year }}
+        <span class="capitalize">{{ movie.type }}  </span> -
+        <span v-if="movie.release_date"
+              :title="movie.release_date ? 'Released on '+ movie.release_date : 'Release Year'"
+              class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" itemprop="datePublished"
+              v-text="movie.release_date"></span>
+        <template v-else>
+          {{ movie.year }}
+        </template>
       </h3>
       <div class="flex justify-between items-end px-2 py-0">
         <p itemprop="name" class="text-base font-semibold text-gray-900 dark:text-white"
@@ -79,4 +86,6 @@ const basicRating = computed(() => {
   return null;
 
 });
+
+console.log(props.movie.details);
 </script>
