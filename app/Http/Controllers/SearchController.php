@@ -47,7 +47,7 @@ class SearchController extends Controller
                 'response_result' => $movies,
             ]);
 
-            $totalResults = $movies['TotalResults'];
+            $totalResults = $movies['totalResults'] ?? 0;
 
             Search::updateOrCreate([
                 'query' => $search,
