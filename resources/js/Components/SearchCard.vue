@@ -37,6 +37,32 @@
                 fill-rule="evenodd"/>
         </svg>
       </div>
+
+
+      <div class="px-2 pb-3 space-y-1 text-sm text-gray-600 dark:text-gray-300">
+        <p v-if="isValue(movie.writer)">
+          <strong>Written by </strong>
+          <span itemprop="creator" itemscope itemtype="https://schema.org/Person">
+            <span itemprop="name">{{ movie.writer }}</span>
+          </span>
+        </p>
+
+        <p v-if="isValue(movie.director)">
+          <strong>Directed by </strong>
+          <span itemprop="director" itemscope itemtype="https://schema.org/Person">
+            <span itemprop="name">{{ movie.director }}</span>
+          </span>
+        </p>
+        <!--        <p v-if="isValue(movie.actors)">-->
+        <!--          <strong class="font-medium">Featuring </strong>-->
+        <!--          <span v-for="(actor, index) in movie.actors.split(',').slice(0, 3)" :key="index" class="inline-block">-->
+        <!--            <span itemprop="actor" itemscope itemtype="https://schema.org/Person">-->
+        <!--              <span itemprop="name">{{ actor.trim() }}</span><span v-if="index < 2">,</span>-->
+        <!--            </span>-->
+        <!--          </span>-->
+        <!--        </p>-->
+      </div>
+
     </div>
     <button
         class="m-2 mb-4 whitespace-nowrap flex justify-center gap-2 items-center bg-primary-500 hover:bg-primary-700 text-white font-bold py-1 px-2 rounded-full"
@@ -87,5 +113,4 @@ const basicRating = computed(() => {
 
 });
 
-console.log(props.movie.details);
 </script>

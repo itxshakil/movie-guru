@@ -84,6 +84,10 @@ class DetailController extends Controller
                     '',
                     $updatedDetail['imdbVotes']
                 ) : 0,
+                'genre' => $updatedDetail['Genre'],
+                'director' => $updatedDetail['Director'],
+                'writer' => $updatedDetail['Writer'],
+                'actors' => $updatedDetail['Actors'],
                 'details' => $updatedDetail,
             ]);
         });

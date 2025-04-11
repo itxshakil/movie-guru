@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class MovieDetail extends Model
 {
-    /** @use HasFactory<MovieDetailFactory> */
+    /** @use HasFactory<MovieDetailFactory\array> */
     use HasFactory;
 
     protected $fillable = [
@@ -24,6 +24,10 @@ class MovieDetail extends Model
         'type',
         'imdb_rating',
         'imdb_votes',
+        'genre',
+        'director',
+        'writer',
+        'actors',
         'details',
         'views',
     ];

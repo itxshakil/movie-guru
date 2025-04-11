@@ -12,7 +12,6 @@ class HomeController extends Controller
     public function index(TrendingQueryService $trendingQueryService)
     {
         $trendingSearchQueries = $trendingQueryService->fetch();
-
         $popularMovies = Cache::remember('popular-movies', now()->endOfDay(), function () {
             return MovieDetail::popular()->take(6)->get([
                 'imdb_id',
@@ -23,6 +22,9 @@ class HomeController extends Controller
                 'type',
                 'imdb_rating',
                 'imdb_votes',
+                'director',
+                'writer',
+                'actors',
             ]);
         });
 
@@ -36,6 +38,9 @@ class HomeController extends Controller
                 'type',
                 'imdb_rating',
                 'imdb_votes',
+                'director',
+                'writer',
+                'actors',
             ]);
         });
 
@@ -49,6 +54,9 @@ class HomeController extends Controller
                 'type',
                 'imdb_rating',
                 'imdb_votes',
+                'director',
+                'writer',
+                'actors',
             ]);
         });
 
@@ -62,6 +70,9 @@ class HomeController extends Controller
                 'type',
                 'imdb_rating',
                 'imdb_votes',
+                'director',
+                'writer',
+                'actors',
             ]);
         });
 
@@ -75,6 +86,9 @@ class HomeController extends Controller
                 'type',
                 'imdb_rating',
                 'imdb_votes',
+                'director',
+                'writer',
+                'actors',
             ]);
         });
 
@@ -88,6 +102,9 @@ class HomeController extends Controller
                 'type',
                 'imdb_rating',
                 'imdb_votes',
+                'director',
+                'writer',
+                'actors',
             ]);
         });
 
