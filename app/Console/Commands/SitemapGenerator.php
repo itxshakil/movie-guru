@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\SearchQuery;
+use App\Models\Search;
 use App\Models\ShowPageAnalytics;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
@@ -48,9 +48,9 @@ class SitemapGenerator extends Command
 
     private function getTopSearches(int $limit): Collection
     {
-        return SearchQuery::select('query', DB::raw('count(query) as total'))
-            ->groupBy('query')
-            ->orderBy('total', 'desc')
+        return Search::select('query')
+            ->where('total_results', '>', 0)
+            ->orderBy('search_count', 'desc')
             ->take($limit)
             ->get();
     }
