@@ -32,7 +32,7 @@ class SitemapGenerator extends Command
         $limit = $this->option('limit');
         $topQueries = $this->getTopSearches((int)$limit);
         foreach ($topQueries as $searchQuery) {
-            $sitemap->add(Url::create("/search?s=$searchQuery->query"));
+            $sitemap->add(Url::create("/search/$searchQuery->query"));
         }
 
         // Add top movies
