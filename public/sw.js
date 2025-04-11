@@ -49,7 +49,7 @@ const basicPathsToCache = [
     '/build/assets/Login-BqeDoV6H.js',
     '/build/assets/Terms-Byhjx1K-.js',
     '/build/assets/NewsletterForm-C4x51F1e.js',
-    '/build/assets/PrivacyPolicy-DpSgN9_e.j',
+    '/build/assets/PrivacyPolicy-DpSgN9_e.js',
     '/build/assets/DeleteUserForm-emXBfhq1.js',
     '/build/assets/SearchCard-ljERGPIH.js',
     '/build/assets/Contact-KxEmBX49.js',
