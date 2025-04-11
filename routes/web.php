@@ -29,6 +29,7 @@ Route::inertia('/contact', 'Contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search')->middleware('throttle:search');
+Route::get('/search/{search}', [SearchController::class, 'show'])->name('search.show')->middleware('throttle:search');
 Route::get('/i/{imdbID}', [DetailController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
 
 Route::post('/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('subscribe')->middleware('throttle:api');

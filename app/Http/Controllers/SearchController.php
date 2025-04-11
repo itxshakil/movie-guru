@@ -18,6 +18,94 @@ class SearchController extends Controller
     public function index(Request $request, OMDBApiService $OMDBApiService, TrendingQueryService $trendingQueryService)
     {
         $search = $request->get('s');
+        [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
+            $search,
+            $request
+        );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'searchResults' => $movies,
+                'search' => $search,
+                'page' => $page,
+                'movieType' => $movieType,
+                'year' => $year,
+                'movieTypes' => $movieTypes,
+                'nextUrl' => $nextUrl,
+                'trendingQueries' => $trendingQueries,
+            ]);
+        }
+
+        return Inertia::render('Search', [
+            'searchResults' => $movies,
+            'search' => $search,
+            'page' => $page,
+            'movieType' => $movieType,
+            'year' => $year,
+            'movieTypes' => $movieTypes,
+            'nextUrl' => $nextUrl,
+            'trendingQueries' => $trendingQueries,
+        ]);
+    }
+
+    public function show(
+        Request $request,
+        string $search,
+        OMDBApiService $OMDBApiService,
+        TrendingQueryService $trendingQueryService
+    ) {
+        [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
+            $search,
+            $request
+        );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'searchResults' => $movies,
+                'search' => $search,
+                'page' => $page,
+                'movieType' => $movieType,
+                'year' => $year,
+                'movieTypes' => $movieTypes,
+                'nextUrl' => $nextUrl,
+                'trendingQueries' => $trendingQueries,
+            ]);
+        }
+
+        return Inertia::render('Search', [
+            'searchResults' => $movies,
+            'search' => $search,
+            'page' => $page,
+            'movieType' => $movieType,
+            'year' => $year,
+            'movieTypes' => $movieTypes,
+            'nextUrl' => $nextUrl,
+            'trendingQueries' => $trendingQueries,
+        ]);
+    }
+
+    public function logSearchQuery(
+        ?string $search,
+        ?int $page,
+        ?string $movieType,
+        ?int $year,
+        Request $request
+    ): SearchQuery {
+        return SearchQuery::create([
+            'query' => $search ?? 'empty',
+            'page' => $page,
+            'type' => $movieType,
+            'year' => $year,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+    }
+
+    public function getSearchData(string $search, Request $request): array
+    {
+        $trendingQueryService = app(TrendingQueryService::class);
+        $OMDBApiService = app(OMDBApiService::class);
+
         $page = $request->integer('page', 1);
         $movieType = $request->get('type');
         $year = $request->integer('year', null);
@@ -31,7 +119,7 @@ class SearchController extends Controller
 
         $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
 
-        $cacheKey = 'search-'.$search.'-'.$page.'-'.$movieType.'-'.$year;
+        $cacheKey = 'searcgh-'.$search.'-'.$page.'-'.$movieType.'-'.$year;
         $movies = Cache::flexible(
             $cacheKey,
             [now()->addHours(16), now()->addHours(24)],
@@ -74,45 +162,6 @@ class SearchController extends Controller
             }
         }
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'searchResults' => $movies,
-                'search' => $search,
-                'page' => $page,
-                'movieType' => $movieType,
-                'year' => $year,
-                'movieTypes' => $movieTypes,
-                'nextUrl' => $nextUrl,
-                'trendingQueries' => $trendingQueries,
-            ]);
-        }
-
-        return Inertia::render('Search', [
-            'searchResults' => $movies,
-            'search' => $search,
-            'page' => $page,
-            'movieType' => $movieType,
-            'year' => $year,
-            'movieTypes' => $movieTypes,
-            'nextUrl' => $nextUrl,
-            'trendingQueries' => $trendingQueries,
-        ]);
-    }
-
-    public function logSearchQuery(
-        ?string $search,
-        ?int $page,
-        ?string $movieType,
-        ?int $year,
-        Request $request
-    ): SearchQuery {
-        return SearchQuery::create([
-            'query' => $search ?? 'empty',
-            'page' => $page,
-            'type' => $movieType,
-            'year' => $year,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        return [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl];
     }
 }
