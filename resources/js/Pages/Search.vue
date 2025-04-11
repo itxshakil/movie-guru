@@ -114,9 +114,11 @@ const viewDetail = (imdb_id, sectionName, title = null) => {
 defineOptions({ layout: BaseLayout })
 
 const pageTitle = props.searchResults.Response === 'False' ?
-    `No results found for ${props.search}` :
+    `Hmm, Couldn't Find "${props.search}" - Try Another Search?` :
     `${props.searchResults.totalResults} results found for ` + props.search;
-const pageDescription = `Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to ${props.search} and dive into the world of entertainment.`;
+const pageDescription = props.searchResults.Response === 'False' ?
+    `Oops! We couldn't find matches for “${props.search}”. Try exploring trending movies, or filter by genre and year to discover top-rated films and shows. The perfect pick might be a search away.` :
+    `Looking for "${props.search}"? Get detailed info, cast, ratings, and find out where you can watch this movie now! Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to ${props.search} and dive into the world of entertainment.`;
 
 const pageUrl = window.location.href;
 
