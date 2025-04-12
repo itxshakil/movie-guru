@@ -112,7 +112,7 @@ class SearchController extends Controller
 
         $trendingQueries = $trendingQueryService->fetch();
         $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(
-            max(5, $trendingQueries->count())
+            min(5, $trendingQueries->count())
         )->toArray() : [];
 
         if (empty($search)) {
