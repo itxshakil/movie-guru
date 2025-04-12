@@ -24,7 +24,7 @@ class Search extends Model
 
     public function incrementViews(): void
     {
-        $browser = request()->getUserAgent();
+        $browser = request()->userAgent();
         $ipAddress = request()->ip();
 
         $botPatterns = [
