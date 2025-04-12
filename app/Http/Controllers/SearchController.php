@@ -111,7 +111,9 @@ class SearchController extends Controller
         $year = $request->integer('year', null);
 
         $trendingQueries = $trendingQueryService->fetch();
-        $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(5)->toArray() : [];
+        $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(
+            max(5, $trendingQueries->count())
+        )->toArray() : [];
 
         if (empty($search)) {
             $search = $defaultSearches[array_rand($defaultSearches)];
