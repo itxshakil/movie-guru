@@ -59,7 +59,6 @@ class Search extends Model
             'mj12bot',
             'blexbot',
             'mozillafirefox 6.0 (compatible; heritrix3@archive.org',
-            '/http(s)?:\/\/[\w.-]+(?:\.[\w\.-]+)+(?:[\w\-\._~:/?#[\]@!\$&\'\(\)\*\+,;=.]+)?/',
         ];
 
         foreach ($botPatterns as $pattern) {
