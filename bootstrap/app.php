@@ -32,5 +32,37 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return $response;
+        })->dontReportDuplicates()->report(function (Throwable $e) {
+            if (app()->isProduction()) {
+                $name = get_class($e);
+                $message = $e->getMessage();
+                $file = $e->getFile();
+                $line = $e->getLine();
+                $trace = $e->getTraceAsString();
+
+                $emails = config('mail.admin.address', '');
+                $emails = explode(',', $emails);
+
+                $subject = config('app.name').' - Production Error: '.class_basename(
+                        $name
+                    ).' on line '.$line.' of '.$file;
+                $body = "An exception occurred in the production environment:\n\n".
+                    "Exception: $name\n".
+                    "Message: $message\n".
+                    "File: $file\n".
+                    "Line: $line\n\n".
+                    "Stack Trace:\n$trace\n";
+
+                foreach ($emails as $email) {
+                    $email = trim($email);
+                    if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        \Illuminate\Support\Facades\Mail::raw($body, function ($mail) use ($email, $subject) {
+                            $mail->to($email)->subject($subject);
+                        });
+                    } else {
+                        \Illuminate\Support\Facades\Log::error('Invalid admin email address configured: '.$email);
+                    }
+                }
+            }
         });
     })->create();
