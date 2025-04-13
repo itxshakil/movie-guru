@@ -58,7 +58,7 @@ class Search extends Model
             'ahrefsbot',
             'mj12bot',
             'blexbot',
-            'mozillafirefox 6.0 (compatible; heritrix3@archive.org',
+            'heritrix',
         ];
 
         foreach ($botPatterns as $pattern) {
