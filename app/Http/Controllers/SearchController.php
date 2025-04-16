@@ -50,7 +50,7 @@ class SearchController extends Controller
 
     public function show(
         Request $request,
-        string $search,
+        string $search = null,
         OMDBApiService $OMDBApiService,
         TrendingQueryService $trendingQueryService
     ) {
@@ -101,7 +101,7 @@ class SearchController extends Controller
         ]);
     }
 
-    public function getSearchData(string $search, Request $request): array
+    public function getSearchData(string $search = null, Request $request): array
     {
         $trendingQueryService = app(TrendingQueryService::class);
         $OMDBApiService = app(OMDBApiService::class);
