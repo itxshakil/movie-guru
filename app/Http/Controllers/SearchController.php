@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Search;
 use App\Models\SearchQuery;
 use App\OMDB\MovieType;
+use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
 use App\Services\TrendingQueryService;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ use Inertia\Inertia;
 
 class SearchController extends Controller
 {
-    public function index(Request $request, OMDBApiService $OMDBApiService, TrendingQueryService $trendingQueryService)
+    public function index(Request $request)
     {
         $search = $request->get('s');
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
@@ -119,8 +120,6 @@ class SearchController extends Controller
             $search = $defaultSearches[array_rand($defaultSearches)];
         }
 
-        $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
-
         $cacheKey = 'searcgh-'.$search.'-'.$page.'-'.$movieType.'-'.$year;
         $movies = Cache::flexible(
             $cacheKey,
@@ -130,21 +129,25 @@ class SearchController extends Controller
             }
         );
 
-        defer(function () use ($search, $searchQuery, $movies) {
-            $searchQuery->update([
-                'response_at' => now(),
-                'response' => $movies['Response'] === 'True',
-                'response_result' => $movies,
-            ]);
+        $botdetector = app(BotDetectorService::class);
+        if ($botdetector->isBot($request) === false) {
+            defer(function () use ($request, $year, $movieType, $page, $search, $movies) {
+                $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
+                $searchQuery->update([
+                    'response_at' => now(),
+                    'response' => $movies['Response'] === 'True',
+                    'response_result' => $movies,
+                ]);
 
-            $totalResults = $movies['totalResults'] ?? 0;
+                $totalResults = $movies['totalResults'] ?? 0;
 
-            Search::updateOrCreate([
-                'query' => $search,
-            ], [
-                'total_results' => $totalResults,
-            ])->incrementViews();
-        });
+                Search::updateOrCreate([
+                    'query' => $search,
+                ], [
+                    'total_results' => $totalResults,
+                ])->incrementViews();
+            });
+        }
 
         $movieTypes = MovieType::cases();
 

@@ -7,7 +7,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Log;
 
 class Search extends Model
 {
@@ -24,58 +23,7 @@ class Search extends Model
 
     public function incrementViews(): void
     {
-        $browser = request()->userAgent();
         $ipAddress = request()->ip();
-
-        $botPatterns = [
-            'bot',
-            'crawler',
-            'spider',
-            'googlebot',
-            'bingbot',
-            'slurp',
-            'duckduckbot',
-            'yandexbot',
-            'baiduspider',
-            'facebot',
-            'ia_archiver',
-            'magpie-crawler',
-            'mediapartners-google',
-            'msnbot',
-            'pinterestbot',
-            'redditbot',
-            'seokicks-robot',
-            'semrushbot',
-            'twitterbot',
-            'whatsapp',
-            'yahoo! slurp',
-            'zabbix',
-            'uptimerobot',
-            'datadog',
-            'statuscake',
-            'cloudflare',
-            'netcraft',
-            'ahrefsbot',
-            'mj12bot',
-            'blexbot',
-            'heritrix',
-        ];
-
-        foreach ($botPatterns as $pattern) {
-            if (preg_match('/'.$pattern.'/i', $browser)) {
-                Log::info('Bot detected',
-                    [
-                        'ip' => $ipAddress,
-                        'user_agent' => $browser,
-                        'query' => $this->query,
-                        'reason' => 'User agent matched bot pattern: '.$pattern
-                    ]
-                );
-
-                return;
-            }
-        }
-
         $cacheKey = 'search-query-'.$this->query.'-'.$ipAddress;
 
         if (!Cache::has($cacheKey)) {
