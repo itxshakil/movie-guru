@@ -5,7 +5,7 @@ A Slow Query Occurred on **{{ $connectionName }}** that took **{{ number_format(
 
 ## Query
 ```sql
-{{ $query }}
+    {!! $query !!}
 ```
 
 Thanks,<br>
