@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovieDetail;
 use App\Models\ShowPageAnalytics;
+use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -21,14 +22,16 @@ class DetailController extends Controller
             return $this->fetchDetail($imdbId);
         });
 
-        defer(function () use ($request, $imdbId) {
-            // Log the analytics
-            ShowPageAnalytics::create([
-                'imdb_id' => $imdbId,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
-        });
+        $botDetector = app(BotDetectorService::class);
+        if ($botDetector->isBot($request) === false) {
+            defer(function () use ($request, $imdbId) {
+                ShowPageAnalytics::create([
+                    'imdb_id' => $imdbId,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            });
+        }
 
         if ($request->wantsJson()) {
             return response()->json(['detail' => $detail]);
