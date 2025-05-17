@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\OMDB\MovieType;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -74,21 +75,28 @@ class OMDBApiService
         return $this->makeRequest($query);
     }
 
+    /**
+     * @throws ConnectionException
+     * @throws Exception
+     */
     protected function makeRequest(string $query)
     {
         $apiKey = $this->getRandomApiKey();
         $url = 'https://www.omdbapi.com/?apikey='.$apiKey.'&'.$query;
         $startTime = microtime(true);
-        $response = Http::get($url)->json();
+        $response = Http::connectTimeout(3)->get($url)->json();
 
         $endTime = microtime(true);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
 
         Log::channel('omdb')->info("OMDB API took $responseTime ms to respond. URL: $url");
 
-        if (isset($response['Response']) && $response['Response'] === 'True' && isset($response['Search']) && count(
-                $response['Search']
-            ) > 0) {
+        if (
+            isset($response['Response'])
+            && $response['Response'] === 'True'
+            && isset($response['Search'])
+            && count($response['Search']) > 0
+        ) {
             $result = array_map(function ($item) {
                 return [
                     'title' => $item['Title'],
