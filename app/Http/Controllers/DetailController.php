@@ -119,7 +119,7 @@ class DetailController extends Controller
                 'release_date' => $detail['Released'],
                 'poster' => $detail['Poster'],
                 'type' => $detail['Type'],
-                'imdb_rating' => $detail['imdbRating'],
+                'imdb_rating' => $detail['imdbRating'] && $detail['imdbRating'] != 'N/A' ? $detail['imdbRating'] : 0,
                 'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
                 'details' => $detail,
             ])->incrementViews();
