@@ -110,7 +110,10 @@ class DetailController extends Controller
         $detail = $OMDBApiService->getById($imdbId);
 
         defer(function () use ($detail, $imdbId) {
-            // Save the details to the database
+            $voted = $detail['imdbVotes'] && $detail['imdbVotes'] != 'N/A'
+                ? str_replace(',', '', $detail['imdbVotes'])
+                : 0;
+
             MovieDetail::updateOrCreate([
                 'imdb_id' => $imdbId,
             ], [
@@ -120,7 +123,7 @@ class DetailController extends Controller
                 'poster' => $detail['Poster'],
                 'type' => $detail['Type'],
                 'imdb_rating' => $detail['imdbRating'] && $detail['imdbRating'] != 'N/A' ? $detail['imdbRating'] : 0,
-                'imdb_votes' => str_replace(',', '', $detail['imdbVotes']),
+                'imdb_votes' => $voted,
                 'details' => $detail,
             ])->incrementViews();
         });
