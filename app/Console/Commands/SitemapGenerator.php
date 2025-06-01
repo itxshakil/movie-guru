@@ -22,20 +22,17 @@ class SitemapGenerator extends Command
     {
         $sitemap = Sitemap::create();
 
-        // Add static pages
         $sitemap->add(Url::create('/'))
             ->add(Url::create('/privacy'))
             ->add(Url::create('/terms'))
             ->add(Url::create('/contact'));
 
-        // Add top queries
         $limit = $this->option('limit');
         $topQueries = $this->getTopSearches((int)$limit);
         foreach ($topQueries as $searchQuery) {
             $sitemap->add(Url::create("/search/$searchQuery->query"));
         }
 
-        // Add top movies
         $topMovies = $this->getTopMovies((int)$limit);
         foreach ($topMovies as $topMovie) {
             $sitemap->add(Url::create("/i/$topMovie->imdb_id"));
