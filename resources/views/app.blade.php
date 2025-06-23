@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'Movie Guru') }}</title>
 
     <!-- <meta name="description" content="{{ $metadescription ?? "Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." }}" /> -->
     <meta name="keywords" content="movie, film, ratings, reviews, movie database" />
