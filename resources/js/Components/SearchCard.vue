@@ -8,7 +8,7 @@
              :src="moviePoster(movie)"
              @click="viewDetail(movie.imdb_id)"
              loading="lazy"
-             class="h-full w-full object-cover object-center italic">
+             class="h-full w-full object-cover object-center italic hover:scale-105 transition-all duration-500 ease-in">
       </div>
       <h3 class="mt-2 p-2 pb-1 text-sm text-gray-500 dark:text-gray-400">
         <span class="capitalize">{{ movie.type }}  </span> -
@@ -53,23 +53,24 @@
             <span itemprop="name">{{ movie.director }}</span>
           </span>
         </p>
-        <!--        <p v-if="isValue(movie.actors)">-->
-        <!--          <strong class="font-medium">Featuring </strong>-->
-        <!--          <span v-for="(actor, index) in movie.actors.split(',').slice(0, 3)" :key="index" class="inline-block">-->
-        <!--            <span itemprop="actor" itemscope itemtype="https://schema.org/Person">-->
-        <!--              <span itemprop="name">{{ actor.trim() }}</span><span v-if="index < 2">,</span>-->
-        <!--            </span>-->
-        <!--          </span>-->
-        <!--        </p>-->
+          <p v-if="isValue(movie.actors)">
+              <strong>Featuring </strong>
+              <span v-for="(actor, index) in movie.actors.split(',').slice(0, 3)" :key="index" class="inline-block">
+            <span itemprop="actor" itemscope itemtype="https://schema.org/Person">
+              <span itemprop="name">{{ actor.trim() }}</span><span v-if="index < 2">,</span>
+            </span>
+          </span>
+          </p>
       </div>
 
     </div>
     <button
-        class="m-2 mb-4 whitespace-nowrap flex justify-center gap-2 items-center bg-primary-500 hover:bg-primary-700 text-white font-bold py-1 px-2 rounded-full"
+        class="m-2 mb-4 whitespace-nowrap flex justify-center gap-2 items-center bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-full group/detail"
         type="button"
         @click="viewDetail(movie.imdb_id)">
       <span class="">View Details</span>
-      <svg class="w-5 h-5 text-xs" fill="none" height="24" stroke="currentColor"
+        <svg class="w-5 h-5 text-xs group-hover/detail:translate-x-1.5 transition-all duration-600 ease-out" fill="none"
+             height="24" stroke="currentColor"
            stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
            width="24" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 0h24v24H0z" fill="none" stroke="none"/>

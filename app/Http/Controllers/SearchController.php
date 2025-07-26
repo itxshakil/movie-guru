@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\MovieDetail;
 use App\Models\Search;
 use App\Models\SearchQuery;
 use App\OMDB\MovieType;
@@ -24,6 +25,41 @@ class SearchController extends Controller
             $request
         );
 
+        $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
+
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
+            return MovieDetail::recentlyReleased()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+                'director',
+                'writer',
+                'actors',
+            ]);
+        });
+
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
+            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+                'director',
+                'writer',
+                'actors',
+            ]);
+        });
+
+
         if ($request->wantsJson()) {
             return response()->json([
                 'searchResults' => $movies,
@@ -46,20 +82,54 @@ class SearchController extends Controller
             'movieTypes' => $movieTypes,
             'nextUrl' => $nextUrl,
             'trendingQueries' => $trendingQueries,
+            'recentlyReleasedMovies' => $recentlyReleasedMovies,
+            'recommendedMovies' => $recommendedMovies,
         ]);
     }
 
     public function show(
         Request $request,
-        string $search = null,
-        OMDBApiService $OMDBApiService,
-        TrendingQueryService $trendingQueryService
+        ?string $search
     ) {
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
             $search,
             $request
         );
 
+        $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
+
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
+            return MovieDetail::recentlyReleased()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+                'director',
+                'writer',
+                'actors',
+            ]);
+        });
+
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
+            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+                'director',
+                'writer',
+                'actors',
+            ]);
+        });
+
         if ($request->wantsJson()) {
             return response()->json([
                 'searchResults' => $movies,
@@ -70,6 +140,8 @@ class SearchController extends Controller
                 'movieTypes' => $movieTypes,
                 'nextUrl' => $nextUrl,
                 'trendingQueries' => $trendingQueries,
+                'recentlyReleasedMovies' => $recentlyReleasedMovies,
+                'recommendedMovies' => $recommendedMovies,
             ]);
         }
 
@@ -82,6 +154,8 @@ class SearchController extends Controller
             'movieTypes' => $movieTypes,
             'nextUrl' => $nextUrl,
             'trendingQueries' => $trendingQueries,
+            'recentlyReleasedMovies' => $recentlyReleasedMovies,
+            'recommendedMovies' => $recommendedMovies,
         ]);
     }
 
@@ -102,7 +176,7 @@ class SearchController extends Controller
         ]);
     }
 
-    public function getSearchData(string $search = null, Request $request): array
+    public function getSearchData(?string $search, Request $request): array
     {
         $trendingQueryService = app(TrendingQueryService::class);
         $OMDBApiService = app(OMDBApiService::class);

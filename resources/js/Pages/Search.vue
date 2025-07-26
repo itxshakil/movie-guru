@@ -22,7 +22,11 @@ const props = defineProps({
     movieTypes: Array,
     nextUrl: String,
     trendingQueries: Array,
+    recentlyReleasedMovies: Array,
+    recommendedMovies: Array,
 });
+
+console.log(props.recommendedMovies);
 
 const showSuggestions = ref(false);
 const filteredTrendingQueries = ref([...props.trendingQueries]);
@@ -47,7 +51,7 @@ const selectTrendingQuery = (query) => {
 const form = useForm({
     s: props.search,
     type: props.movieType,
-    year: props.year,
+    year: props.year || '',
     page: 1,
 });
 
@@ -230,10 +234,50 @@ const moviePoster = (movie) => {
 
               <div v-show="nextURLLink" class="flex justify-center my-2">
                     <button v-show="nextURLLink && loading === false"
-                            class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-sm"
+                            class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-sm hover:scale-105 transition-all duration-300"
                             @click="loadMore">Load More
                     </button>
                     <LoadingSpinnerButton v-show="loading" :isLoading="true" value="Loading..."/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <div v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎉 Fresh Releases</h2>
+                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Stay up-to-date with the latest
+                        movies hitting
+                        the screens.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <SearchCard
+                        v-for="movie in recentlyReleasedMovies"
+                        :key="movie.imdb_id"
+                        :movie="movie"
+                        @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div v-if="recommendedMovies && recommendedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 Recommended Movies</h2>
+                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Timeless classics and must-watch
+                        films for
+                        every movie lover.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <SearchCard
+                        v-for="movie in recommendedMovies"
+                        :key="movie.imdb_id"
+                        :movie="movie"
+                        @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
+                    />
                 </div>
             </div>
         </div>
