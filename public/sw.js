@@ -1,12 +1,12 @@
-const DEBUG = true;
+const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.16';
-const SEARCH_CACHE = 'search-cache-v-4.16';
-const INFO_CACHE = 'info-cache-v-4.16';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.16';
-const POSTER_CACHE = 'poster-cache-v-4.16';
+const APP_CACHE = 'v-4.17';
+const SEARCH_CACHE = 'search-cache-v-4.17';
+const INFO_CACHE = 'info-cache-v-4.17';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.17';
+const POSTER_CACHE = 'poster-cache-v-4.17';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -23,42 +23,42 @@ const basicPathsToCache = [
     '/',
     '/?utm_source=homescreen',
     '/build/manifest.json',
-    '/build/assets/Search-DgxZEKd8.css',
+    '/build/assets/Search-e4G1Minw.css',
     '/build/assets/SearchCard-Df8yoEfg.css',
     '/build/assets/BaseLayout-pP2Wt1YA.css',
-    '/build/assets/app-C4tw-ury.css',
-    '/build/assets/LoadingSpinner-Dxa8otIn.js',
-    '/build/assets/ApplicationLogo-ktQbfUzy.js',
-    '/build/assets/InputError-rfaA-P4r.js',
-    '/build/assets/InputLabel-BA1-CHXD.js',
-    '/build/assets/GuestLayout-UUjIvXga.js',
-    '/build/assets/LoadingSpinnerButton-DmOAiTbv.js',
-    '/build/assets/PrimaryButton-5c94s4I4.js',
-    '/build/assets/Dashboard-7tq9eUs4.js',
-    '/build/assets/TextInput-BTEHzQwo.js',
-    '/build/assets/Edit-B4hX2UsM.js',
-    '/build/assets/ConfirmPassword-BZ-Di5sc.js',
-    '/build/assets/ForgotPassword-CvHbzMgY.js',
-    '/build/assets/VerifyEmail-DW9WcZoN.js',
-    '/build/assets/ResetPassword-UOuX9ugm.js',
-    '/build/assets/Error-DZd_Qytj.js',
-    '/build/assets/Show-sgKJTjlU.js',
-    '/build/assets/Register-CbGbTq7P.js',
-    '/build/assets/UpdatePasswordForm-BnGkY7xa.js',
-    '/build/assets/UpdateProfileInformationForm--OABnKMU.js',
-    '/build/assets/Login-BqeDoV6H.js',
-    '/build/assets/Terms-Byhjx1K-.js',
-    '/build/assets/NewsletterForm-C4x51F1e.js',
-    '/build/assets/PrivacyPolicy-DpSgN9_e.js',
-    '/build/assets/DeleteUserForm-emXBfhq1.js',
-    '/build/assets/SearchCard-ljERGPIH.js',
-    '/build/assets/Contact-KxEmBX49.js',
-    '/build/assets/AuthenticatedLayout-DfYY6FeA.js',
-    '/build/assets/Search-Cd3GNP4T.js',
-    '/build/assets/Welcome-DSvh8HMJ.js',
-    '/build/assets/BaseLayout-BdDZUWuD.js',
-    '/build/assets/DetailCard-CYbXDLJr.js',
-    '/build/assets/app-DX3-7ma1.js',
+    '/build/assets/app-DFuQafOT.css',
+    '/build/assets/LoadingSpinner-DWUvvIym.js',
+    '/build/assets/ApplicationLogo-BA3R8zz9.js',
+    '/build/assets/InputError-CYVZ4rd-.js',
+    '/build/assets/InputLabel-BbG0eV6Q.js',
+    '/build/assets/GuestLayout-nExaGgZL.js',
+    '/build/assets/LoadingSpinnerButton-B_47WGhL.js',
+    '/build/assets/PrimaryButton-DwQXzkBx.js',
+    '/build/assets/Dashboard-BHVoVtHn.js',
+    '/build/assets/TextInput-Bw2nvzjG.js',
+    '/build/assets/Edit-LGVZKxY4.js',
+    '/build/assets/ConfirmPassword-CEwXPFXx.js',
+    '/build/assets/ForgotPassword-koSo2FZr.js',
+    '/build/assets/VerifyEmail-K44nal7j.js',
+    '/build/assets/ResetPassword--AqfL73M.js',
+    '/build/assets/Error-Cv1H2pXp.js',
+    '/build/assets/Show-B31OjObN.js',
+    '/build/assets/Register-Cb-lu7RV.js',
+    '/build/assets/UpdatePasswordForm-Ec5YITH_.js',
+    '/build/assets/UpdateProfileInformationForm-BWJmHtEl.js',
+    '/build/assets/Login-B63Fsh83.js',
+    '/build/assets/Terms-DrSWVZlZ.js',
+    '/build/assets/NewsletterForm-Cdb6rP81.js',
+    '/build/assets/PrivacyPolicy-zPoi6ukt.js',
+    '/build/assets/DeleteUserForm-D_UYAHup.js',
+    '/build/assets/Contact-BrhVXod8.js',
+    '/build/assets/SearchCard-B9Sre387.js',
+    '/build/assets/AuthenticatedLayout-B-oPq78V.js',
+    '/build/assets/Search-DUJ6N1CT.js',
+    '/build/assets/Welcome-r6Td7AVA.js',
+    '/build/assets/BaseLayout-CBx2FPQJ.js',
+    '/build/assets/DetailCard-UQAhZ_Yr.js',
+    '/build/assets/app-RxxrIiP2.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -346,10 +346,9 @@ function handleNotificationClick(event) {
                     const openWindow = clientList.find(client => client.url === urlToOpen && client.visibilityState === 'visible');
 
                     if (openWindow) {
-                        // If there's already an open window, focus it
                         openWindow.focus();
+                        event.notification.close();
                     } else {
-                        // If no open window, open a new window
                         if (clients.openWindow) {
                             if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
                                 await clients.openWindow(urlToOpen);
@@ -364,6 +363,8 @@ function handleNotificationClick(event) {
                                 window.open('/', '_blank');
                             }
                         }
+
+                        event.notification.close();
                     }
                 } catch (err) {
                     // Handle potential errors, e.g., if clients.matchAll fails
@@ -411,7 +412,7 @@ async function offlineSyncRequest(offlineRequestUrl) {
         // Perform actions to notify the user about the stored offline request
         self.registration.showNotification('Content is Ready!', {
             body: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
-            badge: 'https://movieguru.shakiltech.com/icons/ios/192.png',
+            badge: 'https://movieguru.shakiltech.com/icons/android/android-launchericon-96-96.png',
             icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
             actions: [
                 {
@@ -596,7 +597,7 @@ function dailyNotification() {
     self.registration.showNotification('🎬 Your Movie Awaits!', {
         tag: 'alert',
         body: randomMessage,
-        badge: 'https://movieguru.shakiltech.com/icons/ios/192.png',
+        badge: 'https://movieguru.shakiltech.com/icons/android/android-launchericon-96-96.png',
         icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
         actions: [
             {
@@ -672,7 +673,7 @@ function sendTrendingNotification() {
     self.registration.showNotification(notificationTitle, {
         body: notificationBody,
         icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
-        badge: 'https://movieguru.shakiltech.com/icons/ios/192.png',
+        badge: 'https://movieguru.shakiltech.com/icons/android/android-launchericon-96-96.png',
         actions: [
             {action: 'close', title: 'Not Now'},
             {action: 'open', title: 'Check It Out!'},
