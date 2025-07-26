@@ -43,7 +43,7 @@
     <link rel="manifest" href="/app.webmanifest" />
     <script type="application/ld+json">
         {
-           "@context":"https://schema.org",
+           "@@context":"https://schema.org",
            "@type":"Organization",
            "name":"Movie Guru",
            "description":"Discover and explore a world of movies with Movie Guru! Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone.",
@@ -72,7 +72,7 @@
 
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+      "@@context": "https://schema.org",
       "@type": "WebSite",
       "url": "https://movieguru.shakiltech.com",
       "potentialAction": {
