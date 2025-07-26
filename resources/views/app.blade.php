@@ -121,7 +121,7 @@
     @endproduction
 
 </head>
-<body class="font-sans antialiased accent-primary-500">
+<body class="font-sans antialiased accent-primary-500 dark:bg-gray-900 dark:text-white">
     @inertia
     <script type="text/javascript">
         if ('serviceWorker' in navigator) {
