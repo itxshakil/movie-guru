@@ -69,8 +69,14 @@ class MovieDetail extends Model
     public function scopeRecommended(Builder $query): void
     {
         $query->where(function (Builder $query) {
-            $query->where('imdb_rating', '>', 7.5)
-                ->where('imdb_votes', '>', 30_000);
+            $query->where(function (Builder $q) {
+                $q->where('imdb_rating', '>', 7.0)
+                    ->where('imdb_rating', '<=', 7.5)
+                    ->where('imdb_votes', '>', 50_000);
+            })->orWhere(function (Builder $q) {
+                $q->where('imdb_rating', '>', 7.5)
+                    ->where('imdb_votes', '>', 30_000);
+            });
         });
     }
 
