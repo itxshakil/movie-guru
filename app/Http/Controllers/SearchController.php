@@ -28,7 +28,7 @@ class SearchController extends Controller
         $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
 
         $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
-            return MovieDetail::recentlyReleased()->take(6)->get([
+            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
@@ -99,7 +99,7 @@ class SearchController extends Controller
         $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
 
         $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
-            return MovieDetail::recentlyReleased()->take(6)->get([
+            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',

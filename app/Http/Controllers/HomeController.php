@@ -29,7 +29,7 @@ class HomeController extends Controller
         });
 
         $trendingMovies = Cache::remember('trending-movies', now()->endOfDay(), function () {
-            return MovieDetail::trending()->take(6)->get([
+            return MovieDetail::trending()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
@@ -45,7 +45,7 @@ class HomeController extends Controller
         });
 
         $hiddenGemsMovies = Cache::remember('hidden-gems-movies', now()->endOfDay(), function () {
-            return MovieDetail::hiddenGems()->take(6)->get([
+            return MovieDetail::hiddenGems()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
@@ -61,7 +61,7 @@ class HomeController extends Controller
         });
 
         $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
-            return MovieDetail::recentlyReleased()->take(6)->get([
+            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
@@ -93,7 +93,7 @@ class HomeController extends Controller
         });
 
         $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), function () {
-            return MovieDetail::topRated()->take(6)->get([
+            return MovieDetail::topRated()->inRandomOrder()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
