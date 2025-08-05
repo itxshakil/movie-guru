@@ -58,7 +58,18 @@ class MovieDetail extends Model
 
     public function scopeTrending(Builder $query): void
     {
-        $query->topRated()->recentlyReleased();
+        $query->recentlyReleased()
+            ->where(function (Builder $query) {
+                $query->where(function ($query) {
+                    $query->where(function (Builder $query) {
+                        $query->where('imdb_rating', '>=', 8.5)
+                            ->where('imdb_votes', '>', 8_000);
+                    })->orWhere(function (Builder $query) {
+                        $query->whereBetween('imdb_rating', [8.0, 8.5])
+                            ->where('imdb_votes', '>', 10_000);
+                    });
+                });
+            });
     }
 
     public function scopeRecentlyReleased(Builder $query): void
