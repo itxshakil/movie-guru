@@ -128,23 +128,6 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
   </div>
   <OurFeatures/>
 
-  <div v-if="popularMovies && popularMovies.length" class="bg-white dark:bg-gray-900 py-8">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">Popular Movies</h2>
-        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Explore What's Popular Right Now</p>
-      </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <SearchCard
-            v-for="movie in popularMovies"
-            :key="movie.imdb_id"
-            :movie="movie"
-            @selected="viewDetail(movie.imdb_id, 'Popular Movies')"
-        />
-      </div>
-    </div>
-  </div>
-
   <div v-if="trendingMovies && trendingMovies.length" class="bg-white dark:bg-gray-900 py-8">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
       <div class="text-center mb-12">
@@ -158,24 +141,6 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
             :key="movie.imdb_id"
             :movie="movie"
             @selected="viewDetail(movie.imdb_id, 'Trending Movies')"
-        />
-      </div>
-    </div>
-  </div>
-
-  <div v-if="hiddenGemsMovies && hiddenGemsMovies.length" class="bg-white dark:bg-gray-900 py-8">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">💎 Hidden Gems</h2>
-        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Uncover underrated masterpieces waiting to be
-          explored.</p>
-      </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <SearchCard
-            v-for="movie in hiddenGemsMovies"
-            :key="movie.imdb_id"
-            :movie="movie"
-            @selected="viewDetail(movie.imdb_id, 'Hidden Gems')"
         />
       </div>
     </div>
@@ -217,6 +182,25 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
     </div>
   </div>
 
+    <div v-if="hiddenGemsMovies && hiddenGemsMovies.length" class="bg-white dark:bg-gray-900 py-8">
+        <div class="mx-auto max-w-7xl px-4 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">💎 Hidden Gems</h2>
+                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Uncover underrated masterpieces waiting
+                    to be
+                    explored.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <SearchCard
+                    v-for="movie in hiddenGemsMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    @selected="viewDetail(movie.imdb_id, 'Hidden Gems')"
+                />
+            </div>
+        </div>
+    </div>
+
   <div v-if="recommendedMovies && recommendedMovies.length" class="bg-white dark:bg-gray-900 py-8">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
       <div class="text-center mb-12">
@@ -235,6 +219,22 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
     </div>
   </div>
 
+    <div v-if="popularMovies && popularMovies.length" class="bg-white dark:bg-gray-900 py-8">
+        <div class="mx-auto max-w-7xl px-4 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">Popular Movies</h2>
+                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Explore What's Popular Right Now</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <SearchCard
+                    v-for="movie in popularMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    @selected="viewDetail(movie.imdb_id, 'Popular Movies')"
+                />
+            </div>
+        </div>
+    </div>
 
   <NewsletterForm/>
 

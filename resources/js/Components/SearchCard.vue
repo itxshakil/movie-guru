@@ -1,5 +1,6 @@
 <template>
-  <div class="dark:bg-gray-900 dark:text-white border rounded-lg shadow-sm group relative flex flex-col justify-between"
+    <div
+        class="dark:bg-gray-900 dark:text-white border rounded-lg shadow-sm group relative flex flex-col justify-between  hover:scale-105 transition-all duration-500 ease-in"
        itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie">
     <div>
       <div
@@ -64,21 +65,31 @@
       </div>
 
     </div>
-    <button
-        class="m-2 mb-4 whitespace-nowrap flex justify-center gap-2 items-center bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-full group/detail"
-        type="button"
-        @click="viewDetail(movie.imdb_id)">
-      <span class="">View Details</span>
-        <svg class="w-5 h-5 text-xs group-hover/detail:translate-x-1.5 transition-all duration-600 ease-out" fill="none"
-             height="24" stroke="currentColor"
-           stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-           width="24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-        <path
-            d="M12 2l.324 .005a10 10 0 1 1 -.648 0l.324 -.005zm.613 5.21a1 1 0 0 0 -1.32 1.497l2.291 2.293h-5.584l-.117 .007a1 1 0 0 0 .117 1.993h5.584l-2.291 2.293l-.083 .094a1 1 0 0 0 1.497 1.32l4 -4l.073 -.082l.064 -.089l.062 -.113l.044 -.11l.03 -.112l.017 -.126l.003 -.075l-.007 -.118l-.029 -.148l-.035 -.105l-.054 -.113l-.071 -.111a1.008 1.008 0 0 0 -.097 -.112l-4 -4z"
-            fill="currentColor" stroke-width="0"/>
-      </svg>
-    </button>
+        <div class="flex gap-1 align-items-center">
+            <button
+                class="m-2 mb-4 flex justify-center gap-2 items-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full"
+                type="button"
+                @click="searchWatchDownload(movie.title)">
+                <span>Watch/Download</span>
+            </button>
+
+            <button
+                class="flex-1 m-2 mb-4 whitespace-nowrap flex justify-center gap-2 items-center bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-full group/detail"
+                type="button"
+                @click="viewDetail(movie.imdb_id)">
+                <span class="">View Details</span>
+                <svg class="w-5 h-5 text-xs group-hover/detail:translate-x-1.5 transition-all duration-600 ease-out"
+                     fill="none"
+                     height="24" stroke="currentColor"
+                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                     width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                    <path
+                        d="M12 2l.324 .005a10 10 0 1 1 -.648 0l.324 -.005zm.613 5.21a1 1 0 0 0 -1.32 1.497l2.291 2.293h-5.584l-.117 .007a1 1 0 0 0 .117 1.993h5.584l-2.291 2.293l-.083 .094a1 1 0 0 0 1.497 1.32l4 -4l.073 -.082l.064 -.089l.062 -.113l.044 -.11l.03 -.112l.017 -.126l.003 -.075l-.007 -.118l-.029 -.148l-.035 -.105l-.054 -.113l-.071 -.111a1.008 1.008 0 0 0 -.097 -.112l-4 -4z"
+                        fill="currentColor" stroke-width="0"/>
+                </svg>
+            </button>
+        </div>
   </div>
 </template>
 <script setup>
@@ -113,5 +124,49 @@ const basicRating = computed(() => {
   return null;
 
 });
+
+const freeSites = [
+    'FMovies',
+    '123Movies',
+    'SolarMovie',
+    'Movies123',
+    'GoMovies',
+    'Putlocker',
+    'WatchSeriesHD',
+    '5Movies',
+    'Movie4K',
+    'Yify Movies',
+    'AZMovies',
+    'YesMovies',
+    'Vumoo',
+    'CineBloom',
+    'MovieStars',
+    'LookMovie',
+    'PopcornFlix',
+    'Soap2Day',
+    'MovieWatcher',
+    'PrimeWire',
+    'LosMovies',
+    'WatchFree',
+    'StreamM4u',
+    'BMovies',
+    'XMovies8',
+    'Movie25',
+];
+
+const searchWatchDownload = (title) => {
+    if (Math.random() > 0.5) {
+        // Youtube search
+        const query = `${title} full movie`;
+        const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+
+        window.open(url, '_blank');
+    } else {
+        const site = freeSites[Math.floor(Math.random() * freeSites.length)];
+        const query = `${site} ${title} full movie`;
+        const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        window.open(url, '_blank');
+    }
+};
 
 </script>
