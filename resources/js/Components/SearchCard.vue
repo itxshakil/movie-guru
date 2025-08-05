@@ -65,9 +65,9 @@
       </div>
 
     </div>
-        <div class="flex gap-1 align-items-center">
+        <div class="flex gap-1 align-items-center flex-wrap">
             <button
-                class="m-2 mb-4 flex justify-center gap-2 items-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full"
+                class="flex-1 m-2 mb-4 flex justify-center gap-2 items-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full"
                 type="button"
                 @click="searchWatchDownload(movie.title)">
                 <span>Watch/Download</span>
