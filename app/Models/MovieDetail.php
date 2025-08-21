@@ -29,6 +29,9 @@ class MovieDetail extends Model
         'writer',
         'actors',
         'details',
+        'where_to_watch',
+        'where_to_watch_fetched_at',
+        'where_to_watch_expires_at',
         'views',
     ];
 
@@ -108,6 +111,9 @@ class MovieDetail extends Model
     {
         return [
             'details' => 'json',
+            'where_to_watch' => 'json',
+            'where_to_watch_fetched_at' => 'datetime',
+            'where_to_watch_expires_at' => 'datetime',
         ];
     }
 }
