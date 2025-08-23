@@ -8,12 +8,13 @@ const props = defineProps({
   title: {
     type: String,
     required: false
-  }
+  },
 })
 
 const emit = defineEmits(['close']);
 
 const detail = ref(null);
+const sources = ref([]);
 const loading = ref(false);
 const timeout = ref(null);
 const maxRetry  = ref(3);
@@ -37,6 +38,7 @@ const loadDetail = async () => {
         if (response.status === 200) {
             if (response.data.detail && typeof response.data.detail === 'object' && response.data.detail.hasOwnProperty('Title')) {
                 detail.value = response.data.detail;
+                sources.value = response.data.sources;
             } else {
                 alert('Unexpected data format');
 
@@ -84,7 +86,7 @@ const onClose = () => {
 
 <template>
     <DialogModal @close="onClose" max-width=" w-full md:max-w-2xl lg:max-w-4xl">
-      <DetailCard :detail="detail" :title="title"/>
+        <DetailCard :detail="detail" :sources="sources" :title="title"/>
     </DialogModal>
 </template>
 

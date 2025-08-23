@@ -106,76 +106,45 @@
                             </div>
 
                           <!-- Watch Now Section -->
-                          <section class="mt-2">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white sr-only">Watch Now</h3>
-                            <ul class="space-y-4 flex flex-wrap items-center gap-2">
-                              <!-- Netflix -->
-                              <li class="flex items-center space-x-2">
-                                <a
-                                    :href="netflixLink"
-                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
-                                    @click="sendAnalytics('Netflix', netflixLink)"
-                                   target="_blank">
-                                  <img alt="Netflix Logo" class="h-16 w-8" src="/assets/netflix-logo.png">
-                                  <span class="sr-only">Watch on Netflix</span>
-                                </a>
-                              </li>
-                              <!-- Amazon Prime -->
-                              <li class="flex items-center space-x-2">
-                                <a
-                                    :href="amazonAffiliateLink"
-                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
-                                    @click="sendAnalytics('Amazon Prime', amazonAffiliateLink)"
-                                   target="_blank">
-                                  <img alt="Amazon Prime Logo" class="h-8 w-8" src="/assets/prime-logo.png">
-                                  <span class="sr-only">Watch on Amazon Prime</span>
-                                </a>
-                              </li>
-                              <!-- Hulu -->
-                              <!--                              <li class="flex items-center space-x-2">-->
-                              <!--                                <a :href="huluLink"-->
-                              <!--                                   class="text-primary-500 hover:underline"-->
-                              <!--                                   rel="noopener noreferrer" @click="sendAnalytics('Hulu', huluLink)"-->
-                              <!--                                   target="_blank">-->
-                              <!--                                  <img alt="Hulu Logo" class="h-8 w-12" src="/assets/hulu-logo.svg">-->
-                              <!--                                  <span class="sr-only">Watch on Hulu</span>-->
-                              <!--                                </a>-->
-                              <!--                              </li>-->
-                              <!-- Disney+ -->
-                              <!--                              <li class="flex items-center space-x-2">-->
-                              <!--                                <a-->
-                              <!--                                    :href="disneyPlusLink"-->
-                              <!--                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"-->
-                              <!--                                    @click="sendAnalytics('Disney+', disneyPlusLink)"-->
-                              <!--                                   target="_blank">-->
-                              <!--                                  <img alt="Disney+ Logo" class="h-9 w-16" src="/assets/disney-logo.jpg">-->
-                              <!--                                  <span class="sr-only">Watch on Disney+</span>-->
-                              <!--                                </a>-->
-                              <!--                              </li>-->
-                              <!-- HBO Max -->
-                              <!--                              <li class="flex items-center space-x-2">-->
-                              <!--                                <a-->
-                              <!--                                    :href="hboMaxLink"-->
-                              <!--                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"-->
-                              <!--                                    @click="sendAnalytics('HBO Max', hboMaxLink)"-->
-                              <!--                                   target="_blank">-->
-                              <!--                                  <img alt="HBO Max Logo" class="h-8 w-12" src="/assets/hbo-logo.png">-->
-                              <!--                                  <span class="sr-only">Watch on HBO Max</span>-->
-                              <!--                                </a>-->
-                              <!--                              </li>-->
-                              <!-- Download Max -->
-                              <li class="flex items-center space-x-2 mb-4">
-                                <a
-                                    :href="googleDownloadLink"
-                                    class="text-primary-500 hover:underline" rel="noopener noreferrer"
-                                    @click="sendAnalytics('Google Download', googleDownloadLink)"
-                                   target="_blank">
-                                  <img alt="HBO Max Logo" class="h-8 w-8" src="/assets/google-logo.png">
-                                  <span class="sr-only">Search Download Links on Googlex</span>
-                                </a>
-                              </li>
-                            </ul>
-                          </section>
+                            <section class="mt-2">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white sr-only">Watch Now</h3>
+                                <ul class="space-y-4 flex flex-wrap items-center gap-1">
+                                    <SourceCard
+                                        v-for="source in props.sources"
+                                        :key="source.availability.sourceId"
+                                        :send-analytics="sendAnalytics"
+                                        :source="source"
+                                        class="flex items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    >
+                                    </SourceCard>
+
+                                    <!-- Always show Google fallback -->
+                                    <li
+                                        class="flex items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    >
+                                        <a
+                                            :href="googleDownloadLink"
+                                            class="flex items-center gap-3 flex-1"
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            @click="sendAnalytics('Google Download', googleDownloadLink)"
+                                        >
+                                            <img alt="Google Logo" class="h-10 w-10 rounded"
+                                                 src="/assets/google-logo.png"/>
+
+                                            <div>
+                                                <p class="font-medium text-gray-900 dark:text-white">
+                                                    Google Search
+                                                </p>
+
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 flex flex-wrap gap-1 items-center">
+                                                    Find download or streaming links on Google
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
 
                             <SnippetText :text="isValue(detail.Plot) ? detail.Plot : 'No Plot detail'"  itemprop="description" class="text-gray-900 dark:text-white mt-2"/>
 
@@ -295,9 +264,15 @@
 import DetailSkeletonCard from '@/Components/DetailSkeletonCard.vue';
 import {computed} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
+import SourceCard from "@/Components/SourceCard.vue";
 
 const props = defineProps({
     detail: Object,
+    sources: {
+        type: Array,
+        required: false,
+        default: () => [],
+    },
   title: {
     type: String,
     required: false,

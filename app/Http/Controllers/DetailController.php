@@ -8,6 +8,7 @@ use App\Models\MovieDetail;
 use App\Models\ShowPageAnalytics;
 use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
+use App\Services\WatchModeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -18,27 +19,57 @@ class DetailController extends Controller
     {
         $cacheKey = 'detail.'.$imdbId;
         $cacheTTl = [now()->addHours(18), now()->addHours(24)];
-        $detail = Cache::flexible($cacheKey, $cacheTTl, function () use ($imdbId) {
+        $movie = Cache::flexible($cacheKey, $cacheTTl, function () use ($imdbId) {
             return $this->fetchDetail($imdbId);
         });
 
+        $detail = $movie instanceof MovieDetail ? $movie->details : $movie;
+
+        $sources = $movie->sources ?? [];
+
+        $shouldRefresh = $movie instanceof MovieDetail && (
+                empty($sources) ||
+                !$movie->source_last_fetched_at ||
+                $movie->source_last_fetched_at->lt(now()->subDays(7))
+            );
+
         $botDetector = app(BotDetectorService::class);
         if ($botDetector->isBot($request) === false) {
-            defer(function () use ($request, $imdbId) {
+            defer(function () use ($shouldRefresh, $request, $imdbId) {
                 ShowPageAnalytics::create([
                     'imdb_id' => $imdbId,
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                 ]);
+
+                if ($shouldRefresh) {
+                    $watchMode = app(WatchModeService::class);
+                    $sources = $watchMode->getTitleSources($imdbId, ['IN']);
+
+                    if ($sources !== null) {
+                        $movie = MovieDetail::where('imdb_id', $imdbId)->first();
+                        if (!$movie) {
+                            return;
+                        }
+                        $movie->update([
+                            'sources' => $sources,
+                            'source_last_fetched_at' => now(),
+                        ]);
+                    }
+                }
             });
         }
 
         if ($request->wantsJson()) {
-            return response()->json(['detail' => $detail]);
+            return response()->json([
+                'detail' => $detail,
+                'sources' => $sources,
+            ]);
         }
 
         return Inertia::render('Show', [
             'detail' => $detail,
+            'sources' => $sources,
         ]);
     }
 
@@ -56,15 +87,12 @@ class DetailController extends Controller
         return $this->fetchFromAPI($imdbId);
     }
 
-    /**
-     * @return array|mixed
-     */
-    public function handleDB(MovieDetail $movie, string $imdbId): mixed
+    public function handleDB(MovieDetail $movie, string $imdbId): MovieDetail
     {
         defer(fn() => $movie->incrementViews());
         $this->updateDetailInBG($imdbId);
 
-        return $movie->details;
+        return $movie;
     }
 
     private function updateDetailInBG(string $imdbId): void

@@ -5,7 +5,12 @@ import BaseLayout from '@/Layouts/BaseLayout.vue';
 import DetailCard from '@/Components/DetailCard.vue';
 
 const props = defineProps({
-    detail: Object
+    detail: Object,
+    sources: {
+        type: Array,
+        required: false,
+        default: () => [],
+    },
 })
 
 defineOptions({ layout: BaseLayout })
@@ -66,6 +71,7 @@ const ogImage = moviePoster(props.detail);
         <link rel="canonical" :href="pageUrl" head-key="canonical" />
     </Head>
 
-    <DetailCard :detail="detail" class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white" />
+    <DetailCard :detail="detail" :sources="sources"
+                class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
     <NewsletterForm/>
 </template>

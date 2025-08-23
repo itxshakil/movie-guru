@@ -29,6 +29,8 @@ class MovieDetail extends Model
         'writer',
         'actors',
         'details',
+        'sources',
+        'source_last_fetched_at',
         'views',
     ];
 
@@ -108,6 +110,8 @@ class MovieDetail extends Model
     {
         return [
             'details' => 'json',
+            'sources' => 'json',
+            'source_last_fetched_at' => 'datetime',
         ];
     }
 }
