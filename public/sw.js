@@ -2,11 +2,11 @@ const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.19';
-const SEARCH_CACHE = 'search-cache-v-4.19';
-const INFO_CACHE = 'info-cache-v-4.19';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.19';
-const POSTER_CACHE = 'poster-cache-v-4.19';
+const APP_CACHE = 'v-4.5.0';
+const SEARCH_CACHE = 'search-cache-v-4.5.0';
+const INFO_CACHE = 'info-cache-v-4.5.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-5.0';
+const POSTER_CACHE = 'poster-cache-v-4.5.0';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -26,39 +26,39 @@ const basicPathsToCache = [
     '/build/assets/Search-e4G1Minw.css',
     '/build/assets/SearchCard-Df8yoEfg.css',
     '/build/assets/BaseLayout-pP2Wt1YA.css',
-    '/build/assets/app-CTTzdlKo.css',
-    '/build/assets/LoadingSpinner-C3a41K9D.js',
-    '/build/assets/ApplicationLogo-BwWzuqBi.js',
-    '/build/assets/InputError-rpH83t30.js',
-    '/build/assets/InputLabel-DnfazyzN.js',
-    '/build/assets/GuestLayout-DtLGHGtV.js',
-    '/build/assets/LoadingSpinnerButton-Dx7vQxUG.js',
-    '/build/assets/PrimaryButton-CDTouc2E.js',
-    '/build/assets/Dashboard-C7DD5E8c.js',
-    '/build/assets/TextInput-2Q4aukxm.js',
-    '/build/assets/Edit-BP-7m6sx.js',
-    '/build/assets/ConfirmPassword-mJ5QqgLY.js',
-    '/build/assets/ForgotPassword-DXIj6fxc.js',
-    '/build/assets/VerifyEmail-B0coQ-Yu.js',
-    '/build/assets/ResetPassword-Bu',
-    '/build/assets/Error-C9N5CbCJ.js',
-    '/build/assets/Show-DUzlmqzc.js',
-    '/build/assets/Register-DZey4TcZ.js',
-    '/build/assets/UpdatePasswordForm-XDXOKD2l.js',
-    '/build/assets/UpdateProfileInformationForm-DRoOIowD.js',
-    '/build/assets/Login-B7QuenIP.js',
-    '/build/assets/Terms-Dl',
-    '/build/assets/NewsletterForm-zR-BHg8u.js',
-    '/build/assets/PrivacyPolicy-BX49PBk9.js',
-    '/build/assets/DeleteUserForm-BKWJNs4b.js',
-    '/build/assets/Contact-D',
-    '/build/assets/AuthenticatedLayout-DmQROoJy.js',
-    '/build/assets/SearchCard-C',
-    '/build/assets/Search-T79A8goA.js',
-    '/build/assets/Welcome-5fBu0D',
-    '/build/assets/BaseLayout-Cx10ZW9c.js',
-    '/build/assets/DetailCard-g1muAeeu.js',
-    '/build/assets/app-64f2bUT1.js',
+    '/build/assets/app-E56yfxAa.css',
+    '/build/assets/LoadingSpinner-zACpK_I2.js',
+    '/build/assets/ApplicationLogo-BzfElOsR.js',
+    '/build/assets/InputError-DiTuofyv.js',
+    '/build/assets/InputLabel-DLx6YXi3.js',
+    '/build/assets/GuestLayout-BCRe5IrR.js',
+    '/build/assets/LoadingSpinnerButton-BlLhlnXF.js',
+    '/build/assets/PrimaryButton-CxMQfDk-.js',
+    '/build/assets/Dashboard-BJxRtoff.js',
+    '/build/assets/TextInput-Dt5y1RS6.js',
+    '/build/assets/Edit-DV4yGjZ6.js',
+    '/build/assets/ConfirmPassword-7cnOy27O.js',
+    '/build/assets/ForgotPassword-y7JDGN1_.js',
+    '/build/assets/VerifyEmail-BgArnbMo.js',
+    '/build/assets/ResetPassword-Cdmh2-H0.js',
+    '/build/assets/Error-DWES3oqJ.js',
+    '/build/assets/Register-Dalnbdzp.js',
+    '/build/assets/UpdatePasswordForm-BBRxTt5O.js',
+    '/build/assets/Show-BH1oVXEm.js',
+    '/build/assets/UpdateProfileInformationForm-CZJLUWxE.js',
+    '/build/assets/Login-DGTA93nJ.js',
+    '/build/assets/Terms-BQWg_DzV.js',
+    '/build/assets/NewsletterForm-BBEqEdRM.js',
+    '/build/assets/PrivacyPolicy-BkXfaWFm.js',
+    '/build/assets/DeleteUserForm-Bwnt9kur.js',
+    '/build/assets/Contact-DOjRPhQv.js',
+    '/build/assets/AuthenticatedLayout-Dex1rUAe.js',
+    '/build/assets/SearchCard-C6bOoXV3.js',
+    '/build/assets/Search-CvOAYPXs.js',
+    '/build/assets/Welcome-gWsU59Mq.js',
+    '/build/assets/BaseLayout-UDFL3bIZ.js',
+    '/build/assets/DetailCard-DWsrJbtE.js',
+    '/build/assets/app-I0goOTEh.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -455,87 +455,123 @@ function dailyNotification() {
 
     // Time-of-day specific messages
     const morningMessages = [
-        "🌅 Morning Glory! Time to kickstart your day with some cinematic magic! 🎬",
-        "☀️ Rise and Shine! Your movie adventure begins now. Grab your coffee! ☕",
-        "🌞 Good Morning! The screen is set for your next movie masterpiece. 🍿",
+        "🌅 Morning Glory! Time to kickstart your day with some cinematic magic! 🎬 (Better than emails, right?)",
+        "☀️ Rise and Shine! Your movie adventure begins now. Grab your coffee! ☕ (Or two, no judgment.)",
+        "🌞 Good Morning! The screen is set for your next movie masterpiece. 🍿 (Don’t worry, pants are optional.)",
         "🎬 Movie time, before the world wakes up. Start your day with a plot twist! 😎",
-        "🛋️ Who needs a gym when you have a couch? Let's binge! 💪",
-        "☕ Morning fuel: Coffee + Movie! What’s your choice today? 🎥",
+        "🛋️ Who needs a gym when you have a couch? Let's binge! 💪 (Calories don’t count in the morning.)",
+        "☕ Morning fuel: Coffee + Movie! What’s your choice today? 🎥 (Espresso shots = extra plot twists.)",
         "🌅 Let’s make today legendary—start with a movie! 🍿",
-        "👀 Morning movie magic is the best way to wake up. Let’s go! 🎬",
-        "⏰ Early bird catches the best flicks. Grab your popcorn! 🍿",
-        "🎥 Good vibes and good movies—because mornings should be epic!"
+        "👀 Morning movie magic is the best way to wake up. Let’s go! 🎬 (Sorry, alarm clock.)",
+        "⏰ Early bird catches the best flicks. Grab your popcorn! 🍿 (Productivity can wait.)",
+        "🎥 Good vibes and good movies—because mornings should be epic!",
+        "⚡ Start the day with drama, action, or laughter—your choice, superstar! 🌟",
+        "💡 Morning hack: Movies first, responsibilities later. 😉",
+        "🍳 Breakfast is optional. Popcorn is mandatory. 🍿",
+        "🚀 Launch your day with a blockbuster, not an alarm clock. 🎬",
+        "🌞 Mornings are brighter with a little movie chaos. Ready? 🎥"
     ];
 
     const afternoonMessages = [
-        "🎥 Afternoon Delights: The perfect time to unwind with a great movie. 🌟",
-        "🌤️ Midday Marvels: The movie world is waiting—what's on your watchlist today?",
-        "🍿 Afternoon Binge: The spotlight's on you, star! Which movie are you craving today?",
-        "☕ Coffee break? More like movie break! 🎬 Time to relax!",
-        "⏳ The afternoon slump just met its match: Movie time! 🎥",
-        "🛋️ Take a break, press play, and let the movie marathon begin. 🍿",
-        "🌞 The afternoon sun is setting, but the binge session is just beginning. 🌇",
-        "🎬 Afternoon movie therapy is the best kind of therapy. Let’s do this!",
-        "📅 Your afternoon just got better: Movie marathon mode activated!",
-        "🍫 Afternoon treat: A little movie magic for your soul!"
+        "🎥 Afternoon Delights: The perfect time to unwind with a great movie. 🌟 (Meetings who?)",
+        "🌤️ Midday Marvels: The movie world is waiting—what's on your watchlist today? (Better than a nap.)",
+        "🍿 Afternoon Binge: The spotlight's on you, star! Which movie are you craving today? (Snacks mandatory.)",
+        "☕ Coffee break? More like movie break! 🎬 Time to relax! (Boss doesn’t need to know.)",
+        "⏳ The afternoon slump just met its match: Movie time! 🎥 (Goodbye yawns, hello popcorn.)",
+        "🛋️ Take a break, press play, and let the movie marathon begin. 🍿 (Best productivity hack.)",
+        "🌞 The afternoon sun is setting, but the binge session is just beginning. 🌇 (Curtains closed = cinema vibes.)",
+        "🎬 Afternoon movie therapy is the best kind of therapy. Let’s do this! (No co-pay required.)",
+        "📅 Your afternoon just got better: Movie marathon mode activated! (Zero regrets.)",
+        "🍫 Afternoon treat: A little movie magic for your soul! (Better than sugar rush.)",
+        "🍫 Afternoon treat: A little movie magic for your soul!",
+        "⚡ Power up your afternoon with some cinematic fuel! 🎬",
+        "🥤 Lunchtime is done. Showtime has just begun! 🍿",
+        "🎯 Afternoon slump cure = one epic movie scene. Guaranteed. 🎥",
+        "🌞 Bright sun outside, brighter screen inside. Let’s roll! 🍿",
+        "📺 Plot twist: Your productivity today = 0. Your movie marathon = 100. 🔥",
     ];
 
     const eveningMessages = [
-        "🌇 Evening Vibes: It's showtime! Let the marathon begin! 🌟",
-        "🌙 Prime Time: Your perfect movie companion for the evening is just a click away. 🎬",
-        "✨ Evening Rush: The movies are calling! Ready for your next great binge? 🍿",
-        "🍿 Movie night just got real—who's ready for the first feature? 🎥",
-        "🎬 The night is young and so are the movies. Get comfy and press play!",
-        "🛋️ Time for your evening relaxation therapy. Movies await! 🎥",
-        "🌙 Evening lights, movie nights. What's on your watchlist tonight?",
-        "🎥 From sunset to screen: Your perfect movie awaits! 🌇",
-        "✨ The night belongs to movie lovers. What’s your pick tonight?",
-        "🌌 The stars are out, the movie is about to start. Let’s go, movie lover! 🍿"
+        "🌇 Evening Vibes: It's showtime! Let the marathon begin! 🌟 (Dinner can wait.)",
+        "🌙 Prime Time: Your perfect movie companion for the evening is just a click away. 🎬 (Couch included.)",
+        "✨ Evening Rush: The movies are calling! Ready for your next great binge? 🍿 (Don’t ghost them.)",
+        "🍿 Movie night just got real—who's ready for the first feature? 🎥 (Double features = win.)",
+        "🎬 The night is young and so are the movies. Get comfy and press play! (Blankets recommended.)",
+        "🛋️ Time for your evening relaxation therapy. Movies await! 🎥 (Stress = gone.)",
+        "🌙 Evening lights, movie nights. What's on your watchlist tonight? (Stars + screen = perfection.)",
+        "🎥 From sunset to screen: Your perfect movie awaits! 🌇 (Golden hour, but indoors.)",
+        "✨ The night belongs to movie lovers. What’s your pick tonight? (No curfew here.)",
+        "🍕 Pizza, popcorn, and pure movie magic—this is your evening plan. 🍿 (Calories = happiness points.)",
+        "🌌 The stars are out, the movie is about to start. Let’s go, movie lover! 🍿",
+        "🍕 Pizza, popcorn, and pure movie magic—this is your evening plan. 🍿",
+        "🎬 Prime time = YOUR time. Let’s roll the opening credits. 🌟",
+        "💡 Idea: Cancel all plans. Watch movies instead. 😉",
+        "🌙 Moonlight + Movies = The perfect night combo. 🎥",
+        "🎧 Add soundtracks to your soul—start your binge now! 🍿"
     ];
 
     const lateNightMessages = [
-        "🌙 Late Night Cinematic Bliss: Perfect time to dream with a great film. 🌙",
-        "🌌 Night Owl's Binge: Your late-night movie escape awaits... 🎬",
-        "🌑 Nighttime Flicks: Time to unwind and let the movie magic happen. ✨",
-        "🎬 Who needs sleep when there's a movie marathon waiting? 🌙",
-        "🦉 Late night movies: Because who doesn't want to live on the edge? 🎥",
-        "🌠 Stars on the screen and stars in the sky—perfect time for a late-night binge! 🍿",
-        "🎥 The night calls for a good flick. Get comfy, the show’s about to start. 🌙",
-        "🌌 Midnight movie vibes—popcorn in hand, movie on screen. 🎬",
+        "🌙 Late Night Cinematic Bliss: Perfect time to dream with a great film. 🌙 (Sleep is overrated.)",
+        "🌌 Night Owl's Binge: Your late-night movie escape awaits... 🎬 (Eyes wide open.)",
+        "🌑 Nighttime Flicks: Time to unwind and let the movie magic happen. ✨ (Insomnia cure unlocked.)",
+        "🎬 Who needs sleep when there's a movie marathon waiting? 🌙 (Your pillow understands.)",
+        "🦉 Late night movies: Because who doesn't want to live on the edge? 🎥 (Risk level: popcorn crumbs.)",
+        "🌠 Stars on the screen and stars in the sky—perfect time for a late-night binge! 🍿 (Galaxy brain move.)",
+        "🎥 The night calls for a good flick. Get comfy, the show’s about to start. 🌙 (Blanket fortress optional.)",
+        "🌌 Midnight movie vibes—popcorn in hand, movie on screen. 🎬 (Perfect combo.)",
+        "🔥 The city sleeps, but your movie playlist doesn’t. 🎥 (Legendary energy.)",
+        "🦉 Night owls unite—movie marathons are our superpower! 🍿 (We don’t do mornings.)",
         "🌙 No better time to let the screen take you to another world. Movie time!",
-        "🛏️ Late night, movie lights. Time to end the day with a film!"
+        "🛏️ Late night, movie lights. Time to end the day with a film!",
+        "🌙 Midnight = perfect time for a cinematic escape. Don’t fight it. 🎬",
+        "🚀 Sleep is overrated. Movies are eternal. 🌌",
+        "👀 Late-night binge? You’re living the dream. 🍿",
     ];
 
     // Special Day Messages (New Year, Christmas, Weekend, Sunday, Monday)
     const holidayMessages = {
         newYear: [
-            "🎉 New Year, New Flicks! Time to kick off the year with a movie binge! 🍿",
-            "🎆 Happy New Year! What better way to start than with a movie marathon? 🎬",
-            "✨ Cheers to new beginnings! Ring in the new year with your favorite films! 🍾"
+            "🎉 New Year, New Flicks! Time to kick off the year with a movie binge! 🍿 (Resolution: binge responsibly.)",
+            "🎆 Happy New Year! What better way to start than with a movie marathon? 🎬 (Hangover cure: movies.)",
+            "✨ Cheers to new beginnings! Ring in the new year with your favorite films! 🍾 (Blockbusters > fireworks.)",
+            "🎇 Resolution idea: More movies, less stress. 💡 (Best self-care hack.)",
+            "🎆 New year = new watchlist! Let’s crush it together. 🎬",
+            "🍾 Ring in the year with plot twists and popcorn explosions. 🍿",
+            "🎇 Resolution idea: More movies, less stress. 💡"
         ],
         christmas: [
-            "🎄 Ho Ho Ho! It’s Christmas movie time! Grab the eggnog and let’s go! 🍿",
-            "🎅 Tis the season for a movie marathon! What’s your holiday classic? 🎥",
-            "🌟 Merry Christmas! Cozy up with a movie and enjoy the magic of the season! 🎬"
+            "🎄 Ho Ho Ho! It’s Christmas movie time! Grab the eggnog and let’s go! 🍿 (Santa approves.)",
+            "🎅 Tis the season for a movie marathon! What’s your holiday classic? 🎥 (Bonus points: pajamas all day.)",
+            "🌟 Merry Christmas! Cozy up with a movie and enjoy the magic of the season! 🎬 (Holiday spirit = 100.)",
+            "❄️ Snow, cocoa, and Christmas classics. Movie heaven unlocked! 🍿 (Snow optional.)",
+            "🎁 The best gift = cozy movies all day long. 🎬",
+            "✨ Forget the chimney, Santa’s bringing movies straight to your screen! 🎅"
         ],
         fridayEvening: [
-            "🎉 Friday night’s here! Time to put the workweek to rest and press play on some epic movies. 🍿",
-            "✨ The weekend's calling, and it starts with a movie marathon. Get comfy, it's showtime! 🎬",
-            "🥳 Friday feels: It’s time to kick back with popcorn and let the movie magic take over! 🍿",
+            "🎉 Friday night’s here! Time to put the workweek to rest and press play on some epic movies. 🍿 (No alarms tomorrow.)",
+            "✨ The weekend's calling, and it starts with a movie marathon. Get comfy, it's showtime! 🎬 (Best happy hour = movies.)",
+            "🥳 Friday feels: It’s time to kick back with popcorn and let the movie magic take over! 🍿 (Emails ignored.)",
+            "🕺 The work week’s done! Time to dive into a movie binge that lasts all night. Who's in? 🍿 (After-party = Netflix.)",
+            "🍿 Start your weekend off right: Great movies, cozy vibes, and no alarms tomorrow! 🎬 (Freedom unlocked.)",
             "🌟 Friday night vibes = Movie mode activated. What’s your first flick? 🍿🎥",
-            "🕺 The work week’s done! Time to dive into a movie binge that lasts all night. Who's in? 🍿",
             "🎥 Friday’s here to save you from reality. Choose your movie and get comfy! 🛋️",
             "🍿 Start your weekend off right: Great movies, cozy vibes, and no alarms tomorrow! 🎬",
             "🎉 It’s Friday night! Time to do absolutely nothing except watch movies. Let’s go! 🛋️",
             "📅 Weekend = movies + popcorn. Let’s make this Friday night unforgettable! 🎥🍿",
-            "⚡ The weekend begins NOW! Movies, snacks, and zero responsibilities. 🛋️🍿"
+            "⚡ The weekend begins NOW! Movies, snacks, and zero responsibilities. 🛋️🍿",
+            "🎬 Weekend loading... First step: Movies! 🍿",
+            "🍹 Drinks? Nah. Popcorn towers? Absolutely. 🍿",
+            "⚡ Friday = Permission to binge without guilt. 🎥",
+            "🥳 End the week strong—with movies, not emails. 🍿",
+            "🎉 Your boss doesn’t know this, but movies are mandatory tonight. 😉"
         ],
         weekend: [
-            "🎉 Weekend vibes: Time to kick back, relax, and enjoy a movie marathon! 🍿",
-            "🛋️ The weekend is here—let’s get comfy and binge-watch all the movies! 🎬",
-            "🍿 It’s the weekend! Movie time, snack time, all the good times! 🎥",
+            "🎉 Weekend vibes: Time to kick back, relax, and enjoy a movie marathon! 🍿 (Laundry can wait.)",
+            "🛋️ The weekend is here—let’s get comfy and binge-watch all the movies! 🎬 (Pajamas mandatory.)",
+            "🍿 It’s the weekend! Movie time, snack time, all the good times! 🎥 (Snacks > chores.)",
+            "🎬 Saturday vibes: Settle in, relax, and let the movie magic begin! ✨ (Errands cancelled.)",
+            "🎯 Weekend checklist: Snacks ✅ Movies ✅ Zero responsibilities ✅ (Best list ever.)",
             "🌞 Saturday's here! Perfect day for an all-day movie binge. What’s first on the list? 🍿",
-            "🎬 Saturday vibes: Settle in, relax, and let the movie magic begin! ✨",
             "🍿 It’s Saturday, let’s get comfy with a marathon! Who’s in for movie madness? 🎥",
             "🎉 Saturdays are for doing nothing... except watching movies. Ready to roll? 🎬",
             "🕶️ Lazy Saturday = Movie marathon day! Grab the popcorn and hit play. 🍿",
@@ -543,13 +579,19 @@ function dailyNotification() {
             "🎬 Ready for the weekend binge fest? Saturday's perfect for it! Grab your popcorn! 🍿",
             "☀️ Saturday morning movie vibes are calling... and you MUST answer. 🎥",
             "🍕 Saturday = Movie night all day long. Ready to get cozy and indulge? 🎬",
-            "🍿 Saturday's calling: The best way to spend it is in front of the screen. Let’s roll!"
+            "🍿 Saturday's calling: The best way to spend it is in front of the screen. Let’s roll!",
+            "🎯 Weekend checklist: Snacks ✅ Movies ✅ Zero responsibilities ✅",
+            "💤 Lazy day = Legendary movie marathon. 🛋️",
+            "🍕 Movies taste better on weekends. Fact. 🍿",
+            "⚡ Saturday + Screen = Pure happiness unlocked. 🎬",
+            "🎉 Your weekend + movies = blockbuster lifestyle. 🌟"
         ],
         sunday: [
-            "🌞 Sunday Funday: The perfect day for a movie binge. Let’s do this! 🍿",
-            "🎬 Sunday means movie day. Ready to end your weekend in cinematic style? 🍿",
-            "🛋️ Cozy Sunday, popcorn in hand. Movie marathon, here we come! 🎥",
-            "🌞 Sunday chill mode: Let’s get comfy with some movies, snacks, and zero stress! 🍿",
+            "🌞 Sunday Funday: The perfect day for a movie binge. Let’s do this! 🍿 (Self-care level: unlocked.)",
+            "🎬 Sunday means movie day. Ready to end your weekend in cinematic style? 🍿 (Pro tip: nap during credits.)",
+            "🛋️ Cozy Sunday, popcorn in hand. Movie marathon, here we come! 🎥 (Reset button engaged.)",
+            "🌞 Sunday chill mode: Let’s get comfy with some movies, snacks, and zero stress! 🍿 (Perfect recharge.)",
+            "🍕 Sunday + movies = The perfect combination. Are you ready to binge-watch? 🎬 (Pizza > productivity.)",
             "🎬 Sunday Funday starts now! Ready for some cozy movie magic? 🍿",
             "☕ Sunday mornings + movies = Perfection. Grab your popcorn and start the show! 🍿",
             "🎉 Sunday is for movie marathons. Who's in for the ultimate binge session? 🍿🎥",
@@ -558,18 +600,156 @@ function dailyNotification() {
             "🎥 Sunday vibes: Relax, rewind, and enjoy a movie marathon. 🛋️🍿",
             "🍕 Sunday + movies = The perfect combination. Are you ready to binge-watch? 🎬",
             "🎬 Sundays are for unwinding and watching the best flicks. Grab the popcorn! 🍿",
-            "🌙 Sunday night = A good movie, good food, and good vibes. Let’s do this! 🎥🍿"
+            "🌙 Sunday night = A good movie, good food, and good vibes. Let’s do this! 🎥🍿",
+            "🛋️ Sundays were MADE for movie naps between scenes. 🍿",
+            "☀️ Recharge the soul: Movies > Chores. 🎬",
+            "🍫 Sweet Sundays deserve sweet flicks. 🍿",
+            "📅 Tomorrow’s Monday... but today, it’s MOVIE DAY! 🎥",
+            "⚡ Sunday movie vibes = guaranteed happiness. 🌟"
         ],
         monday: [
-            "⏰ Monday Motivation: Get ready to conquer the week with a movie escape! 🎬",
-            "📅 It’s Monday—time to start the week with a bang! Movie time! 🍿",
-            "🌞 Monday blues? Turn them into movie gold. What’s on today’s list? 🎥"
-        ]
+            "⏰ Monday Motivation: Get ready to conquer the week with a movie escape! 🎬 (Emails can wait.)",
+            "📅 It’s Monday—time to start the week with a bang! Movie time! 🍿 (Meetings postponed.)",
+            "🌞 Monday blues? Turn them into movie gold. What’s on today’s list? 🎥 (Better cure than coffee.)",
+            "🚀 Start the week strong—with popcorn power! 🍿 (Energy = snacks + movies.)",
+            "💼 Work can wait. Movies can’t. 🎬 (Boss doesn’t need to know.)",
+            "🚀 Start the week strong—with popcorn power! 🍿",
+            "🌞 Monday mood flip: One good movie and the blues disappear. 🎥",
+            "⚡ Power move: Watch a movie before emails. Productivity skyrockets! 💡"
+        ],
+        valentines: [
+            "❤️ Movies > Roses. Popcorn > Flowers. Valentine’s = Sorted. 🍿",
+            "💘 Love + Buttered Popcorn = The only couple goals you need. 🥰",
+            "🌹 Roses wilt, popcorn pops. Movies last forever. 🎬",
+            "💕 Fancy dinner? Nah. Cozy movies in PJs = peak Valentine’s hack. 😍",
+            "💞 No heartbreaks here—movies are the real soulmates. 🎥",
+            "🎬 Love story marathon = Valentine’s dopamine overdose. ❤️",
+            "🍫 Chocolates melt… but your watchlist won’t. Happy Valentine’s! 🍿",
+            "💖 Best Valentine’s gift? Popcorn bucket + endless screen love. 🎬",
+            "🥰 Celebrate love your way—with movies that never ghost. 🍿",
+            "🔥 Skip the clichés. Movies + Chill = Valentine’s gold. 💘",
+            "🌙 Candlelight? Overrated. Movie light = perfect vibe. 🎥",
+            "💌 Nothing says ‘I love you’ like sharing popcorn. 🍿",
+            "🎧 Swap cheesy songs with Bollywood love hits marathon. 🎶",
+            "💃 Dance, romance, re-watch DDLJ again—classic Valentine’s therapy. ❤️",
+            "🎭 Love in 4K > Love letters on paper. Happy Valentine’s! 💌",
+            "🚨 Valentine’s Hack: Movies never ask, ‘Where’s this going?’ 🎬",
+            "😂 Reminder: Popcorn won’t judge you for being single today. 🍿",
+            "🔥 PSA: SRK movies may cause sudden ‘Palat!’ reflexes. 💕",
+            "💕 Valentine’s hack: Cozy movie > Expensive dinner. (PJs allowed!)",
+            "💞 Movies don’t ghost you. Celebrate love with your screen soulmate. 🎥",
+            "🥰 Celebrate love your way—with movies that never break your heart. 🍿",
+            "🚀 Single? Perfect. You don’t have to share your popcorn today. 💯",
+            "😎 Valentine’s flex: Watching movies solo = Zero drama, full control. 🎬",
+            "👯‍♀️ Galentine’s/Palentine’s = Movie marathon with your besties. 🍿",
+            "💡 Reminder: You + Couch + Movie = Happily Ever After. 🛋️❤️",
+            "😂 Plot twist: Your movie’s more romantic than your last date. 🍿",
+            "📽️ Valentine’s isn’t just for couples—your watchlist loves you back. 😉",
+            "🌌 Escape the clichés: Dive into fantasy, sci-fi, or thrillers tonight. Your Valentine = cinema magic. ✨"
+        ],
+
+        republicDay: [
+            "🇮🇳 Republic Day binge: Deshbhakti + Blockbusters = Perfect vibe. 🎬",
+            "🎆 Feel the tiranga pride with stories that shaped Bharat. Jai Hind! 🇮🇳",
+            "📜 Cinema that celebrates our Constitution, courage & unity. 🎥",
+            "🇮🇳 Jai Hind + Popcorn shower = Republic Day marathon mode. 🍿",
+            "⚡ Tiranga feels + Patriot flicks = High-voltage Republic Day! 🎇",
+            "🎖️ Salute to real heroes, celebrate with reel heroes. 🎬",
+            "🕊️ Freedom stories, unity vibes, powerful cinema. Jai Hind! 🇮🇳",
+            "🎺 Parade in the streets, patriotism on the screen. 🎥",
+            "🎆 Blockbusters that roar ‘Mera Bharat Mahaan’. 🇮🇳",
+            "🔥 Patriotic marathons > Boring speeches. 🍿",
+            "🇮🇳 Popcorn in one hand, flag in the other. Perfect 26th Jan! 🎬",
+            "💪 Bollywood deshbhakti mode: On. 🎥",
+            "🎇 Celebrate azadi with goosebump-worthy cinema. 🇮🇳",
+            "📺 Tiranga spirit streaming loud & proud! 🎉",
+            "🎉 Patriotic playlists + patriotic flicks = double vibes. 🇮🇳",
+            "😂 Plot twist: Your neighbor’s louder than the Republic Day parade. 🎺",
+            "🚨 Warning: Overdose of deshbhakti movies may cause sudden ‘Jai Hind’ outbursts. 🇮🇳",
+            "🔥 Secret tip: Replace parade drumrolls with dhol beats from Lagaan. 🥁",
+        ],
+
+        independenceDay: [
+            "🇮🇳 Independence Day = Azadi to binge nonstop patriotic sagas! 🎬",
+            "🎆 Sky painted with Tiranga, screen lit with blockbusters. Jai Hind! 🇮🇳",
+            "🍿 Freedom tastes like popcorn + endless cinema. Happy Azadi! 🎥",
+            "🔥 Heroic stories + Deshbhakti beats = Independence Day binge. 🇮🇳",
+            "🎇 Azadi vibes on max: Patriotic marathons, desi pride forever. Jai Bharat! 🇮🇳",
+            "🎖️ Stories of courage that still give goosebumps. 🎬",
+            "📺 Tiranga + Popcorn = Best Independence Day combo. 🍿",
+            "🕊️ Freedom to choose your movie marathon = True Azadi. 🎥",
+            "🎉 Patriotic cinema > Fireworks outside. Jai Hind! 🇮🇳",
+            "💪 Bollywood blockbusters screaming Bharat Mata Ki Jai! 🎆",
+            "🎆 Independence feels: National anthem + DDLJ train scene. 🇮🇳",
+            "🎇 From border heroes to reel legends—binge them all. 🎥",
+            "🍿 This 15th Aug, let cinema unite us all. Jai Bharat! 🇮🇳",
+            "🎺 Tiranga pride streaming louder than the parade bands. 🎶",
+            "⚡ Azadi marathons that hit harder than crackers. 🎬",
+            "🚨 Independence Day cheat code: Replace firecrackers with popcorn pops. 🍿",
+            "😂 Warning: Too much deshbhakti may cause you to salute the TV. 📺🇮🇳",
+            "🔥 Hack: Deshbhakti movies = best excuse to cry proudly in public. 😢🇮🇳",
+        ],
+
     };
+
+    const regularMessages = [
+        "🍿 Movies: the best excuse to ignore reality for 2 hours.",
+        "🎬 A film a day keeps the boredom away.",
+        "✨ Nothing kills stress faster than pressing ‘Play’.",
+        "🔥 Tonight deserves a blockbuster ending.",
+        "🌙 Good night, good vibes, great movie.",
+        "🎞️ Why live one life when you can live a hundred through films?",
+        "💡 Movies: cheaper than therapy, and just as effective.",
+        "🚪 Step into another world—your ticket is just one click.",
+        "🎥 Even Mondays look better through a movie lens.",
+        "⏳ Time spent watching movies is never wasted.",
+        "🚨 Warning: Watching movies today may cause uncontrollable happiness 🍿",
+        "🤯 Plot twist: You’re the main character, and popcorn is your sidekick.",
+        "🍟 Fact: Fries + Movies = scientifically proven mood booster. Don’t @ me.",
+        "🦸‍♂️ Hero mode unlocked: Press play and save the world (from boredom).",
+        "📺 99% productivity lost, 100% satisfaction gained. Worth it.",
+        "😂 Rare achievement unlocked: Binge Legend Status 🏆",
+        "🍕 Pizza delivery guy is basically your co-star tonight.",
+        "👽 If aliens invade, they better bring snacks for movie night.",
+        "🥱 Sleep is optional. Movies are eternal. (Doctors hate this one trick!)",
+        "🎉 Surprise cameo: YOU in a blanket burrito binge session.",
+    ];
+
+    const rareMessages = [
+        "🚨 Warning: Side effect of today’s movie may include popcorn overdose.",
+        "🕵️ You’ve unlocked ‘Cinephile Mode.’ Proceed with extreme excitement.",
+        "🤯 Did you know? Popcorn tastes 83% better during suspense scenes.",
+        "⚡ Movie nights cure boredom faster than WiFi fixes depression.",
+        "🎲 Dare mode: pick the weirdest title you see and roll with it.",
+        "🪄 Fun fact: Movies secretly double your charisma score.",
+        "🐼 Rare message unlocked. You’re officially in the Movie Elite Club.",
+        "💃 Mandatory rule: musicals require loud, shameless singing.",
+        "🚀 Tonight’s screening: Escape From Reality (runtime: infinite).",
+        "🍿 You’ve been randomly selected for Unlimited Popcorn Powers.* *Terms: imagination only."
+    ];
+
+    const legendaryMessages = [
+        "👑 Congrats. You’ve just unlocked the **Director’s Cut of Life**. Spoiler: You win.",
+        "🎬 Plot twist: You’re not watching the movie. The movie is watching YOU.",
+        "🚨 This message is rarer than free Netflix. Take a bow, chosen one.",
+        "🦄 Achievement unlocked: **Cinematic Immortal**. Your end credits will never roll.",
+        "⚡ Breaking news: Hollywood has cast you as the lead in *Reality 2*.",
+        "🌌 This text only appears once every 10,000 scrolls. Screenshot it. Frame it.",
+        "🥂 You’ve just pulled the **Golden Popcorn Drop**. Eternal snacks are yours.",
+        "🔥 Rarer than finding the remote on the first try—respect.",
+        "🎭 Alternate universe update: This exact message just won an Oscar.",
+        "🪙 Legendary unlocked: All your plot twists now come with happy endings."
+    ];
 
     // Function to pick a random message based on the time of day and special days
     const messages = (function () {
-        if (month === 11 && date === 25) {  // Christmas
+        if (month === 1 && date === 14) { // Valentine’s Day
+            return holidayMessages.valentines;
+        } else if (month === 0 && date === 26) { // Republic Day
+            return holidayMessages.republicDay;
+        } else if (month === 7 && date === 15) { // Independence Day
+            return holidayMessages.independenceDay;
+        } else if (month === 11 && date === 25) {  // Christmas
             return holidayMessages.christmas;
         } else if (month === 0 && date === 1) {  // New Year
             return holidayMessages.newYear;
@@ -592,7 +772,18 @@ function dailyNotification() {
         }
     })();
 
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    const roll = Math.random() * 100;
+    let pool = [];
+
+    if (roll < 1) {
+        pool = legendaryMessages;
+    } else if (roll < 6) {
+        pool = rareMessages;
+    } else {
+        pool = [...regularMessages, ...messages];
+    }
+
+    const randomMessage = pool[Math.floor(Math.random() * pool.length)];
 
     self.registration.showNotification('🎬 Your Movie Awaits!', {
         tag: 'alert',
