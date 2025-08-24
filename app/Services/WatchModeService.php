@@ -13,6 +13,8 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class WatchModeService
 {
@@ -33,8 +35,8 @@ class WatchModeService
      */
     public function search(
         WatchModeSearchField $searchField,
-        string               $searchValue,
-        array                $types = []
+        string $searchValue,
+        array  $types = []
     ): array
     {
         $params = [
@@ -83,7 +85,6 @@ class WatchModeService
     /**
      * Get streaming availability for a title, enriched with source metadata
      *
-     * @param string|int $titleId
      * @param array<string> $regions
      * @return Collection<array{availability: WatchModeSource, meta: WatchModeSourceMeta|null}>
      */
@@ -95,12 +96,24 @@ class WatchModeService
             $params['regions'] = implode(',', $regions);
         }
 
-        $raw = $this->request("/title/{$titleId}/sources/", $params);
+        $raw = $this->request("/title/$titleId/sources/", $params);
 
-        // Map availability to DTOs
-        $availability = collect($raw)->map(
-            fn($item) => WatchModeSource::fromArray($item)
-        );
+        try {
+            $availability = collect($raw)->map(
+                fn($item) => WatchModeSource::fromArray($item)
+            );
+        } catch (Throwable $e) {
+            Log::error('Error getting title sources', [
+                'title_id' => $titleId,
+                'regions' => $regions,
+                'error' => $e->getMessage(),
+                'raw' => $raw,
+                'items' => collect($raw)
+            ]);
+            report($e);
+
+            return collect();
+        }
 
         // Attach cached metadata
         $meta = $this->getSources()->keyBy('id');

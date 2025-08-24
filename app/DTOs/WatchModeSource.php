@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\DTOs;
@@ -8,17 +9,17 @@ use App\Enums\WatchModeSourceType;
 class WatchModeSource
 {
     public function __construct(
-        public readonly int                 $sourceId,
-        public readonly string              $name,
+        public readonly int     $sourceId,
+        public readonly string  $name,
         public readonly WatchModeSourceType $type,
-        public readonly string              $region,
-        public readonly ?string             $iosUrl = null,
-        public readonly ?string             $androidUrl = null,
-        public readonly ?string             $webUrl = null,
-        public readonly ?string             $format = null,
-        public readonly ?float              $price = null,
-        public readonly ?int                $seasons = null,
-        public readonly ?int                $episodes = null
+        public readonly string  $region,
+        public readonly ?string $iosUrl = null,
+        public readonly ?string $androidUrl = null,
+        public readonly ?string $webUrl = null,
+        public readonly ?string $format = null,
+        public readonly ?float  $price = null,
+        public readonly ?int    $seasons = null,
+        public readonly ?int    $episodes = null
     )
     {
     }
