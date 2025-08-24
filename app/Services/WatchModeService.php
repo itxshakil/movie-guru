@@ -36,7 +36,7 @@ class WatchModeService
     public function search(
         WatchModeSearchField $searchField,
         string $searchValue,
-        array  $types = []
+        array $types = []
     ): array
     {
         $params = [
@@ -98,6 +98,17 @@ class WatchModeService
 
         $raw = $this->request("/title/$titleId/sources/", $params);
 
+        if (isset($raw['error'])) {
+            Log::error('Error getting title sources', [
+                'title_id' => $titleId,
+                'regions' => $regions,
+                'error' => $raw['error'],
+                'raw' => $raw,
+            ]);
+
+            return collect();
+        }
+
         try {
             $availability = collect($raw)->map(
                 fn($item) => WatchModeSource::fromArray($item)
@@ -108,7 +119,7 @@ class WatchModeService
                 'regions' => $regions,
                 'error' => $e->getMessage(),
                 'raw' => $raw,
-                'items' => collect($raw)
+                'items' => collect($raw),
             ]);
             report($e);
 
