@@ -3,6 +3,7 @@ import {Head} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import DetailCard from '@/Components/DetailCard.vue';
+import SearchCard from "@/Components/SearchCard.vue";
 
 const props = defineProps({
     detail: Object,
@@ -11,6 +12,8 @@ const props = defineProps({
         required: false,
         default: () => [],
     },
+    recentlyReleasedMovies: Array,
+    recommendedMovies: Array,
 })
 
 defineOptions({ layout: BaseLayout })
@@ -73,5 +76,45 @@ const ogImage = moviePoster(props.detail);
 
     <DetailCard :detail="detail" :sources="sources"
                 class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
+
+    <div class="mt-4">
+        <div v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎉 Fresh Releases</h2>
+                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Stay up-to-date with the latest
+                        movies hitting
+                        the screens.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <SearchCard
+                        v-for="movie in recentlyReleasedMovies"
+                        :key="movie.imdb_id"
+                        :movie="movie"
+                        @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div v-if="recommendedMovies && recommendedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 Recommended Movies</h2>
+                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Timeless classics and must-watch
+                        films for
+                        every movie lover.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <SearchCard
+                        v-for="movie in recommendedMovies"
+                        :key="movie.imdb_id"
+                        :movie="movie"
+                        @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
     <NewsletterForm/>
 </template>

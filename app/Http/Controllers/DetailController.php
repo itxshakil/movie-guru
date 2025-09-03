@@ -67,9 +67,43 @@ class DetailController extends Controller
             ]);
         }
 
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
+            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+                'director',
+                'writer',
+                'actors',
+            ]);
+        });
+
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
+            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
+                'imdb_id',
+                'title',
+                'year',
+                'release_date',
+                'poster',
+                'type',
+                'imdb_rating',
+                'imdb_votes',
+                'director',
+                'writer',
+                'actors',
+            ]);
+        });
+
         return Inertia::render('Show', [
             'detail' => $detail,
             'sources' => $sources,
+            'recentlyReleasedMovies' => $recentlyReleasedMovies,
+            'recommendedMovies' => $recommendedMovies,
         ]);
     }
 
