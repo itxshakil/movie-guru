@@ -14,7 +14,7 @@ use Spatie\Sitemap\Tags\Url;
 
 class SitemapGenerator extends Command
 {
-    protected $signature = 'sitemap:generate {--limit=100}';
+    protected $signature = 'sitemap:generate {--limit=1000 : Number of top searches and movies to include}';
 
     protected $description = 'Generate the sitemap.';
 
