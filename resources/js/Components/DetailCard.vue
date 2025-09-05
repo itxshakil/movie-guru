@@ -110,17 +110,17 @@
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white sr-only">Watch Now</h3>
                                 <ul class="space-y-4 flex flex-wrap items-center gap-1">
                                     <SourceCard
-                                        v-for="source in props.sources"
+                                        v-for="source in uniqueSources"
                                         :key="source.availability.sourceId"
                                         :send-analytics="sendAnalytics"
                                         :source="source"
-                                        class="flex items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
                                     >
                                     </SourceCard>
 
                                     <!-- Always show Google fallback -->
                                     <li
-                                        class="flex items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
                                     >
                                         <a
                                             :href="googleDownloadLink"
@@ -278,6 +278,40 @@ const props = defineProps({
     required: false,
   }
 });
+
+const uniqueSources = computed(() => {
+    const sourceMap = new Map();
+
+    if (!Array.isArray(props.sources)) {
+        return [];
+    }
+
+    props.sources.forEach((source) => {
+        if (!source || !source.meta || !source.meta.name) {
+            return; // skip invalid entries
+        }
+
+        const name = source.meta.name;
+        const format = source?.availability?.format ?? null;
+
+        if (sourceMap.has(name)) {
+            const currentSource = sourceMap.get(name);
+            if (format) {
+                currentSource.formats = Array.isArray(currentSource.formats)
+                    ? [...new Set([...currentSource.formats, format])]
+                    : [format];
+            }
+        } else {
+            sourceMap.set(name, {
+                ...source,
+                formats: format ? [format] : [],
+            });
+        }
+    });
+
+    return Array.from(sourceMap.values());
+});
+
 
 const associateTrackingID = "itxshakil0ec-21"; // Replace with your actual tracking ID
 const netflixLink = computed(() => props.detail ? `https://www.netflix.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');

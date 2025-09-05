@@ -32,15 +32,16 @@ defineProps({
 
                     <template v-if="source.availability.seasons">
                         <span
-                            v-if="source.availability.format"
+                            v-for="format in source.availability.formats"
+                            :key="format"
                             :class="{
-                            'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100': source.availability.format === '4K',
-                            'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100': source.availability.format === 'HD',
-                            'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200': source.availability.format === 'SD'
+                            'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100': format === '4K',
+                            'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100': format === 'HD',
+                            'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200': format === 'SD'
                         }"
                             class="px-2 py-0.5 rounded text-xs font-medium"
                         >
-                        {{ source.availability.format }}
+                        {{ format }}
                     </span>
 
                         <span v-if="source.availability.type"
@@ -67,15 +68,16 @@ defineProps({
                 <p class="text-sm text-gray-600 dark:text-gray-400 flex flex-wrap gap-1 items-center">
                     <template v-if="!source.availability.seasons">
                         <span
-                            v-if="source.availability.format"
+                            v-for="format in source.availability.formats"
+                            :key="format"
                             :class="{
-                            'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100': source.availability.format === '4K',
-                            'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100': source.availability.format === 'HD',
-                            'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200': source.availability.format === 'SD'
+                            'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100': format === '4K',
+                            'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100': format === 'HD',
+                            'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200': format === 'SD'
                         }"
                             class="px-2 py-0.5 rounded text-xs font-medium"
                         >
-                      {{ source.availability.format }}
+                      {{ format }}
                     </span>
 
                         <span v-if="source.availability.type"
@@ -103,9 +105,9 @@ defineProps({
                           {{ source.availability.episodes }} episodes
                     </span>
 
-                    <span class="ml-2 text-xs bg-gray-200 dark:bg-gray-700 px-2 mt-1 py-0.5 rounded">
-                      {{ source.availability.region }}
-                    </span>
+                    <!--                    <span class="ml-2 text-xs bg-gray-200 dark:bg-gray-700 px-2 mt-1 py-0.5 rounded">-->
+                    <!--                      {{ source.availability.region }}-->
+                    <!--                    </span>-->
                 </p>
             </div>
         </a>
