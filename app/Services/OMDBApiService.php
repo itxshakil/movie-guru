@@ -89,7 +89,9 @@ class OMDBApiService
         $endTime = microtime(true);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
 
-        Log::channel('omdb')->info("OMDB API took $responseTime ms to respond. URL: $url");
+        Log::channel('omdb')->info("OMDB API took $responseTime ms to respond. URL: $url", [
+            $response
+        ]);
 
         if (
             isset($response['Response'])
