@@ -226,7 +226,7 @@ class SearchController extends Controller
         $movieTypes = MovieType::cases();
 
         $nextUrl = null;
-        if ($movies['Response'] === 'True') {
+        if (isset($movies['Response']) && $movies['Response'] === 'True') {
             $totalResults = $movies['totalResults'];
             $currentPage = $page;
 
