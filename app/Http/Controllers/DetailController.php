@@ -9,8 +9,10 @@ use App\Models\ShowPageAnalytics;
 use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
 use App\Services\WatchModeService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class DetailController extends Controller
@@ -135,6 +137,16 @@ class DetailController extends Controller
             $OMDBApiService = app(OMDBApiService::class);
             $updatedDetail = $OMDBApiService->getById($imdbId);
 
+            Log::debug('Response for IMDB ID: '.$imdbId, [
+                $updatedDetail
+            ]);
+            if( $updatedDetail['Response'] === 'False'){
+                report(new Exception('Invalid Response for IMDB ID: '.$imdbId, 500),);
+
+                Log::error('Invalid Response for IMDB ID: '.$imdbId, [
+                    $updatedDetail
+                ]);
+            }
             MovieDetail::updateOrCreate([
                 'imdb_id' => $imdbId,
             ], [
