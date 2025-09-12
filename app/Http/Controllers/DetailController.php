@@ -125,7 +125,8 @@ class DetailController extends Controller
 
     public function handleDB(MovieDetail $movie, string $imdbId): MovieDetail
     {
-        defer(fn() => $movie->incrementViews());
+        $ipAddress = request()->ip();
+        defer(fn() => $movie->incrementViews($ipAddress));
         $this->updateDetailInBG($imdbId);
 
         return $movie;
