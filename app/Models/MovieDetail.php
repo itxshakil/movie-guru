@@ -34,9 +34,8 @@ class MovieDetail extends Model
         'views',
     ];
 
-    public function incrementViews(): void
+    public function incrementViews($ipAddress): void
     {
-        $ipAddress = request()->ip();
         $cacheKey = 'movie-view-'.$this->imdb_id.'-'.$ipAddress;
 
         if (!Cache::has($cacheKey)) {
