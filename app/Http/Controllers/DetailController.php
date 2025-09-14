@@ -138,12 +138,13 @@ class DetailController extends Controller
             $OMDBApiService = app(OMDBApiService::class);
             $updatedDetail = $OMDBApiService->getById($imdbId);
 
-            if($updatedDetail === null){
-                report(new Exception('Failed to fetch updated details for IMDB ID: '.$imdbId, 500),);
+            if ($updatedDetail === null) {
+                report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId, 500));
 
                 Log::error('Failed to fetch updated details for IMDB ID: '.$imdbId, [
                     'response' => $updatedDetail,
                 ]);
+
                 return;
             }
 
@@ -172,7 +173,7 @@ class DetailController extends Controller
 
     private function isValue($value)
     {
-        return $value && $value != 'N/A';
+        return $value && $value !== 'N/A';
     }
 
     /**
@@ -182,9 +183,10 @@ class DetailController extends Controller
     {
         $OMDBApiService = app(OMDBApiService::class);
         $detail = $OMDBApiService->getById($imdbId);
+        $ipAddress = request()->ip();
 
-        defer(function () use ($detail, $imdbId) {
-            $voted = $detail['imdbVotes'] && $detail['imdbVotes'] != 'N/A'
+        defer(function () use ($ipAddress, $detail, $imdbId) {
+            $voted = $detail['imdbVotes'] && $detail['imdbVotes'] !== 'N/A'
                 ? str_replace(',', '', $detail['imdbVotes'])
                 : 0;
 
@@ -196,10 +198,10 @@ class DetailController extends Controller
                 'release_date' => $detail['Released'],
                 'poster' => $detail['Poster'],
                 'type' => $detail['Type'],
-                'imdb_rating' => $detail['imdbRating'] && $detail['imdbRating'] != 'N/A' ? $detail['imdbRating'] : 0,
+                'imdb_rating' => $detail['imdbRating'] && $detail['imdbRating'] !== 'N/A' ? $detail['imdbRating'] : 0,
                 'imdb_votes' => $voted,
                 'details' => $detail,
-            ])->incrementViews();
+            ])->incrementViews($ipAddress);
         });
 
         return $detail; // Return fetched details
