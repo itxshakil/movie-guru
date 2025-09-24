@@ -76,6 +76,10 @@ class WatchModeService
 
             return $response->json();
         } catch (RequestException $e) {
+            $message = $e->getMessage();
+            if (str_contains($message, 'Title not found')) {
+                return ['error' => 'Title not found'];
+            }
             report($e);
 
             return ['error' => $e->getMessage()];
