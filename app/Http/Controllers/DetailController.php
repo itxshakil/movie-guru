@@ -32,7 +32,7 @@ class DetailController extends Controller
         $shouldRefresh = $movie instanceof MovieDetail && (
                 empty($sources) ||
                 !$movie->source_last_fetched_at ||
-                $movie->source_last_fetched_at->lt(now()->subDays(7))
+                $movie->source_last_fetched_at->lt(now()->subMonth())
             );
 
         $botDetector = app(BotDetectorService::class);
