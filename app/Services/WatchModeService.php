@@ -9,6 +9,7 @@ use App\DTOs\WatchModeSource;
 use App\DTOs\WatchModeSourceMeta;
 use App\Enums\WatchModeSearchField;
 use App\Enums\WatchModeType;
+use Exception;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -21,10 +22,28 @@ class WatchModeService
     protected string $apiKey;
 
     protected string $baseUrl = 'https://api.watchmode.com/v1';
+    /**
+     * @var string[]
+     */
+    private array $apiKeys;
 
     public function __construct()
     {
-        $this->apiKey = config('services.watchmode.key');
+        $this->apiKeys = explode(',', config('services.watchmode.key'));
+    }
+
+    /**
+     * Get a random API key from the configured keys
+     *
+     * @throws Exception
+     */
+    protected function getRandomApiKey(): string
+    {
+        if (empty($this->apiKeys)) {
+            throw new Exception('No API keys are configured.');
+        }
+
+        return $this->apiKeys[array_rand($this->apiKeys)];
     }
 
     /**
