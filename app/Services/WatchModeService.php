@@ -85,7 +85,7 @@ class WatchModeService
 
     protected function request(string $endpoint, array $params = []): array
     {
-        $params['apiKey'] = $this->apiKey;
+        $params['apiKey'] = $this->getRandomApiKey();
 
         try {
             $response = Http::baseUrl($this->baseUrl)
