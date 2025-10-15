@@ -148,6 +148,14 @@ class DetailController extends Controller
                 return;
             }
 
+            if (!isset($updatedDetail['Title'])) {
+                Log::error('Failed to fetch updated details for IMDB ID: ' . $imdbId, [
+                    $updatedDetail
+                ]);
+
+                return;
+            }
+
             MovieDetail::updateOrCreate([
                 'imdb_id' => $imdbId,
             ], [
