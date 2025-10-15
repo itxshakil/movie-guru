@@ -138,19 +138,11 @@ class DetailController extends Controller
             $OMDBApiService = app(OMDBApiService::class);
             $updatedDetail = $OMDBApiService->getById($imdbId);
 
-            if ($updatedDetail === null) {
+            if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
                 report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId, 500));
 
                 Log::error('Failed to fetch updated details for IMDB ID: '.$imdbId, [
                     'response' => $updatedDetail,
-                ]);
-
-                return;
-            }
-
-            if (!isset($updatedDetail['Title'])) {
-                Log::error('Failed to fetch updated details for IMDB ID: ' . $imdbId, [
-                    $updatedDetail
                 ]);
 
                 return;
