@@ -139,7 +139,9 @@ class DetailController extends Controller
             $updatedDetail = $OMDBApiService->getById($imdbId);
 
             if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
-                report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId, 500));
+
+                $response = $updatedDetail['Response'] ?? null;
+                report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response, 500));
 
                 Log::error('Failed to fetch updated details for IMDB ID: '.$imdbId, [
                     'response' => $updatedDetail,
@@ -157,7 +159,7 @@ class DetailController extends Controller
                 'poster' => $updatedDetail['Poster'],
                 'type' => $updatedDetail['Type'],
                 'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
-                'imdb_votes' => $this->isValue($updatedDetail['imdbVotes']) ? str_replace(
+                'imdb_votes' => $this->isValue($updatedDetail['imdbVotes'] ?? null) ? str_replace(
                     ',',
                     '',
                     $updatedDetail['imdbVotes']
