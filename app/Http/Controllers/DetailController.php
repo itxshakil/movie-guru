@@ -186,6 +186,14 @@ class DetailController extends Controller
         $ipAddress = request()->ip();
 
         defer(function () use ($ipAddress, $detail, $imdbId) {
+            if ($detail === null || !isset($detail['Title'])) {
+                $e = new Exception('Failed to fetch details for IMDB ID: ' . $imdbId, 500);
+                report($e);
+
+                Log::error('Failed to fetch details for IMDB ID: ' . $imdbId, [
+                    'response' => $detail,
+                ]);
+            }
             $voted = $detail['imdbVotes'] && $detail['imdbVotes'] !== 'N/A'
                 ? str_replace(',', '', $detail['imdbVotes'])
                 : 0;
