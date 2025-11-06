@@ -60,7 +60,6 @@ class SearchController extends Controller
             ]);
         });
 
-
         if ($request->wantsJson()) {
             return response()->json([
                 'searchResults' => $movies,
@@ -177,8 +176,9 @@ class SearchController extends Controller
         ]);
     }
 
-    public function getSearchData(?string $search, Request $request, TitleCleaner $titleCleaner): array
+    public function getSearchData(?string $search, Request $request): array
     {
+        $titleCleaner = app(TitleCleaner::class);
         $trendingQueryService = app(TrendingQueryService::class);
         $OMDBApiService = app(OMDBApiService::class);
 
