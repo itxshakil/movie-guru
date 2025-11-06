@@ -13,12 +13,21 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DetailController extends Controller
 {
     public function show(Request $request, string $imdbId)
     {
+        $cleanImdbId = $this->extractImdbId($imdbId);
+
+        if (!$cleanImdbId) {
+            // Optionally: log the bad input, then throw a 404 or return a validation error
+            throw new NotFoundHttpException('Invalid IMDb ID.');
+        }
+
         $cacheKey = 'detail.'.$imdbId;
         $cacheTTl = [now()->addHours(18), now()->addHours(24)];
         $movie = Cache::flexible($cacheKey, $cacheTTl, function () use ($imdbId) {
@@ -215,5 +224,34 @@ class DetailController extends Controller
         });
 
         return $detail; // Return fetched details
+    }
+
+    /**
+     * Extracts and returns a clean IMDb title ID (e.g., "tt6468322") from messy input.
+     *
+     * Handles:
+     * - Raw IDs ("tt6468322")
+     * - Full URLs ("https://www.imdb.com/title/tt6468322/?ref_=nv_sr_sr_1")
+     * - Query strings and trackers ("tt6468322&sa=U&ved=...")
+     * - HTML entities (&amp;)
+     *
+     * Returns: string|null
+     */
+    private function extractImdbId(string $input): ?string
+    {
+        $candidate = trim($input);
+
+        $candidate = html_entity_decode($candidate, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // - Starts with "tt"
+        // - Followed by 7 or 8 digits (IMDb IDs are commonly 7–8 digits; allow 7+ to be safe)
+        // - Bounded to avoid partial matches inside larger tokens
+        $pattern = '/\btt\d{7,8}\b/i';
+
+        if (preg_match($pattern, $candidate, $matches)) {
+            return Str::lower($matches[0]);
+        }
+
+        return null;
     }
 }
