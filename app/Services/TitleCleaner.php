@@ -20,6 +20,8 @@ class TitleCleaner
 
         // Define regex patterns for unwanted elements
         $patterns = [
+            '/https?:\/\/\S+/i', // Remove URLs
+            '/\b(share|shared|click|link|download|copy|view|terabox|mega\.nz|drive\.google)\b.*/i', // Remove share messages
             '/\s*full[\s-]*movie$/i',       // Remove "full movie" (with optional spaces or hyphen) at the end
             '/\s*south[\s-]*movie$/i',      // Remove "south movie" (with optional spaces or hyphen) at the end
             '/\s*movie$/i',                 // Remove "movie" at the end

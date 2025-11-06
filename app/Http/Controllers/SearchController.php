@@ -10,6 +10,7 @@ use App\Models\SearchQuery;
 use App\OMDB\MovieType;
 use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
+use App\Services\TitleCleaner;
 use App\Services\TrendingQueryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -176,7 +177,7 @@ class SearchController extends Controller
         ]);
     }
 
-    public function getSearchData(?string $search, Request $request): array
+    public function getSearchData(?string $search, Request $request, TitleCleaner $titleCleaner): array
     {
         $trendingQueryService = app(TrendingQueryService::class);
         $OMDBApiService = app(OMDBApiService::class);
@@ -189,6 +190,8 @@ class SearchController extends Controller
         $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(
             min(5, $trendingQueries->count())
         )->toArray() : [];
+
+        $search = $titleCleaner->clean($search);
 
         if (empty($search)) {
             $search = $defaultSearches[array_rand($defaultSearches)];
