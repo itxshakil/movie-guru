@@ -1,6 +1,6 @@
 <template>
     <div
-        class="dark:bg-gray-900 dark:text-white border rounded-lg shadow-sm group relative flex flex-col justify-between  hover:scale-105 transition-all duration-500 ease-in"
+        class="dark:bg-gray-900 dark:text-white border rounded-lg shadow-sm group relative flex flex-col justify-between  hover:scale-110 transition-all duration-500 ease-in"
        itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie">
     <div>
       <div
@@ -9,7 +9,7 @@
              :src="moviePoster(movie)"
              @click="viewDetail(movie.imdb_id)"
              loading="lazy"
-             class="h-full w-full object-cover object-center italic hover:scale-105 transition-all duration-500 ease-in">
+             class="h-full w-full object-cover object-center italic hover:scale-110 transition-all duration-700 ease-in-out">
       </div>
       <h3 class="mt-2 p-2 pb-1 text-sm text-gray-500 dark:text-gray-400">
         <span class="capitalize">{{ movie.type }}  </span> -
