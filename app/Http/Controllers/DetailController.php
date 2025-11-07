@@ -145,6 +145,7 @@ class DetailController extends Controller
     {
         defer(function () use ($imdbId) {
             $OMDBApiService = app(OMDBApiService::class);
+            $imdbId = $this->extractImdbId($imdbId);
             $updatedDetail = $OMDBApiService->getById($imdbId);
 
             if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
@@ -192,6 +193,10 @@ class DetailController extends Controller
      */
     public function fetchFromAPI(string $imdbId): mixed
     {
+        $imdbId = $this->extractImdbId($imdbId);
+        if (!$imdbId) {
+            return [];
+        }
         $OMDBApiService = app(OMDBApiService::class);
         $detail = $OMDBApiService->getById($imdbId);
         $ipAddress = request()->ip();
