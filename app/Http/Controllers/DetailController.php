@@ -25,7 +25,7 @@ class DetailController extends Controller
 
         if (!$cleanImdbId) {
             // Optionally: log the bad input, then throw a 404 or return a validation error
-            throw new NotFoundHttpException('Invalid IMDb ID.');
+            throw new NotFoundHttpException('Invalid IMDb ID. Provided');
         }
 
         $cacheKey = 'detail.'.$imdbId;
