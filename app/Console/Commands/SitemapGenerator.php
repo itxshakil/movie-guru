@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Models\MovieDetail;
 use App\Models\Search;
-use App\Models\ShowPageAnalytics;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
-class SitemapGenerator extends Command
+final class SitemapGenerator extends Command
 {
     protected $signature = 'sitemap:generate {--limit=1000 : Number of top searches and movies to include}';
 
@@ -29,13 +28,13 @@ class SitemapGenerator extends Command
 
         $limit = $this->option('limit');
         $topQueries = $this->getTopSearches((int)$limit);
-        foreach ($topQueries as $searchQuery) {
-            $sitemap->add(Url::create("/search/$searchQuery->query"));
+        foreach ($topQueries as $topQuery) {
+            $sitemap->add(Url::create('/search/' . $topQuery->query));
         }
 
         $topMovies = $this->getTopMovies((int)$limit);
         foreach ($topMovies as $topMovie) {
-            $sitemap->add(Url::create("/i/$topMovie->imdb_id"));
+            $sitemap->add(Url::create('/i/' . $topMovie->imdb_id));
         }
 
         $sitemap->writeToFile(public_path('sitemap.xml'));
@@ -54,9 +53,8 @@ class SitemapGenerator extends Command
 
     private function getTopMovies(int $limit): Collection
     {
-        return ShowPageAnalytics::select('imdb_id', DB::raw('count(imdb_id) as total'))
-            ->groupBy('imdb_id')
-            ->orderBy('total', 'desc')
+        return MovieDetail::select('imdb_id', 'views')
+            ->orderBy('views', 'desc')
             ->take($limit)
             ->get();
     }
