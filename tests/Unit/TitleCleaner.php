@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Services\TitleCleaner;
 
-it('cleans full movie titles correctly', function () {
+it('cleans full movie titles correctly', function (): void {
     $cleaner = new TitleCleaner();
 
     expect($cleaner->clean('Inception Full Movie'))
@@ -19,7 +19,7 @@ it('cleans full movie titles correctly', function () {
         ->toBe('The Matrix');
 });
 
-it('handles various platform and quality names', function () {
+it('handles various platform and quality names', function (): void {
     $cleaner = new TitleCleaner();
 
     expect($cleaner->clean('Matrix 4 Netflix HDRip'))
@@ -32,7 +32,7 @@ it('handles various platform and quality names', function () {
         ->toBe('Titanic');
 });
 
-it('removes languages and subtitles correctly', function () {
+it('removes languages and subtitles correctly', function (): void {
     $cleaner = new TitleCleaner();
 
     expect($cleaner->clean('Dangal Hindi Dubbed'))
@@ -45,20 +45,20 @@ it('removes languages and subtitles correctly', function () {
         ->toBe('Drishyam 2');
 });
 
-it('removes redundant or repetitive information', function () {
+it('removes redundant or repetitive information', function (): void {
     $cleaner = new TitleCleaner();
 
-//    expect($cleaner->clean('The Avengers The Avengers'))
-//        ->toBe('The Avengers');
+    //    expect($cleaner->clean('The Avengers The Avengers'))
+    //        ->toBe('The Avengers');
     expect($cleaner->clean('Toy Story 1995 1995'))
         ->toBe('Toy Story 1995');
-//    expect($cleaner->clean('Classic Classic Remake'))
-//        ->toBe('Remake');
+    //    expect($cleaner->clean('Classic Classic Remake'))
+    //        ->toBe('Remake');
     expect($cleaner->clean('The The Matrix Matrix'))
         ->toBe('The Matrix');
 });
 
-it('handles edge cases and preserves original title when needed', function () {
+it('handles edge cases and preserves original title when needed', function (): void {
     $cleaner = new TitleCleaner();
 
     expect($cleaner->clean(null))

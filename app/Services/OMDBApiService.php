@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\OMDB\MovieType;
@@ -7,54 +9,54 @@ use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class OMDBApiService
+final class OMDBApiService
 {
-    protected const string TYPE_SEARCH = 's';
-
-    protected const string TYPE_ID = 'i';
-
-    protected array $apiKeys;
-
-    protected string $type;
+    /**
+     * @var mixed[]
+     */
+    private array $apiKeys;
 
     private int $page;
 
-    private MovieType|string|null $movieType;
+    private MovieType|string|null $movieType = null;
 
-    private ?int $year;
+    private ?int $year = null;
 
     private string $title;
 
     private string $imdbID;
 
-    private TitleCleaner $titleCleaner;
+    private readonly TitleCleaner $titleCleaner;
 
     /**
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function __construct()
     {
-        $this->apiKeys = explode(',', config('omdb.api_keys'));
+        $this->apiKeys = explode(',', (string)config('omdb.api_keys'));
         $this->titleCleaner = app(TitleCleaner::class);
 
-        if (empty($this->apiKeys)) {
-            throw new Exception('OMDB API keys are not configured.');
-        }
+        throw_if($this->apiKeys === [], Exception::class, 'OMDB API keys are not configured.');
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function getByTitle(string $title)
     {
-        return $this->makeRequest('t='.$title);
+        return $this->makeRequest('t=' . $title);
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function getById(string $imdbID = '')
     {
-        $this->type = self::TYPE_ID;
-
         $this->imdbID = $imdbID ?? $this->imdbID;
 
-        $query = "i=$this->imdbID&&plot=full";
+        $query = sprintf('i=%s&&plot=full', $this->imdbID);
 
         return $this->makeRequest($query);
     }
@@ -64,7 +66,6 @@ class OMDBApiService
      */
     public function searchByTitle(?string $title = '', int $page = 1, ?string $movieType = null, $year = null)
     {
-        $this->type = self::TYPE_SEARCH;
         $this->title = $this->titleCleaner->clean($title ?? $this->title ?? '');
         $this->page = $page ?? $this->page ?? 1;
         $this->movieType = $movieType ?? $this->movieType ?? null;
@@ -76,38 +77,62 @@ class OMDBApiService
     }
 
     /**
+     * Generate search query for OMDB API.
+     *
+     * @throws Exception
+     */
+    public function generateSearchQuery(): string
+    {
+        $title = $this->title ?? null;
+
+        throw_unless($title, Exception::class, 'Title is required');
+
+        $query = 's=' . $title;
+        if ($this->page !== 0) {
+            $query .= '&page=' . $this->page;
+        }
+
+        if ($this->movieType !== null) {
+            $query .= '&type=' . $this->movieType;
+        }
+
+        if ($this->year) {
+            $query .= '&y=' . $this->year;
+        }
+
+        return $query;
+    }
+
+    /**
      * @throws ConnectionException
      * @throws Exception
      */
-    protected function makeRequest(string $query)
+    private function makeRequest(string $query)
     {
         $apiKey = $this->getRandomApiKey();
-        $url = 'https://www.omdbapi.com/?apikey='.$apiKey.'&'.$query;
+        $url = 'https://www.omdbapi.com/?apikey=' . $apiKey . '&' . $query;
         $startTime = microtime(true);
         $response = Http::connectTimeout(3)->get($url)->json();
 
         $endTime = microtime(true);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
 
-        Log::channel('omdb')->info("OMDB API took $responseTime ms to respond. URL: $url", [
-            $response
+        Log::channel('omdb')->info(sprintf('OMDB API took %s ms to respond. URL: %s', $responseTime, $url), [
+            $response,
         ]);
 
         if (
-            isset($response['Response'])
+            isset($response['Response'], $response['Search'])
             && $response['Response'] === 'True'
-            && isset($response['Search'])
             && count($response['Search']) > 0
         ) {
-            $result = array_map(function ($item) {
-                return [
-                    'title' => $item['Title'],
-                    'year' => $item['Year'],
-                    'type' => $item['Type'],
-                    'imdb_id' => $item['imdbID'],
-                    'poster' => $item['Poster'],
-                ];
-            }, $response['Search']);
+            $result = array_map(fn(array $item): array => [
+                'title' => $item['Title'],
+                'year' => $item['Year'],
+                'type' => $item['Type'],
+                'imdb_id' => $item['imdbID'],
+                'poster' => $item['Poster'],
+            ], $response['Search']);
 
             $response['Search'] = $result;
         }
@@ -116,45 +141,14 @@ class OMDBApiService
     }
 
     /**
-     * Get a random API key from the configured keys
+     * Get a random API key from the configured keys.
      *
-     * @throws Exception
+     * @throws Exception|Throwable
      */
-    protected function getRandomApiKey(): string
+    private function getRandomApiKey(): string
     {
-        if (empty($this->apiKeys)) {
-            throw new Exception('No API keys are configured.');
-        }
+        throw_if($this->apiKeys === [], Exception::class, 'No API keys are configured.');
 
         return $this->apiKeys[array_rand($this->apiKeys)];
-    }
-
-    /**
-     * Generate search query for OMDB API
-     *
-     * @throws Exception
-     */
-    public function generateSearchQuery(): string
-    {
-        $title = $this->title ?? null;
-
-        if (!$title) {
-            throw new Exception('Title is required');
-        }
-
-        $query = 's='.$title;
-        if ($this->page) {
-            $query .= '&page='.$this->page;
-        }
-
-        if ($this->movieType) {
-            $query .= '&type='.$this->movieType;
-        }
-
-        if ($this->year) {
-            $query .= '&y='.$this->year;
-        }
-
-        return $query;
     }
 }

@@ -16,49 +16,45 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
-class SearchController extends Controller
+final class SearchController extends Controller
 {
     public function index(Request $request)
     {
         $search = $request->get('s');
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
             $search,
-            $request
+            $request,
         );
 
         $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
 
-        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
-            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]);
-        });
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), fn() => MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
+            'imdb_id',
+            'title',
+            'year',
+            'release_date',
+            'poster',
+            'type',
+            'imdb_rating',
+            'imdb_votes',
+            'director',
+            'writer',
+            'actors',
+        ]));
 
-        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
-            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]);
-        });
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), fn() => MovieDetail::recommended()->inRandomOrder()->take(6)->get([
+            'imdb_id',
+            'title',
+            'year',
+            'release_date',
+            'poster',
+            'type',
+            'imdb_rating',
+            'imdb_votes',
+            'director',
+            'writer',
+            'actors',
+        ]));
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -89,46 +85,42 @@ class SearchController extends Controller
 
     public function show(
         Request $request,
-        ?string $search
+        ?string $search,
     ) {
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
             $search,
-            $request
+            $request,
         );
 
         $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
 
-        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
-            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]);
-        });
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), fn() => MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
+            'imdb_id',
+            'title',
+            'year',
+            'release_date',
+            'poster',
+            'type',
+            'imdb_rating',
+            'imdb_votes',
+            'director',
+            'writer',
+            'actors',
+        ]));
 
-        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
-            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]);
-        });
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), fn() => MovieDetail::recommended()->inRandomOrder()->take(6)->get([
+            'imdb_id',
+            'title',
+            'year',
+            'release_date',
+            'poster',
+            'type',
+            'imdb_rating',
+            'imdb_votes',
+            'director',
+            'writer',
+            'actors',
+        ]));
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -164,7 +156,7 @@ class SearchController extends Controller
         ?int $page,
         ?string $movieType,
         ?int $year,
-        Request $request
+        Request $request,
     ): SearchQuery {
         return SearchQuery::create([
             'query' => $search ?? 'empty',
@@ -188,8 +180,8 @@ class SearchController extends Controller
 
         $trendingQueries = $trendingQueryService->fetch();
         $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(
-            min(5, $trendingQueries->count())
-        )->toArray() : [];
+            min(5, $trendingQueries->count()),
+        )->all() : [];
 
         $search = $titleCleaner->clean($search);
 
@@ -197,18 +189,16 @@ class SearchController extends Controller
             $search = $defaultSearches[array_rand($defaultSearches)];
         }
 
-        $cacheKey = 'searcgh-'.$search.'-'.$page.'-'.$movieType.'-'.$year;
+        $cacheKey = 'searcgh-' . $search . '-' . $page . '-' . $movieType . '-' . $year;
         $movies = Cache::flexible(
             $cacheKey,
             [now()->addHours(16), now()->addHours(24)],
-            function () use ($OMDBApiService, $search, $page, $movieType, $year) {
-                return $OMDBApiService->searchByTitle($search, $page, $movieType, $year);
-            }
+            fn() => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
         );
 
         $botdetector = app(BotDetectorService::class);
         if ($botdetector->isBot($request) === false) {
-            defer(function () use ($request, $year, $movieType, $page, $search, $movies) {
+            defer(function () use ($request, $year, $movieType, $page, $search, $movies): void {
                 $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
                 $searchQuery->update([
                     'response_at' => now(),

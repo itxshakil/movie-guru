@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class BlockTemporaryEmailRule implements Rule
+final class BlockTemporaryEmailRule implements Rule
 {
     public function passes($attribute, $value): bool
     {
@@ -13,13 +15,7 @@ class BlockTemporaryEmailRule implements Rule
             '/\b(?:mailinator\.com|guerrillamail\.com|10mail\.org)\b/i',
         ];
 
-        foreach ($blockedPatterns as $pattern) {
-            if (preg_match($pattern, $value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($blockedPatterns, fn($blockedPattern): bool => !preg_match($blockedPattern, (string)$value));
     }
 
     public function message(): string

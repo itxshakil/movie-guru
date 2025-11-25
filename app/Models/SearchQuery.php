@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SearchQuery extends Model
+final class SearchQuery extends Model
 {
     use HasFactory;
 
@@ -21,9 +23,15 @@ class SearchQuery extends Model
         'response_result',
     ];
 
-    protected $casts = [
-        'response_at' => 'datetime',
-        'response' => 'boolean',
-        'response_result' => 'json',
-    ];
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'response_at' => 'datetime',
+            'response' => 'boolean',
+            'response_result' => 'json',
+        ];
+    }
 }

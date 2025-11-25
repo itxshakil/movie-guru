@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
-class TrendingQueryService
+final class TrendingQueryService
 {
     /**
      * @return Collection<int, string>
@@ -21,9 +21,7 @@ class TrendingQueryService
 
             $titleCleaner = app(TitleCleaner::class);
 
-            return $queries->map(function ($query) use ($titleCleaner) {
-                return Str::title($titleCleaner->clean($query));
-            })->unique()->values();
+            return $queries->map(fn(?string $query) => Str::title($titleCleaner->clean($query)))->unique()->values();
         });
     }
 }

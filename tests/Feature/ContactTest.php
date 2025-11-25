@@ -1,6 +1,11 @@
 <?php
 
-test('contact form submission', function () {
+declare(strict_types=1);
+
+use App\Models\User;
+use App\Notifications\ContactFormSubmission;
+
+test('contact form submission', function (): void {
     $this->post(route('contact'), [
         'name' => 'John Doe',
         'email' => 'test@test.com',
@@ -16,13 +21,13 @@ test('contact form submission', function () {
     $this->assertDatabaseCount('contacts', 1);
 });
 
-test('contact form submission with json', function () {
+test('contact form submission with json', function (): void {
     $this->postJson(route('contact'), [
         'name' => 'John Doe',
         'email' => 'test@test.com',
         'message' => 'Hello world!',
     ])->assertJson([
-        'message' => 'Thanks for your message. We\'ll be in touch.',
+        'message' => "Thanks for your message. We'll be in touch.",
     ]);
 
     $this->assertDatabaseHas('contacts', [
@@ -34,15 +39,15 @@ test('contact form submission with json', function () {
     $this->assertDatabaseCount('contacts', 1);
 
     $this->assertDatabaseHas('notifications', [
-        'type' => \App\Notifications\ContactFormSubmission::class,
-        'notifiable_type' => \App\Models\User::class,
+        'type' => ContactFormSubmission::class,
+        'notifiable_type' => User::class,
         'notifiable_id' => 1,
     ]);
 
     $this->assertDatabaseCount('notifications', 1);
 });
 
-test('contact form submission with invalid data', function () {
+test('contact form submission with invalid data', function (): void {
     $this->post(route('contact'), [
         'name' => 'John Doe',
         'email' => 'test',
@@ -54,7 +59,7 @@ test('contact form submission with invalid data', function () {
     $this->assertDatabaseCount('contacts', 0);
 });
 
-test('contact form submission with invalid data with json', function () {
+test('contact form submission with invalid data with json', function (): void {
     $this->postJson(route('contact'), [
         'name' => '',
         'email' => 'test',

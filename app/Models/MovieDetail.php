@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Database\Factories\MovieDetailFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class MovieDetail extends Model
+final class MovieDetail extends Model
 {
-    /** @use HasFactory<MovieDetailFactory\array> */
-    use HasFactory;
-
     protected $fillable = [
         'imdb_id',
         'title',
@@ -34,9 +30,9 @@ class MovieDetail extends Model
         'views',
     ];
 
-    public function incrementViews($ipAddress): void
+    public function incrementViews(string $ipAddress): void
     {
-        $cacheKey = 'movie-view-'.$this->imdb_id.'-'.$ipAddress;
+        $cacheKey = 'movie-view-' . $this->imdb_id . '-' . $ipAddress;
 
         if (!Cache::has($cacheKey)) {
             $this->increment('views');
@@ -44,28 +40,30 @@ class MovieDetail extends Model
         }
     }
 
-    public function scopeTopRated(Builder $query): void
+    #[Scope]
+    protected function topRated(Builder $query): void
     {
-        $query->where(function ($query) {
-            $query->where(function (Builder $query) {
+        $query->where(function (\Illuminate\Contracts\Database\Query\Builder $query): void {
+            $query->where(function (Builder $query): void {
                 $query->where('imdb_rating', '>=', 8.5)
                     ->where('imdb_votes', '>', 80_000);
-            })->orWhere(function (Builder $query) {
+            })->orWhere(function (Builder $query): void {
                 $query->whereBetween('imdb_rating', [8.0, 8.5])
                     ->where('imdb_votes', '>', 1_00_000);
             });
         });
     }
 
-    public function scopeTrending(Builder $query): void
+    #[Scope]
+    protected function trending(Builder $query): void
     {
         $query->recentlyReleased()
-            ->where(function (Builder $query) {
-                $query->where(function ($query) {
-                    $query->where(function (Builder $query) {
+            ->where(function (Builder $query): void {
+                $query->where(function (\Illuminate\Contracts\Database\Query\Builder $query): void {
+                    $query->where(function (Builder $query): void {
                         $query->where('imdb_rating', '>=', 8.5)
                             ->where('imdb_votes', '>', 8_000);
-                    })->orWhere(function (Builder $query) {
+                    })->orWhere(function (Builder $query): void {
                         $query->whereBetween('imdb_rating', [8.0, 8.5])
                             ->where('imdb_votes', '>', 10_000);
                     });
@@ -73,38 +71,45 @@ class MovieDetail extends Model
             });
     }
 
-    public function scopeRecentlyReleased(Builder $query): void
+    #[Scope]
+    protected function recentlyReleased(Builder $query): void
     {
         $query->where('year', now()->format('Y'));
     }
 
-    public function scopeRecommended(Builder $query): void
+    #[Scope]
+    protected function recommended(Builder $query): void
     {
-        $query->where(function (Builder $query) {
-            $query->where(function (Builder $q) {
+        $query->where(function (Builder $query): void {
+            $query->where(function (Builder $q): void {
                 $q->where('imdb_rating', '>', 7.0)
                     ->where('imdb_rating', '<=', 7.5)
                     ->where('imdb_votes', '>', 50_000);
-            })->orWhere(function (Builder $q) {
+            })->orWhere(function (Builder $q): void {
                 $q->where('imdb_rating', '>', 7.5)
                     ->where('imdb_votes', '>', 30_000);
             });
         });
     }
 
-    public function scopeHiddenGems(Builder $query): void
+    #[Scope]
+    protected function hiddenGems(Builder $query): void
     {
-        $query->where(function ($query) {
+        $query->where(function (\Illuminate\Contracts\Database\Query\Builder $query): void {
             $query->where('imdb_rating', '>', 8.5)
                 ->whereBetween('imdb_votes', [3_000, 80_000]);
         });
     }
 
-    public function scopePopular(Builder $query): void
+    #[Scope]
+    protected function popular(Builder $query): void
     {
         $query->orderBy('views', 'desc');
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

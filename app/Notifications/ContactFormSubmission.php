@@ -1,24 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\Contact;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ContactFormSubmission extends Notification
+final class ContactFormSubmission extends Notification
 {
     use Queueable;
 
-    public $contact = null;
     /**
      * Create a new notification instance.
      */
-    public function __construct(Contact $contact)
+    public function __construct(public Contact $contact)
     {
-        $this->contact = $contact;
     }
 
     /**
@@ -36,7 +35,7 @@ class ContactFormSubmission extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)->markdown('emails.contact', [
+        return (new MailMessage())->markdown('emails.contact', [
             'contact' => $this->contact,
         ]);
     }

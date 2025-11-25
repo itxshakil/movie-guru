@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Notifications\DatabaseApproachingMaxConnections;
@@ -16,12 +18,14 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Override;
 
-class AppServiceProvider extends ServiceProvider
+final class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
+    #[Override]
     public function register(): void
     {
         //
@@ -34,28 +38,26 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict();
 
-        if($this->app->isProduction()) {
-            Model::handleLazyLoadingViolationUsing(function ($model, $relation) {
-                logger()->warning('Attempted to lazy load ' . get_class($model) . '::' . $relation);
+        if ($this->app->isProduction()) {
+            Model::handleLazyLoadingViolationUsing(function ($model, string $relation): void {
+                logger()->warning('Attempted to lazy load ' . $model::class . '::' . $relation);
             });
         }
 
-        Event::listen(function (DatabaseBusy $event) {
+        Event::listen(function (DatabaseBusy $event): void {
             Notification::route('mail', 'dev@example.com')
                 ->notify(new DatabaseApproachingMaxConnections(
                     $event->connectionName,
-                    $event->connections
+                    $event->connections,
                 ));
         });
 
-        DB::whenQueryingForLongerThan(100, function (Connection $connection, QueryExecuted $event) {
+        DB::whenQueryingForLongerThan(100, function (Connection $connection, QueryExecuted $event): void {
             Notification::route('mail', config('mail.admin.address'))
                 ->notify(new SlowQueryDetected($connection, $event));
         });
 
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-        });
+        RateLimiter::for('api', fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
 
         RateLimiter::for('search', function (Request $request) {
             $search = $request->get('s');
@@ -63,13 +65,15 @@ class AppServiceProvider extends ServiceProvider
             $movieType = $request->get('type');
             $year = $request->get('year');
 
-            $cacheKey = 'search-' . $search . '-' . $page . '-' . $movieType . '-' . $year. '-' . $request->ip();
+            $cacheKey = 'search-' . $search . '-' . $page . '-' . $movieType . '-' . $year . '-' . $request->ip();
+
             return Limit::perMinute(10)->by($cacheKey);
         });
 
         RateLimiter::for('movie-show', function (Request $request) {
             $imdbId = $request->route('imdbID');
-            $cacheKey = 'movie-show.' .$imdbId.'.' . $request->ip();
+            $cacheKey = 'movie-show.' . $imdbId . '.' . $request->ip();
+
             return Limit::perMinute(10)->by($cacheKey);
         });
 

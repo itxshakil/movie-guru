@@ -6,24 +6,27 @@ namespace App\DTOs;
 
 use App\Enums\WatchModeSourceType;
 
-class WatchModeSource
+final readonly class WatchModeSource
 {
     public function __construct(
-        public readonly int     $sourceId,
-        public readonly string  $name,
-        public readonly WatchModeSourceType $type,
-        public readonly string  $region,
-        public readonly ?string $iosUrl = null,
-        public readonly ?string $androidUrl = null,
-        public readonly ?string $webUrl = null,
-        public readonly ?string $format = null,
-        public readonly ?float  $price = null,
-        public readonly ?int    $seasons = null,
-        public readonly ?int    $episodes = null
+        public int                 $sourceId,
+        public string              $name,
+        public WatchModeSourceType $type,
+        public string              $region,
+        public ?string             $iosUrl = null,
+        public ?string             $androidUrl = null,
+        public ?string             $webUrl = null,
+        public ?string             $format = null,
+        public ?float              $price = null,
+        public ?int                $seasons = null,
+        public ?int                $episodes = null,
     )
     {
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(

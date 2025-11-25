@@ -10,6 +10,7 @@ use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
 use App\Services\WatchModeService;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -17,22 +18,18 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class DetailController extends Controller
+final class DetailController extends Controller
 {
     public function show(Request $request, string $imdbId)
     {
         $cleanImdbId = $this->extractImdbId($imdbId);
 
-        if (!$cleanImdbId) {
-            // Optionally: log the bad input, then throw a 404 or return a validation error
-            throw new NotFoundHttpException('Invalid IMDb ID. Provided');
-        }
+        // Optionally: log the bad input, then throw a 404 or return a validation error
+        throw_unless($cleanImdbId, NotFoundHttpException::class, 'Invalid IMDb ID. Provided');
 
-        $cacheKey = 'detail.'.$imdbId;
+        $cacheKey = 'detail.' . $imdbId;
         $cacheTTl = [now()->addHours(18), now()->addHours(24)];
-        $movie = Cache::flexible($cacheKey, $cacheTTl, function () use ($imdbId) {
-            return $this->fetchDetail($imdbId);
-        });
+        $movie = Cache::flexible($cacheKey, $cacheTTl, fn(): mixed => $this->fetchDetail($imdbId));
 
         $detail = $movie instanceof MovieDetail ? $movie->details : $movie;
 
@@ -46,7 +43,7 @@ class DetailController extends Controller
 
         $botDetector = app(BotDetectorService::class);
         if ($botDetector->isBot($request) === false) {
-            defer(function () use ($shouldRefresh, $request, $imdbId) {
+            defer(static function () use ($shouldRefresh, $request, $imdbId): void {
                 ShowPageAnalytics::create([
                     'imdb_id' => $imdbId,
                     'ip_address' => $request->ip(),
@@ -62,6 +59,7 @@ class DetailController extends Controller
                         if (!$movie) {
                             return;
                         }
+
                         $movie->update([
                             'sources' => $sources,
                             'source_last_fetched_at' => now(),
@@ -78,37 +76,33 @@ class DetailController extends Controller
             ]);
         }
 
-        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), function () {
-            return MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]);
-        });
+        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), fn() => MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
+            'imdb_id',
+            'title',
+            'year',
+            'release_date',
+            'poster',
+            'type',
+            'imdb_rating',
+            'imdb_votes',
+            'director',
+            'writer',
+            'actors',
+        ]));
 
-        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), function () {
-            return MovieDetail::recommended()->inRandomOrder()->take(6)->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]);
-        });
+        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), fn() => MovieDetail::recommended()->inRandomOrder()->take(6)->get([
+            'imdb_id',
+            'title',
+            'year',
+            'release_date',
+            'poster',
+            'type',
+            'imdb_rating',
+            'imdb_votes',
+            'director',
+            'writer',
+            'actors',
+        ]));
 
         return Inertia::render('Show', [
             'detail' => $detail,
@@ -141,55 +135,10 @@ class DetailController extends Controller
         return $movie;
     }
 
-    private function updateDetailInBG(string $imdbId): void
-    {
-        defer(function () use ($imdbId) {
-            $OMDBApiService = app(OMDBApiService::class);
-            $imdbId = $this->extractImdbId($imdbId);
-            $updatedDetail = $OMDBApiService->getById($imdbId);
-
-            if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
-
-                $response = $updatedDetail['Response'] ?? null;
-                report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response, 500));
-
-                Log::error('Failed to fetch updated details for IMDB ID: '.$imdbId, [
-                    'response' => $updatedDetail,
-                ]);
-
-                return;
-            }
-
-            MovieDetail::updateOrCreate([
-                'imdb_id' => $imdbId,
-            ], [
-                'title' => $updatedDetail['Title'],
-                'year' => $updatedDetail['Year'],
-                'release_date' => $updatedDetail['Released'],
-                'poster' => $updatedDetail['Poster'],
-                'type' => $updatedDetail['Type'],
-                'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
-                'imdb_votes' => $this->isValue($updatedDetail['imdbVotes'] ?? null) ? str_replace(
-                    ',',
-                    '',
-                    $updatedDetail['imdbVotes']
-                ) : 0,
-                'genre' => $updatedDetail['Genre'],
-                'director' => substr($updatedDetail['Director'], 0, 255),
-                'writer' => substr($updatedDetail['Writer'], 0, 255),
-                'actors' => substr($updatedDetail['Actors'], 0, 255),
-                'details' => $updatedDetail,
-            ]);
-        });
-    }
-
-    private function isValue($value)
-    {
-        return $value && $value !== 'N/A';
-    }
-
     /**
      * @return array|mixed
+     *
+     * @throws ConnectionException
      */
     public function fetchFromAPI(string $imdbId): mixed
     {
@@ -197,19 +146,21 @@ class DetailController extends Controller
         if (!$imdbId) {
             return [];
         }
+
         $OMDBApiService = app(OMDBApiService::class);
         $detail = $OMDBApiService->getById($imdbId);
         $ipAddress = request()->ip();
 
-        defer(function () use ($ipAddress, $detail, $imdbId) {
+        defer(static function () use ($ipAddress, $detail, $imdbId): void {
             if ($detail === null || !isset($detail['Title'])) {
-                $e = new Exception('Failed to fetch details for IMDB ID: ' . $imdbId, 500);
-                report($e);
+                $exception = new Exception('Failed to fetch details for IMDB ID: ' . $imdbId, 500);
+                report($exception);
 
                 Log::error('Failed to fetch details for IMDB ID: ' . $imdbId, [
                     'response' => $detail,
                 ]);
             }
+
             $voted = $detail['imdbVotes'] && $detail['imdbVotes'] !== 'N/A'
                 ? str_replace(',', '', $detail['imdbVotes'])
                 : 0;
@@ -231,6 +182,53 @@ class DetailController extends Controller
         return $detail; // Return fetched details
     }
 
+    private function updateDetailInBG(string $imdbId): void
+    {
+        defer(function () use ($imdbId): void {
+            $OMDBApiService = app(OMDBApiService::class);
+            $imdbId = $this->extractImdbId($imdbId);
+            $updatedDetail = $OMDBApiService->getById($imdbId);
+
+            if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
+
+                $response = $updatedDetail['Response'] ?? null;
+                report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response, 500));
+
+                Log::error('Failed to fetch updated details for IMDB ID: ' . $imdbId, [
+                    'response' => $updatedDetail,
+                ]);
+
+                return;
+            }
+
+            MovieDetail::updateOrCreate([
+                'imdb_id' => $imdbId,
+            ], [
+                'title' => $updatedDetail['Title'],
+                'year' => $updatedDetail['Year'],
+                'release_date' => $updatedDetail['Released'],
+                'poster' => $updatedDetail['Poster'],
+                'type' => $updatedDetail['Type'],
+                'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
+                'imdb_votes' => $this->isValue($updatedDetail['imdbVotes'] ?? null) ? str_replace(
+                    ',',
+                    '',
+                    $updatedDetail['imdbVotes'],
+                ) : 0,
+                'genre' => $updatedDetail['Genre'],
+                'director' => mb_substr((string)$updatedDetail['Director'], 0, 255),
+                'writer' => mb_substr((string)$updatedDetail['Writer'], 0, 255),
+                'actors' => mb_substr((string)$updatedDetail['Actors'], 0, 255),
+                'details' => $updatedDetail,
+            ]);
+        });
+    }
+
+    private function isValue($value): bool
+    {
+        return $value && $value !== 'N/A';
+    }
+
     /**
      * Extracts and returns a clean IMDb title ID (e.g., "tt6468322") from messy input.
      *
@@ -244,7 +242,7 @@ class DetailController extends Controller
      */
     private function extractImdbId(string $input): ?string
     {
-        $candidate = trim($input);
+        $candidate = mb_trim($input);
 
         $candidate = html_entity_decode($candidate, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
