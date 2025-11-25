@@ -1,17 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Rules;
 
+use Exception;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
-class SpamKeywordRule implements Rule
+final class SpamKeywordRule implements Rule
 {
     public function passes($attribute, $value): bool
     {
-        // Your logic to check for spam keywords goes here
-        // For example, you can have an array of spam keywords and check if the value contains any of them
-
         $spamKeywords = [
             'make money',
             'private photos',
@@ -73,13 +73,17 @@ class SpamKeywordRule implements Rule
             'visit our telegram group',
         ];
 
-        foreach ($spamKeywords as $keyword) {
-            if (stripos(strtolower($value), strtolower($keyword)) !== false && str($value)->transliterate()->contains($keyword) !== false) {
+        foreach ($spamKeywords as $spamKeyword) {
+            if (
+                mb_stripos(mb_strtolower((string)$value), mb_strtolower($spamKeyword)) !== false
+                && str($value)->transliterate()->contains($spamKeyword) !== false
+            ) {
                 try {
-                    Log::channel('spam-keyword')->info('Spam Keyword Detected: ' . $keyword . ' in ' . $value);
-                } catch (\Exception $e) {
+                    Log::channel('spam-keyword')->info('Spam Keyword Detected: ' . $spamKeyword . ' in ' . $value);
+                } catch (Exception $e) {
                     Log::error('Error logging spam keyword: ' . $e->getMessage());
                 }
+
                 return false;
             }
         }

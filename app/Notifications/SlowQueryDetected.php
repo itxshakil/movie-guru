@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
-use App\Mail\SlowQueryDetected as MailSlowQueryDetected;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class SlowQueryDetected extends Notification
+final class SlowQueryDetected extends Notification
 {
     use Queueable;
 
@@ -34,33 +34,21 @@ class SlowQueryDetected extends Notification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @param mixed $notifiable
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         $timeInSeconds = $this->event->time / 1000;
 
-        return (new MailMessage)->markdown('emails.slow-query-detected', [
+        return (new MailMessage())->markdown('emails.slow-query-detected', [
             'connectionName' => $this->queryConnection->getName(),
             'query' => $this->finalQuery(),
             'time' => $timeInSeconds,
         ]);
-// TODO: This gives error
-//        return new MailSlowQueryDetected($this->queryConnection->getName(), $this->finalQuery(), $timeInSeconds);
+        // TODO: This gives error
+        //        return new MailSlowQueryDetected($this->queryConnection->getName(), $this->finalQuery(), $timeInSeconds);
     }
-
-    private function finalQuery(): string
-    {
-        $query = $this->event->sql;
-
-        foreach ($this->event->bindings as $binding) {
-            $query = preg_replace('/\?/', "'$binding'", $query, 1);
-        }
-
-        return $query;
-    }
-
 
     /**
      * Get the array representation of the notification.
@@ -73,7 +61,18 @@ class SlowQueryDetected extends Notification
             'connectionName' => $this->queryConnection->getName(),
             'query' => $this->finalQuery(),
             'time' => $this->event->time,
-            'timeInSeconds' => $this->event->time / 1000
+            'timeInSeconds' => $this->event->time / 1000,
         ];
+    }
+
+    private function finalQuery(): string
+    {
+        $query = $this->event->sql;
+
+        foreach ($this->event->bindings as $binding) {
+            $query = preg_replace('/\?/', sprintf("'%s'", $binding), (string)$query, 1);
+        }
+
+        return $query;
     }
 }

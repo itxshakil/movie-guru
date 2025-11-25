@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class BotDetectorService
+final class BotDetectorService
 {
     /**
-     * List of common bot patterns to detect in user agents
+     * List of common bot patterns to detect in user agents.
      *
-     * @var array
+     * @var string[]
      */
-    protected $botPatterns = [
+    private array $botPatterns = [
         'bot',
         'crawler',
         'spider',
@@ -53,11 +55,11 @@ class BotDetectorService
     ];
 
     /**
-     * IP address ranges known to be associated with bots
+     * IP address ranges known to be associated with bots.
      *
-     * @var array
+     * @var string[]
      */
-    protected $knownBotIpRanges = [
+    private array $knownBotIpRanges = [
         // Google bot IP ranges
         '66.249.64.0/19',
         '64.233.160.0/19',
@@ -68,14 +70,12 @@ class BotDetectorService
     ];
 
     /**
-     * Cache duration for bot detection results in minutes
-     *
-     * @var int
+     * Cache duration for bot detection results in minutes.
      */
-    protected $cacheDuration = 60;
+    private int $cacheDuration = 60;
 
     /**
-     * Determine if the request is from a bot
+     * Determine if the request is from a bot.
      */
     public function isBot(Request $request): bool
     {
@@ -83,7 +83,7 @@ class BotDetectorService
         $ipAddress = $request->ip();
 
         // Generate a cache key based on IP and user agent
-        $cacheKey = 'bot_detection_'.md5($ipAddress.$browser);
+        $cacheKey = 'bot_detection_' . md5($ipAddress . $browser);
 
         // Return cached result if available
         if (Cache::has($cacheKey)) {
@@ -101,19 +101,19 @@ class BotDetectorService
     }
 
     /**
-     * Check if user agent matches any bot patterns
+     * Check if user agent matches any bot patterns.
      */
-    protected function checkUserAgent(string $userAgent, string $ipAddress, Request $request): bool
+    private function checkUserAgent(string $userAgent, string $ipAddress, Request $request): bool
     {
-        if (empty($userAgent)) {
+        if ($userAgent === '' || $userAgent === '0') {
             $this->logBotDetection($ipAddress, $userAgent, $request, 'Empty user agent');
 
             return true;
         }
 
-        foreach ($this->botPatterns as $pattern) {
-            if (stripos($userAgent, $pattern) !== false) {
-                $this->logBotDetection($ipAddress, $userAgent, $request, 'User agent matched bot pattern: '.$pattern);
+        foreach ($this->botPatterns as $botPattern) {
+            if (mb_stripos($userAgent, (string)$botPattern) !== false) {
+                $this->logBotDetection($ipAddress, $userAgent, $request, 'User agent matched bot pattern: ' . $botPattern);
 
                 return true;
             }
@@ -123,9 +123,9 @@ class BotDetectorService
     }
 
     /**
-     * Log bot detection information
+     * Log bot detection information.
      */
-    protected function logBotDetection(string $ipAddress, string $userAgent, ?Request $request, string $reason): void
+    private function logBotDetection(string $ipAddress, string $userAgent, ?Request $request, string $reason): void
     {
         $logData = [
             'ip' => $ipAddress,
@@ -133,7 +133,7 @@ class BotDetectorService
             'reason' => $reason,
         ];
 
-        if ($request) {
+        if ($request instanceof Request) {
             $logData['path'] = $request->path();
             $logData['query'] = $request->query();
             $logData['method'] = $request->method();
@@ -144,17 +144,17 @@ class BotDetectorService
     }
 
     /**
-     * Check if IP is in a known bot IP range
+     * Check if IP is in a known bot IP range.
      */
-    protected function checkIpRange(string $ipAddress): bool
+    private function checkIpRange(string $ipAddress): bool
     {
-        if (empty($ipAddress)) {
+        if ($ipAddress === '' || $ipAddress === '0') {
             return false;
         }
 
-        foreach ($this->knownBotIpRanges as $range) {
-            if ($this->ipInRange($ipAddress, $range)) {
-                $this->logBotDetection($ipAddress, '', null, 'IP in known bot range: '.$range);
+        foreach ($this->knownBotIpRanges as $knownBotIpRange) {
+            if ($this->ipInRange($ipAddress, $knownBotIpRange)) {
+                $this->logBotDetection($ipAddress, '', null, 'IP in known bot range: ' . $knownBotIpRange);
 
                 return true;
             }
@@ -164,13 +164,13 @@ class BotDetectorService
     }
 
     /**
-     * Check if an IP address is within a CIDR range
+     * Check if an IP address is within a CIDR range.
      *
-     * @param  string  $range  CIDR format range
+     * @param string $range CIDR format range
      */
-    protected function ipInRange(string $ip, string $range): bool
+    private function ipInRange(string $ip, string $range): bool
     {
-        if (strpos($range, '/') === false) {
+        if (!str_contains($range, '/')) {
             return $ip === $range;
         }
 
@@ -184,9 +184,9 @@ class BotDetectorService
     }
 
     /**
-     * Check if the request exhibits behavioral patterns of a bot
+     * Check if the request exhibits behavioral patterns of a bot.
      */
-    protected function checkBehavioralPatterns(Request $request): bool
+    private function checkBehavioralPatterns(Request $request): bool
     {
         // Check request headers that are commonly missing in bots
         if (!$request->header('Accept-Language') && !$request->header('Accept-Encoding')) {

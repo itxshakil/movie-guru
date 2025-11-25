@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class NewsletterSubscription extends Model
+final class NewsletterSubscription extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory;
+    use SoftDeletes;
+
+    public const string DELETED_AT = 'unsubscribed_at';
 
     protected $fillable = [
         'email',
@@ -17,9 +22,13 @@ class NewsletterSubscription extends Model
         'last_name',
     ];
 
-    protected $casts = [
-        'unsubscribed_at' => 'timestamp',
-    ];
-
-    public const DELETED_AT = 'unsubscribed_at';
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'unsubscribed_at' => 'timestamp',
+        ];
+    }
 }

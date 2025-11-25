@@ -10,7 +10,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class UpdateSearchFromSearchQueryCommand extends Command
+final class UpdateSearchFromSearchQueryCommand extends Command
 {
     use LogCommands;
 
@@ -23,7 +23,6 @@ class UpdateSearchFromSearchQueryCommand extends Command
         $this->log('Starting the update of search counts.');
 
         try {
-            // Retrieve search queries with their count
             $queryCounts = DB::table('search_queries')
                 ->select('query', DB::raw('count(*) as count'))
                 ->groupBy('query')
@@ -34,14 +33,14 @@ class UpdateSearchFromSearchQueryCommand extends Command
                     ['query' => $queryCount->query],
                     [
                         'search_count' => $queryCount->count,
-                        'total_results' => 1
-                    ]
+                        'total_results' => 1,
+                    ],
                 );
             }
 
             $this->log('Search model updated successfully from search queries.');
-        } catch (Exception $e) {
-            $this->logException($e);
+        } catch (Exception $exception) {
+            $this->logException($exception);
         }
     }
 }

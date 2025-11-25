@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Inertia\Inertia;
+use Override;
 use Throwable;
 
-class Handler extends ExceptionHandler
+final class Handler extends ExceptionHandler
 {
     /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
@@ -22,19 +24,17 @@ class Handler extends ExceptionHandler
     /**
      * Register the exception handling callbacks for the application.
      */
+    #[Override]
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
+        $this->reportable(function (Throwable $e): void {
             //
         });
     }
 
+    #[Override]
     public function render($request, Throwable $e)
     {
-        $response = parent::render($request, $e);
-
-
-
-        return $response;
+        return parent::render($request, $e);
     }
 }

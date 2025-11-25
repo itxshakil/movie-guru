@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\NewsletterSubscription;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class NewsletterSubscriptionController extends Controller
+final class NewsletterSubscriptionController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'email', 'max:191']
+            'email' => ['required', 'email', 'max:191'],
         ]);
 
         NewsletterSubscription::withTrashed()->firstOrCreate($request->only(['email']))->restore();
@@ -18,10 +21,10 @@ class NewsletterSubscriptionController extends Controller
         return back()->with('success', 'You have successfully subscribed.');
     }
 
-    public function unsubscribe(Request $request)
+    public function unsubscribe(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'email', 'max:191', 'exists:newsletter_subscriptions']
+            'email' => ['required', 'email', 'max:191', 'exists:newsletter_subscriptions'],
         ]);
 
         NewsletterSubscription::firstWhere('email', $request->input(['email']))->delete();

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class Search extends Model
+final class Search extends Model
 {
     protected $fillable = [
         'query',
@@ -16,15 +17,10 @@ class Search extends Model
         'search_count',
     ];
 
-    protected $casts = [
-        'search_count' => 'integer',
-        'total_results' => 'integer',
-    ];
-
     public function incrementViews(): void
     {
         $ipAddress = request()->ip();
-        $cacheKey = 'search-query-'.$this->query.'-'.$ipAddress;
+        $cacheKey = 'search-query-' . $this->query . '-' . $ipAddress;
 
         if (!Cache::has($cacheKey)) {
             $this->increment('search_count');
@@ -32,18 +28,32 @@ class Search extends Model
         }
     }
 
-    public function scopeHasResults($query): void
+    #[Scope]
+    protected function hasResults($query): void
     {
         $query->where('total_results', '>', 0);
     }
 
-    public function scopeRecentOnly(Builder $query, int $days = 28): void
+    #[Scope]
+    protected function recentOnly(Builder $query, int $days = 28): void
     {
         $query->where('updated_at', '>', now()->subDays($days));
     }
 
-    public function scopePopular(Builder $query): void
+    #[Scope]
+    protected function popular(Builder $query): void
     {
         $query->orderByDesc('total_results');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'search_count' => 'integer',
+            'total_results' => 'integer',
+        ];
     }
 }

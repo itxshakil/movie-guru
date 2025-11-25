@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SlowQueryDetected extends Mailable
+final class SlowQueryDetected extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     public function __construct(public string $connectionName, public string $query, public string $time)
-    {}
+    {
+    }
 
     /**
      * Get the message envelope.
@@ -34,11 +37,11 @@ class SlowQueryDetected extends Mailable
     {
         return new Content(
             markdown: 'emails.slow-query-detected',
-            with:[
+            with: [
                 'connectionName' => $this->connectionName,
                 'query' => $this->query,
                 'time' => $this->time,
-            ]
+            ],
         );
     }
 

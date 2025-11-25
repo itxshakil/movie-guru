@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\SearchQuery;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
-class SearchQueryFactory extends Factory
+final class SearchQueryFactory extends Factory
 {
     protected $model = SearchQuery::class;
 

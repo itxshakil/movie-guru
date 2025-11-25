@@ -17,11 +17,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class WatchModeService
+final class WatchModeService
 {
-    protected string $apiKey;
+    private string $baseUrl = 'https://api.watchmode.com/v1';
 
-    protected string $baseUrl = 'https://api.watchmode.com/v1';
     /**
      * @var string[]
      */
@@ -29,25 +28,11 @@ class WatchModeService
 
     public function __construct()
     {
-        $this->apiKeys = explode(',', config('services.watchmode.key'));
+        $this->apiKeys = explode(',', (string)config('services.watchmode.key'));
     }
 
     /**
-     * Get a random API key from the configured keys
-     *
-     * @throws Exception
-     */
-    protected function getRandomApiKey(): string
-    {
-        if (empty($this->apiKeys)) {
-            throw new Exception('No API keys are configured.');
-        }
-
-        return $this->apiKeys[array_rand($this->apiKeys)];
-    }
-
-    /**
-     * Search titles or people
+     * Search titles or people.
      *
      * @param WatchModeType[] $types
      * @return WatchModeSearchResult[]
@@ -55,7 +40,7 @@ class WatchModeService
     public function search(
         WatchModeSearchField $searchField,
         string $searchValue,
-        array $types = []
+        array $types = [],
     ): array
     {
         $params = [
@@ -63,13 +48,11 @@ class WatchModeService
             'search_value' => $searchValue,
         ];
 
-        if (!empty($types)) {
+        if ($types !== []) {
             $params['types'] = implode(',', array_map(fn($t) => $t->value, $types));
         }
 
         $raw = $this->request('/search/', $params);
-
-        dd($raw);
         $results = [];
 
         foreach (($raw['title_results'] ?? []) as $title) {
@@ -83,30 +66,8 @@ class WatchModeService
         return $results;
     }
 
-    protected function request(string $endpoint, array $params = []): array
-    {
-        $params['apiKey'] = $this->getRandomApiKey();
-
-        try {
-            $response = Http::baseUrl($this->baseUrl)
-                ->timeout(15)
-                ->get($endpoint, $params)
-                ->throw();
-
-            return $response->json();
-        } catch (RequestException $e) {
-            $message = $e->getMessage();
-            if (str_contains($message, 'Title not found')) {
-                return ['error' => 'Title not found'];
-            }
-            report($e);
-
-            return ['error' => $e->getMessage()];
-        }
-    }
-
     /**
-     * Get streaming availability for a title, enriched with source metadata
+     * Get streaming availability for a title, enriched with source metadata.
      *
      * @param array<string> $regions
      * @return Collection<array{availability: WatchModeSource, meta: WatchModeSourceMeta|null}>
@@ -115,11 +76,11 @@ class WatchModeService
     {
         $params = [];
 
-        if (!empty($regions)) {
+        if ($regions !== []) {
             $params['regions'] = implode(',', $regions);
         }
 
-        $raw = $this->request("/title/$titleId/sources/", $params);
+        $raw = $this->request(sprintf('/title/%s/sources/', $titleId), $params);
 
         if (isset($raw['error'])) {
             Log::error('Error getting title sources', [
@@ -134,17 +95,17 @@ class WatchModeService
 
         try {
             $availability = collect($raw)->map(
-                fn($item) => WatchModeSource::fromArray($item)
+                fn(array $item): WatchModeSource => WatchModeSource::fromArray($item),
             );
-        } catch (Throwable $e) {
+        } catch (Throwable $throwable) {
             Log::error('Error getting title sources', [
                 'title_id' => $titleId,
                 'regions' => $regions,
-                'error' => $e->getMessage(),
+                'error' => $throwable->getMessage(),
                 'raw' => $raw,
                 'items' => collect($raw),
             ]);
-            report($e);
+            report($throwable);
 
             return collect();
         }
@@ -152,7 +113,7 @@ class WatchModeService
         // Attach cached metadata
         $meta = $this->getSources()->keyBy('id');
 
-        return $availability->map(fn(WatchModeSource $source) => [
+        return $availability->map(fn(WatchModeSource $source): array => [
             'availability' => $source,
             'meta' => $meta->get($source->sourceId),
         ]);
@@ -160,7 +121,7 @@ class WatchModeService
 
     /**
      * Get all supported streaming sources (metadata)
-     * Cached for 24 hours
+     * Cached for 24 hours.
      *
      * @return Collection<WatchModeSourceMeta>
      */
@@ -170,8 +131,48 @@ class WatchModeService
             $raw = $this->request('/sources/');
 
             return collect($raw)->map(
-                fn($item) => WatchModeSourceMeta::fromArray($item)
+                fn(array $item): WatchModeSourceMeta => WatchModeSourceMeta::fromArray($item),
             );
         });
+    }
+
+    /**
+     * Get a random API key from the configured keys.
+     *
+     * @throws Exception|Throwable
+     */
+    private function getRandomApiKey(): string
+    {
+        throw_if($this->apiKeys === [], Exception::class, 'No API keys are configured.');
+
+        return $this->apiKeys[array_rand($this->apiKeys)];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @throws Throwable
+     */
+    private function request(string $endpoint, array $params = []): array
+    {
+        $params['apiKey'] = $this->getRandomApiKey();
+
+        try {
+            $response = Http::baseUrl($this->baseUrl)
+                ->timeout(15)
+                ->get($endpoint, $params)
+                ->throw();
+
+            return $response->json();
+        } catch (RequestException $requestException) {
+            $message = $requestException->getMessage();
+            if (str_contains($message, 'Title not found')) {
+                return ['error' => 'Title not found'];
+            }
+
+            report($requestException);
+
+            return ['error' => $requestException->getMessage()];
+        }
     }
 }

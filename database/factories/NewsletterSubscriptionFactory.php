@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\NewsletterSubscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class NewsletterSubscriptionFactory extends Factory
+final class NewsletterSubscriptionFactory extends Factory
 {
     protected $model = NewsletterSubscription::class;
 
