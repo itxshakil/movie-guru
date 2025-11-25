@@ -28,7 +28,7 @@ final class DatabaseApproachingMaxConnections extends Notification
 
     public function toMail(object $notifiable)
     {
-        return (new MailMessage())->markdown('emails.database-approaching-max-connections', [
+        return new MailMessage()->markdown('emails.database-approaching-max-connections', [
             'connectionName' => $this->connectionName,
             'connections' => $this->connections,
         ]);

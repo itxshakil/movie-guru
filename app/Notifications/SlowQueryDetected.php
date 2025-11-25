@@ -41,7 +41,7 @@ final class SlowQueryDetected extends Notification
     {
         $timeInSeconds = $this->event->time / 1000;
 
-        return (new MailMessage())->markdown('emails.slow-query-detected', [
+        return new MailMessage()->markdown('emails.slow-query-detected', [
             'connectionName' => $this->queryConnection->getName(),
             'query' => $this->finalQuery(),
             'time' => $timeInSeconds,
