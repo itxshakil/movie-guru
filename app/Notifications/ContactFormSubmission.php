@@ -35,7 +35,7 @@ final class ContactFormSubmission extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())->markdown('emails.contact', [
+        return new MailMessage()->markdown('emails.contact', [
             'contact' => $this->contact,
         ]);
     }
