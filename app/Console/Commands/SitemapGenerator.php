@@ -42,6 +42,10 @@ final class SitemapGenerator extends Command
         $this->info('Sitemap has been generated!');
     }
 
+    /**
+     * @param int $limit
+     * @return Collection<int, Search>
+     */
     private function getTopSearches(int $limit): Collection
     {
         return Search::select('query')
@@ -51,6 +55,10 @@ final class SitemapGenerator extends Command
             ->get();
     }
 
+    /**
+     * @param int $limit
+     * @return Collection<int, MovieDetail>
+     */
     private function getTopMovies(int $limit): Collection
     {
         return MovieDetail::select('imdb_id', 'views')
