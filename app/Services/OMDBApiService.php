@@ -52,7 +52,7 @@ final class OMDBApiService
     /**
      * @throws ConnectionException
      */
-    public function getById(string $imdbID = '')
+    public function getById(?string $imdbID = null)
     {
         $this->imdbID = $imdbID ?? $this->imdbID;
 
@@ -67,7 +67,7 @@ final class OMDBApiService
     public function searchByTitle(?string $title = '', int $page = 1, ?string $movieType = null, $year = null)
     {
         $this->title = $this->titleCleaner->clean($title ?? $this->title ?? '');
-        $this->page = $page ?? $this->page ?? 1;
+        $this->page = $page;
         $this->movieType = $movieType ?? $this->movieType ?? null;
         $this->year = $year ?? $this->year ?? null;
 
