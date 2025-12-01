@@ -67,7 +67,7 @@
             "rector",
             "pint --dirty"
         ],
-        "test:types": "phpstan",
+        "test:types": "phpstan --memory-limit=2G",
         "lint": [
             "rector",
             "pint --parallel"
