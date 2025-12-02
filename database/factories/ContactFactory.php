@@ -8,6 +8,9 @@ use App\Models\Contact;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
+/**
+ * @extends Factory<Contact>
+ */
 final class ContactFactory extends Factory
 {
     protected $model = Contact::class;

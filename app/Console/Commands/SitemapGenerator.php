@@ -43,7 +43,6 @@ final class SitemapGenerator extends Command
     }
 
     /**
-     * @param int $limit
      * @return Collection<int, Search>
      */
     private function getTopSearches(int $limit): Collection
@@ -56,7 +55,6 @@ final class SitemapGenerator extends Command
     }
 
     /**
-     * @param int $limit
      * @return Collection<int, MovieDetail>
      */
     private function getTopMovies(int $limit): Collection

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * @property-read Carbon $source_last_fetched_at
+ */
 final class MovieDetail extends Model
 {
     protected $fillable = [

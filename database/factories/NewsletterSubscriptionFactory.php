@@ -8,6 +8,9 @@ use App\Models\NewsletterSubscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
+/**
+ * @extends Factory<NewsletterSubscription>
+ */
 final class NewsletterSubscriptionFactory extends Factory
 {
     protected $model = NewsletterSubscription::class;

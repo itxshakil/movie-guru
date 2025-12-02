@@ -7,6 +7,9 @@ namespace Database\Factories;
 use App\Models\SearchQuery;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<SearchQuery>
+ */
 final class SearchQueryFactory extends Factory
 {
     protected $model = SearchQuery::class;
