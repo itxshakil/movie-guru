@@ -17,3 +17,4 @@ parameters:
     level: 1
 
     tmpDir: /tmp/phpstan
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
