@@ -7,6 +7,9 @@ namespace Database\Factories;
 use App\Models\ShowPageAnalytics;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<ShowPageAnalytics>
+ */
 final class ShowPageAnalyticsFactory extends Factory
 {
     protected $model = ShowPageAnalytics::class;

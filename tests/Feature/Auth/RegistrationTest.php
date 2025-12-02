@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Providers\RouteServiceProvider;
-
 test('registration screen can be rendered', function (): void {
     $response = $this->get('/register');
 
