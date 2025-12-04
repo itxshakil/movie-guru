@@ -112,7 +112,7 @@ final class OMDBApiService
         $apiKey = $this->getRandomApiKey();
         $url = 'https://www.omdbapi.com/?apikey=' . $apiKey . '&' . $query;
         $startTime = microtime(true);
-        $response = Http::connectTimeout(3)->get($url)->json();
+        $response = Http::retry(3)->connectTimeout(3)->get($url)->json();
 
         $endTime = microtime(true);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
