@@ -9,17 +9,17 @@ use App\Enums\WatchModeSourceType;
 final readonly class WatchModeSource
 {
     public function __construct(
-        public int                 $sourceId,
-        public string              $name,
+        public int     $sourceId,
+        public string  $name,
         public WatchModeSourceType $type,
-        public string              $region,
-        public ?string             $iosUrl = null,
-        public ?string             $androidUrl = null,
-        public ?string             $webUrl = null,
-        public ?string             $format = null,
-        public ?float              $price = null,
-        public ?int                $seasons = null,
-        public ?int                $episodes = null,
+        public string  $region,
+        public ?string $iosUrl = null,
+        public ?string $androidUrl = null,
+        public ?string $webUrl = null,
+        public ?string $format = null,
+        public ?float  $price = null,
+        public ?int    $seasons = null,
+        public ?int    $episodes = null,
     )
     {
     }
