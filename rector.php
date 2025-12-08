@@ -39,10 +39,6 @@ return RectorConfig::configure()
         SetList::TYPE_DECLARATION,
         SetList::TYPE_DECLARATION_DOCBLOCKS,
 
-        SetList::CODE_QUALITY,
-        SetList::PRIVATIZATION,
-        SetList::EARLY_RETURN,
-        SetList::DEAD_CODE,
         SetList::RECTOR_PRESET,
         SetList::GMAGICK_TO_IMAGICK,
     ])
