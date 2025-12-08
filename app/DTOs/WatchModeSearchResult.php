@@ -7,12 +7,12 @@ namespace App\DTOs;
 final readonly class WatchModeSearchResult
 {
     public function __construct(
-        public int     $id,
-        public string  $name,
-        public string  $type,
-        public ?int    $year = null,
+        public int    $id,
+        public string $name,
+        public string $type,
+        public ?int   $year = null,
         public ?string $imdbId = null,
-        public ?int    $tmdbId = null,
+        public ?int   $tmdbId = null,
         public ?string $tmdbType = null,
         public ?string $mainProfession = null,
     )
