@@ -73,6 +73,12 @@
             "pint --parallel"
         ]
     },
+    "scripts-descriptions": {
+        "setup": "Fresh project setup: install dependencies, copy .env, generate key, run migrations/seeders, install NPM packages and build assets.",
+        "lint:fix": "Run Rector for automated refactoring and Pint to fix coding style issues.",
+        "lint": "Run Rector and Pint in parallel to detect coding and formatting issues.",
+        "test:types": "Run PHPStan static analysis with extended memory limit."
+    },
     "extra": {
         "laravel": {
             "dont-discover": []
