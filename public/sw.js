@@ -2,11 +2,11 @@ const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.9.0';
-const SEARCH_CACHE = 'search-cache-v-4.9.0';
-const INFO_CACHE = 'info-cache-v-4.9.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-9.0';
-const POSTER_CACHE = 'poster-cache-v-4.9.0';
+const APP_CACHE = 'v-4.10.0';
+const SEARCH_CACHE = 'search-cache-v-4.10.0';
+const INFO_CACHE = 'info-cache-v-4.10.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-10.0';
+const POSTER_CACHE = 'poster-cache-v-4.10.0';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -23,42 +23,42 @@ const basicPathsToCache = [
     '/',
     '/?utm_source=homescreen',
     '/build/manifest.json',
-    '/build/assets/Search-e4G1Minw.css',
-    '/build/assets/Show-Df8yoEfg.css',
+    '/build/assets/Search-CszCEZ7c.css',
     '/build/assets/BaseLayout-pP2Wt1YA.css',
-    '/build/assets/app-DSy5iFBc.css',
-    '/build/assets/LoadingSpinner-BU7dk2m5.js',
-    '/build/assets/ApplicationLogo-BQHs3_bv.js',
-    '/build/assets/InputError-DjZrqUel.js',
-    '/build/assets/InputLabel-BZGY0ZGV.js',
-    '/build/assets/GuestLayout-DGMWhwZV.js',
-    '/build/assets/LoadingSpinnerButton-DzWDITnR.js',
-    '/build/assets/PrimaryButton-DSVAjU1g.js',
-    '/build/assets/Dashboard-DTUke1ab.js',
-    '/build/assets/TextInput-SXJDLFhX.js',
-    '/build/assets/Edit-yeA2b6Ug.js',
-    '/build/assets/ConfirmPassword-BbEev210.js',
-    '/build/assets/ForgotPassword-2V5MANYh.js',
-    '/build/assets/VerifyEmail-CaquUBbK.js',
-    '/build/assets/ResetPassword-4qPJgm4-.js',
-    '/build/assets/Error-DcjWU1a8.js',
-    '/build/assets/Show-CDCCZoLp.js',
-    '/build/assets/Register-CiUtyuj_.js',
-    '/build/assets/UpdatePasswordForm-CNLP94KP.js',
-    '/build/assets/UpdateProfileInformationForm-DR7O1XRp.js',
-    '/build/assets/Login-BWdODVsA.js',
-    '/build/assets/Show-lqJcHn7K.js',
-    '/build/assets/Terms-DgsXzjK9.js',
-    '/build/assets/NewsletterForm-_GYFmV_h.js',
-    '/build/assets/PrivacyPolicy-BBfZ-SWc.js',
-    '/build/assets/DeleteUserForm-DhcSJa2c.js',
-    '/build/assets/Contact-BgPCWz7S.js',
-    '/build/assets/AuthenticatedLayout-D1FGyYHH.js',
-    '/build/assets/Search-D1vAZIbv.js',
-    '/build/assets/Welcome-0glZftcJ.js',
-    '/build/assets/BaseLayout-BNjVq-Tr.js',
-    '/build/assets/SearchCard-CF7yKGQq.js',
-    '/build/assets/app-BHD-2r4M.js',
+    '/build/assets/Show-DJ-XbJiW.css',
+    '/build/assets/app-DdcIogbR.css',
+    '/build/assets/LoadingSpinner-CAG7qhVP.js',
+    '/build/assets/ApplicationLogo-B-WWpHLm.js',
+    '/build/assets/InputError-CJI8VPwu.js',
+    '/build/assets/InputLabel-Dkkpv0du.js',
+    '/build/assets/GuestLayout-GMbVw9Uu.js',
+    '/build/assets/LoadingSpinnerButton-DLb6n2bG.js',
+    '/build/assets/PrimaryButton-CVwHuuTu.js',
+    '/build/assets/Dashboard-Bt_79Qpu.js',
+    '/build/assets/TextInput-DpPl1EUK.js',
+    '/build/assets/Edit-BmuZdkjs.js',
+    '/build/assets/ConfirmPassword-DfdelkuL.js',
+    '/build/assets/ForgotPassword-BOsuSA6P.js',
+    '/build/assets/VerifyEmail-8491R1RN.js',
+    '/build/assets/ResetPassword-dGDU4efQ.js',
+    '/build/assets/Error-C5UNCfHT.js',
+    '/build/assets/Register-6_PNb7SX.js',
+    '/build/assets/UpdatePasswordForm-BUGP6YNR.js',
+    '/build/assets/UpdateProfileInformationForm-CjrIyv3l.js',
+    '/build/assets/Login-ke6Mw2Qw.js',
+    '/build/assets/Show-Juy7A6uq.js',
+    '/build/assets/Terms-Boxwhwm6.js',
+    '/build/assets/NewsletterForm-jq9FIPD6.js',
+    '/build/assets/PrivacyPolicy-CsIwbEqv.js',
+    '/build/assets/DeleteUserForm-DzhGdPLo.js',
+    '/build/assets/Show-C7uYifja.js',
+    '/build/assets/AuthenticatedLayout-Clgsde7j.js',
+    '/build/assets/Contact-DzActPjx.js',
+    '/build/assets/Search-CAB9xHOr.js',
+    '/build/assets/Welcome-BeCI--Cf.js',
+    '/build/assets/BaseLayout-B8QmaxLO.js',
+    '/build/assets/SearchCard-BnPynnE_.js',
+    '/build/assets/app-MYk4Hh1D.js',
     '/assets/images/no-poster.jpg',
 ];
 
