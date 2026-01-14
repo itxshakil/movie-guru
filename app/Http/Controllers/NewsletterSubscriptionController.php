@@ -24,11 +24,15 @@ final class NewsletterSubscriptionController extends Controller
     public function unsubscribe(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'email', 'max:191', 'exists:newsletter_subscriptions'],
+            'email' => ['required', 'email', 'max:191'],
         ]);
 
-        NewsletterSubscription::firstWhere('email', $request->input('email'))->delete();
+        $subscription = NewsletterSubscription::where('email', $request->input('email'))->first();
 
-        return back()->with('success', 'You have successfully unsubscribed.');
+        if ($subscription) {
+            $subscription->delete();
+        }
+
+        return redirect('/')->with('success', 'You have successfully unsubscribed.');
     }
 }

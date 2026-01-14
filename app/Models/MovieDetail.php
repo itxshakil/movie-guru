@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Cache;
  */
 final class MovieDetail extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'imdb_id',
         'title',
