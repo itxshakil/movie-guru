@@ -21,6 +21,8 @@ const maxRetry  = ref(3);
 
 const loadDetail = async () => {
     loading.value = true;
+    detail.value = null; // Reset detail to trigger skeleton when loading new ID
+    sources.value = [];
     clearTimeout(timeout.value)
     if (!props.imdbID) {
         alert("Something went wrong. Error -S-100")

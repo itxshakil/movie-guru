@@ -1,10 +1,17 @@
 <template>
-  <p title="Click to view" @click="toggleText">{{ snippet}}</p>
+    <p :title="showingFullText ? 'Click to collapse' : 'Click to view full plot'"
+       class="cursor-pointer transition-colors duration-200 hover:text-primary-600 dark:hover:text-primary-400"
+       @click="toggleText">
+        {{ snippet }}
+        <span v-if="isOverflow" class="ml-1 text-xs font-semibold text-primary-500 hover:underline">
+      {{ showingFullText ? 'Show less' : 'Read more' }}
+    </span>
+    </p>
 </template>
 <script setup>
 import {computed, ref} from 'vue';
 
-    const props = defineProps({
+const props = defineProps({
         text: String,
         limit: {
             type: Number,

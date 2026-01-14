@@ -88,12 +88,15 @@
                                     </svg>
 
                                     <!--                                TODO: Redirect link to imdbID to rating page -->
-                                  <a class="ml-3 text-sm font-medium text-primary-800 dark:text-primary-200 hover:text-primary-100"
-                                     href="#">
+                                    <a :href="'https://www.imdb.com/title/' + detail.imdbID + '/reviews'"
+                                       class="ml-3 text-sm font-medium text-primary-800 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400"
+                                       rel="noopener noreferrer"
+                                       target="_blank"
+                                    >
                                     <span class="sr-only" itemprop="ratingCount">{{
                                         isValue(detail.imdbVotes) ? detail.imdbVotes.replaceAll(',', '').trim() : 0
                                       }}</span>
-                                    <span class="text-xs">(<span>{{
+                                        <span class="text-xs hover:underline">(<span>{{
                                         isValue(detail.imdbVotes) ? detail.imdbVotes : 'No '
                                       }}</span> reviews)</span>
                                   </a>
