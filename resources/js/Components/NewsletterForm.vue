@@ -1,11 +1,20 @@
 <script setup>
 import {useForm} from "@inertiajs/vue3";
+import {inject} from "vue";
+
+const gtag = inject("gtag");
 
 const form = useForm({
     email: "",
 });
 
 const subscribe = () => {
+    if (gtag) {
+        gtag.event('generate_lead', {
+            event_category: 'Newsletter',
+            event_label: 'Subscribe'
+        });
+    }
     form.post(route("subscribe"), {
         preserveScroll: true,
         preserveState: true,

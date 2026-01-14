@@ -1,13 +1,15 @@
 <script setup>
 import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
-import {computed, ref} from 'vue';
+import {computed, inject, ref} from 'vue';
 import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
+
+const gtag = inject('gtag');
 
 // TODO: Generate Search result response Object
 const props = defineProps({
@@ -64,6 +66,9 @@ const timeout = ref(0);
 const maxRetry  = ref(3);
 
 const doSearch = () => {
+    if (gtag) {
+        gtag.trackSearch(form.s, form.type);
+    }
     form.get(route('search'), {
         preserveScroll: true
     });
@@ -102,16 +107,8 @@ const viewDetail = (imdb_id, sectionName, title = null) => {
   if (title) {
     selectedTitle.value = title;
   }
-
-  // Google Analytics event
-  if (window.gtag) {
-    window.gtag('event', 'view_detail', {
-      event_category: 'View Detail',
-      event_label: sectionName,
-      value: imdb_id
-    });
-  } else {
-    console.warn("Google Analytics not initialized.");
+    if (gtag) {
+        gtag.trackViewDetail(imdb_id, sectionName, title);
   }
 };
 
@@ -124,7 +121,7 @@ const pageDescription = props.searchResults.Response === 'False' ?
     `Oops! We couldn't find matches for “${props.search}”. Try exploring trending movies, or filter by genre and year to discover top-rated films and shows. The perfect pick might be a search away.` :
     `Looking for "${props.search}"? Get detailed info, cast, ratings, and find out where you can watch this movie now! Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Discover ${props.searchResults.totalResults} movies related to ${props.search} and dive into the world of entertainment.`;
 
-const pageUrl = window.location.href;
+const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
 
 const ogImage = computed(() => {
     if (movieList.value && movieList.value.length > 0) {
