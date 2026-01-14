@@ -19,7 +19,7 @@ final class NewsletterSubscriptionFactory extends Factory
     {
         return [
             'email' => $this->faker->unique()->safeEmail(),
-            'unsubscribed_at' => Carbon::now(),
+            'unsubscribed_at' => null,
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'created_at' => Carbon::now(),

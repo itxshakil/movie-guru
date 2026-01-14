@@ -19,3 +19,9 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::job(new HeartBeat())->everyMinute();
 Schedule::command('sitemap:generate')
     ->dailyAt('02:00')->timezone('Asia/Kolkata');
+
+Schedule::command('newsletter:send weekly')
+    ->saturdays()->at('18:00');
+
+Schedule::command('newsletter:send monthly')
+    ->lastDayOfMonth('18:00');

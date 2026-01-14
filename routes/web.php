@@ -33,7 +33,7 @@ Route::get('/search/{search}', [SearchController::class, 'show'])->name('search.
 Route::get('/i/{imdbID}', [DetailController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
 
 Route::post('/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('subscribe')->middleware('throttle:api');
-Route::post('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscribe'])->name('unsubscribe')->middleware('throttle:api');
+Route::get('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscribe'])->name('unsubscribe')->middleware(['signed', 'throttle:api']);
 
 Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
