@@ -192,12 +192,25 @@ const moviePoster = (movie) => {
 
                             <ul
                                 v-if="showSuggestions && filteredTrendingQueries.length > 0"
-                                class="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 w-full z-10">
+                                class="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 w-full z-10 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <li class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900/50 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
+                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"></path>
+                                    </svg>
+                                    Trending Searches
+                                </li>
                               <li
                                   v-for="query in filteredTrendingQueries"
                                   :key="query"
                                   @mousedown="selectTrendingQuery(query)"
-                                  class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                  class="px-4 py-2 hover:bg-primary-50 dark:hover:bg-primary-900/30 cursor-pointer flex items-center gap-2 text-gray-700 dark:text-gray-200 transition-colors">
+                                  <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
+                                       viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"></path>
+                                  </svg>
                                 {{ query }}
                               </li>
                             </ul>

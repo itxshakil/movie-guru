@@ -15,7 +15,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  dialog.value?.hide();
+    if (dialog.value?.open) {
+        dialog.value?.close();
+    }
 })
 </script>
 
@@ -37,8 +39,7 @@ onUnmounted(() => {
 </template>
 <style>
 dialog::backdrop {
-    backdrop-filter: blur(5px) brightness(0.5) contrast(1.5);
-    transition: backdrop-filter 5s ease;
+    backdrop-filter: blur(5px) brightness(0.5) contrast(1.1);
+    transition: backdrop-filter 0.5s ease;
 }
-
 </style>

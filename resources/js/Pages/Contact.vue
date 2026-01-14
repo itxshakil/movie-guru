@@ -85,19 +85,23 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                     </form>
                     <hr class="my-4">
 
-                    <div class="grid grid-cols-2 gap-8 md:grid-cols-6 lg:grid-cols-4">
-                        <div class="col-span-2 md:col-span-3 lg:col-span-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="col-span-1 md:col-span-2">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Connect With Us</h3>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Follow us on social media for news, updates, and special offers.</p>
                             <div class="mt-6 flex space-x-3">
-                                <a href="https://www.facebook.com/moviegurufb" class="text-gray-400 hover:text-gray-500">
+                                <a class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                   href="https://www.facebook.com/moviegurufb"
+                                   rel="noopener noreferrer" target="_blank">
                                     <span class="sr-only">Join our Facebook Page</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                         <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
                                     </svg>
                                 </a>
-                                <a href="https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17" class="text-gray-400 hover:text-gray-500">
+                                <a class="text-gray-400 hover:text-green-500 transition-colors"
+                                   href="https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17" rel="noopener noreferrer"
+                                   target="_blank">
                                     <span class="sr-only">Whatsapp Channel</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -105,8 +109,10 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                                         <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
                                     </svg>
                                 </a>
-                                <a href="https://www.facebook.com/groups/movieguru1" class="text-gray-400 hover:text-gray-500">
-                                    <span class="sr-only">Instagram</span>
+                                <a class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                   href="https://www.facebook.com/groups/movieguru1"
+                                   rel="noopener noreferrer" target="_blank">
+                                    <span class="sr-only">Facebook Group</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                         <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
@@ -118,6 +124,36 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                                     </svg>
                                 </a>
                             </div>
+                        </div>
+
+                        <div class="col-span-1 md:col-span-2">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Why Reach Out?</h3>
+                            <ul class="mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                                <li class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 text-primary-500" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"></path>
+                                    </svg>
+                                    Report missing movies or broken links
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 text-primary-500" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"></path>
+                                    </svg>
+                                    Suggest new features or improvements
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 text-primary-500" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"></path>
+                                    </svg>
+                                    Business inquiries and collaborations
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
