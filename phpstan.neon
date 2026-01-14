@@ -8,13 +8,9 @@ parameters:
     paths:
         - app
         - bootstrap/app.php
-        - config
-        - database
-        - public
         - routes
 
-
-    level: 1
+    level: 6
 
     tmpDir: /tmp/phpstan
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

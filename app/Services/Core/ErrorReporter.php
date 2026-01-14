@@ -31,7 +31,7 @@ final class ErrorReporter
             return; // Skip sending email (rate-limited)
         }
 
-        Cache::put($key, true, now()->addMinutes(config('error_mail.rate_limit_minutes')));
+        Cache::put($key, true, now()->addMinutes((int)config('error_mail.rate_limit_minutes')));
 
         $data = self::buildPayload($e);
 
@@ -46,7 +46,7 @@ final class ErrorReporter
     {
         return array_values(array_filter(
             array_map(trim(...), config('error_mail.recipients')),
-            fn(string $email) => filter_var($email, FILTER_VALIDATE_EMAIL),
+            static fn(string $email) => filter_var($email, FILTER_VALIDATE_EMAIL),
         ));
     }
 

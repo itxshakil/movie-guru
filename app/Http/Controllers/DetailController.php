@@ -16,15 +16,19 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 final class DetailController extends Controller
 {
-    public function show(Request $request, string $imdbId)
+    /**
+     * @throws Throwable
+     */
+    public function show(Request $request, string $imdbId): Response
     {
         $cleanImdbId = $this->extractImdbId($imdbId);
 
-        // Optionally: log the bad input, then throw a 404 or return a validation error
         throw_unless($cleanImdbId, NotFoundHttpException::class, 'Invalid IMDb ID. Provided');
 
         $cacheKey = 'detail.' . $imdbId;
@@ -114,6 +118,8 @@ final class DetailController extends Controller
 
     /**
      * @return array|mixed
+     *
+     * @throws ConnectionException
      */
     public function fetchDetail(string $imdbId): mixed
     {
@@ -184,7 +190,9 @@ final class DetailController extends Controller
 
     private function updateDetailInBG(string $imdbId): void
     {
-        defer(function () use ($imdbId): void {
+        defer(/**
+         * @throws ConnectionException
+         */ function () use ($imdbId): void {
             $OMDBApiService = app(OMDBApiService::class);
             $imdbId = $this->extractImdbId($imdbId);
             $updatedDetail = $OMDBApiService->getById($imdbId);
@@ -224,7 +232,7 @@ final class DetailController extends Controller
         });
     }
 
-    private function isValue($value): bool
+    private function isValue(mixed $value): bool
     {
         return $value && $value !== 'N/A';
     }

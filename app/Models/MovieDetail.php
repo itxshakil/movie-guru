@@ -44,6 +44,9 @@ final class MovieDetail extends Model
         }
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function topRated(Builder $query): void
     {
@@ -58,6 +61,9 @@ final class MovieDetail extends Model
         });
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function trending(Builder $query): void
     {
@@ -75,12 +81,18 @@ final class MovieDetail extends Model
             });
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function recentlyReleased(Builder $query): void
     {
         $query->where('year', now()->format('Y'));
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function recommended(Builder $query): void
     {
@@ -96,6 +108,9 @@ final class MovieDetail extends Model
         });
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function hiddenGems(Builder $query): void
     {
@@ -105,6 +120,9 @@ final class MovieDetail extends Model
         });
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function popular(Builder $query): void
     {

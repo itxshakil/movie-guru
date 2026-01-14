@@ -7,12 +7,12 @@ namespace App\DTOs;
 final readonly class WatchModeSearchResult
 {
     public function __construct(
-        public int    $id,
+        public int  $id,
         public string $name,
         public string $type,
-        public ?int   $year = null,
+        public ?int $year = null,
         public ?string $imdbId = null,
-        public ?int   $tmdbId = null,
+        public ?int $tmdbId = null,
         public ?string $tmdbType = null,
         public ?string $mainProfession = null,
     )
@@ -25,14 +25,14 @@ final readonly class WatchModeSearchResult
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
-            name: $data['name'],
-            type: $data['type'] ?? 'person',
-            year: $data['year'] ?? null,
-            imdbId: $data['imdb_id'] ?? null,
-            tmdbId: $data['tmdb_id'] ?? null,
-            tmdbType: $data['tmdb_type'] ?? null,
-            mainProfession: $data['main_profession'] ?? null,
+            id: (int)$data['id'],
+            name: (string)$data['name'],
+            type: (string)($data['type'] ?? 'person'),
+            year: is_numeric($data['year']) ? (int)$data['year'] : null,
+            imdbId: isset($data['imdb_id']) ? (string)$data['imdb_id'] : null,
+            tmdbId: is_numeric($data['tmdb_id']) ? (int)$data['tmdb_id'] : null,
+            tmdbType: isset($data['tmdb_type']) ? (string)$data['tmdb_type'] : null,
+            mainProfession: isset($data['main_profession']) ? (string)$data['main_profession'] : null,
         );
     }
 }
