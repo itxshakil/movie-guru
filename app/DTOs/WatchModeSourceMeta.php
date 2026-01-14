@@ -9,14 +9,14 @@ use App\Enums\WatchModeSourceType;
 final readonly class WatchModeSourceMeta
 {
     public function __construct(
-        public int     $id,
-        public string  $name,
+        public int    $id,
+        public string $name,
         public WatchModeSourceType $type,
-        public string  $logo100px,
+        public string $logo100px,
         public ?string $iosAppstoreUrl = null,
         public ?string $androidPlaystoreUrl = null,
         /** @var string[] */
-        public array   $regions = [],
+        public array  $regions = [],
     )
     {
     }
@@ -27,13 +27,16 @@ final readonly class WatchModeSourceMeta
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
-            name: $data['name'],
-            type: WatchModeSourceType::from($data['type']),
-            logo100px: $data['logo_100px'],
-            iosAppstoreUrl: $data['ios_appstore_url'] ?? null,
-            androidPlaystoreUrl: $data['android_playstore_url'] ?? null,
-            regions: $data['regions'] ?? [],
+            id: (int)$data['id'],
+            name: (string)$data['name'],
+            type: WatchModeSourceType::from((string)$data['type']),
+            logo100px: (string)$data['logo_100px'],
+            iosAppstoreUrl: isset($data['ios_appstore_url']) ? (string)$data['ios_appstore_url'] : null,
+            androidPlaystoreUrl: isset($data['android_playstore_url']) ? (string)$data['android_playstore_url'] : null,
+            regions: array_map(
+                static fn($r): string => (string)$r,
+                is_array($data['regions'] ?? null) ? $data['regions'] : [],
+            ),
         );
     }
 }

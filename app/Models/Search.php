@@ -28,18 +28,27 @@ final class Search extends Model
         }
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
-    protected function hasResults($query): void
+    protected function hasResults(Builder $query): void
     {
         $query->where('total_results', '>', 0);
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function recentOnly(Builder $query, int $days = 28): void
     {
         $query->where('updated_at', '>', now()->subDays($days));
     }
 
+    /**
+     * @param Builder<self> $query
+     */
     #[Scope]
     protected function popular(Builder $query): void
     {
