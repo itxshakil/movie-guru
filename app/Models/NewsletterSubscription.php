@@ -10,9 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class NewsletterSubscription extends Model
 {
-    /**
-     * @use HasFactory<self>
-     */
     use HasFactory;
     use SoftDeletes;
 

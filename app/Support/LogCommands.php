@@ -9,18 +9,31 @@ use Throwable;
 
 trait LogCommands
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function log(string $message, array $context = []): void
     {
         Log::info($message, $context);
-        $this->info($message);
+        if (method_exists($this, 'info')) {
+            $this->info($message);
+        }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function logError(string $message, array $context = []): void
     {
         Log::error($message, $context);
-        $this->error($message);
+        if (method_exists($this, 'error')) {
+            $this->error($message);
+        }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function logException(Throwable $exception, array $context = []): void
     {
         Log::error($exception->getMessage(), array_merge($context, [
@@ -31,6 +44,8 @@ trait LogCommands
             'trace' => $exception->getTrace(),
         ]));
 
-        $this->info($exception->getMessage());
+        if (method_exists($this, 'info')) {
+            $this->info($exception->getMessage());
+        }
     }
 }

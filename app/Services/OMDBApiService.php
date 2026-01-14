@@ -44,7 +44,7 @@ final class OMDBApiService
     /**
      * @throws ConnectionException
      */
-    public function getByTitle(string $title)
+    public function getByTitle(string $title): mixed
     {
         return $this->makeRequest('t=' . $title);
     }
@@ -52,7 +52,7 @@ final class OMDBApiService
     /**
      * @throws ConnectionException
      */
-    public function getById(?string $imdbID = null)
+    public function getById(?string $imdbID = null): mixed
     {
         $this->imdbID = $imdbID ?? $this->imdbID;
 
@@ -62,9 +62,11 @@ final class OMDBApiService
     }
 
     /**
+     * @param string|int|null $year
+     *
      * @throws Exception
      */
-    public function searchByTitle(?string $title = '', int $page = 1, ?string $movieType = null, $year = null)
+    public function searchByTitle(?string $title = '', int $page = 1, ?string $movieType = null, $year = null): mixed
     {
         $this->title = $this->titleCleaner->clean($title ?? $this->title ?? '');
         $this->page = $page;
@@ -107,7 +109,7 @@ final class OMDBApiService
      * @throws ConnectionException
      * @throws Exception
      */
-    private function makeRequest(string $query)
+    private function makeRequest(string $query): mixed
     {
         $apiKey = $this->getRandomApiKey();
         $url = 'https://www.omdbapi.com/?apikey=' . $apiKey . '&' . $query;

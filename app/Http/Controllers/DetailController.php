@@ -11,6 +11,7 @@ use App\Services\OMDBApiService;
 use App\Services\WatchModeService;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +26,7 @@ final class DetailController extends Controller
     /**
      * @throws Throwable
      */
-    public function show(Request $request, string $imdbId): Response
+    public function show(Request $request, string $imdbId): Response|JsonResponse
     {
         $cleanImdbId = $this->extractImdbId($imdbId);
 
@@ -41,7 +42,7 @@ final class DetailController extends Controller
 
         $shouldRefresh = $movie instanceof MovieDetail && (
                 empty($sources) ||
-                !$movie->source_last_fetched_at ||
+                $movie->source_last_fetched_at === null ||
                 $movie->source_last_fetched_at->lt(now()->subMonth())
             );
 
@@ -58,7 +59,7 @@ final class DetailController extends Controller
                     $watchMode = app(WatchModeService::class);
                     $sources = $watchMode->getTitleSources($imdbId, ['IN']);
 
-                    if ($sources !== null) {
+                    if ($sources->isNotEmpty()) {
                         $movie = MovieDetail::where('imdb_id', $imdbId)->first();
                         if (!$movie) {
                             return;

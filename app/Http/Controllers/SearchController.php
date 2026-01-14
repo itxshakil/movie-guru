@@ -12,13 +12,16 @@ use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
 use App\Services\TitleCleaner;
 use App\Services\TrendingQueryService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
+use Inertia\Response;
 
 final class SearchController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response|JsonResponse
     {
         $search = $request->get('s');
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
@@ -86,7 +89,8 @@ final class SearchController extends Controller
     public function show(
         Request $request,
         ?string $search,
-    ) {
+    ): Response|JsonResponse
+    {
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
             $search,
             $request,
@@ -168,6 +172,9 @@ final class SearchController extends Controller
         ]);
     }
 
+    /**
+     * @return array{0: int, 1: string|null, 2: int|null, 3: Collection<int, string>, 4: string|null, 5: mixed, 6: array<int, MovieType>, 7: string|null}
+     */
     public function getSearchData(?string $search, Request $request): array
     {
         $titleCleaner = app(TitleCleaner::class);
@@ -176,7 +183,7 @@ final class SearchController extends Controller
 
         $page = $request->integer('page', 1);
         $movieType = $request->get('type');
-        $year = $request->integer('year', null);
+        $year = $request->get('year') ? $request->integer('year') : null;
 
         $trendingQueries = $trendingQueryService->fetch();
         $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(

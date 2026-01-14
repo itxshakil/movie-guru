@@ -27,7 +27,7 @@ final class NewsletterSubscriptionController extends Controller
             'email' => ['required', 'email', 'max:191', 'exists:newsletter_subscriptions'],
         ]);
 
-        NewsletterSubscription::firstWhere('email', $request->input(['email']))->delete();
+        NewsletterSubscription::firstWhere('email', $request->input('email'))->delete();
 
         return back()->with('success', 'You have successfully unsubscribed.');
     }
