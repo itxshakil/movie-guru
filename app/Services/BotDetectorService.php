@@ -175,6 +175,7 @@ final class BotDetectorService
         }
 
         [$subnet, $bits] = explode('/', $range);
+        $bits = (int)$bits;
         $ip = ip2long($ip);
         $subnet = ip2long($subnet);
         $mask = -1 << (32 - $bits);
