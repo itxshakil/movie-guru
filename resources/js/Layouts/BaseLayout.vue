@@ -9,17 +9,18 @@ import NotificationBanner from "@/Components/NotificationBanner.vue";
 </script>
 
 <template>
-    <AppHeader />
-    <slot />
-    <AppFooter />
-    <ToastNotifications />
-    <InstallBanner />
-  <NotificationBanner/>
-    <OfflineSearchPrompt />
-    <NetworkStatus />
+    <div class="min-h-screen bg-white dark:bg-gray-950 pb-[env(safe-area-inset-bottom)]">
+        <AppHeader/>
+        <slot/>
+        <AppFooter/>
+        <ToastNotifications/>
+        <InstallBanner/>
+        <NotificationBanner/>
+        <OfflineSearchPrompt/>
+        <NetworkStatus/>
 
-    <div
-        class="fixed bottom-0 right-0 z-50 flex flex-col snackbar-container mb-2"
-    ></div>
-    <slot name="modals" />
+        <div
+            class="fixed bottom-0 right-0 z-50 flex flex-col snackbar-container mb-2"
+        ></div>
+    </div>
 </template>

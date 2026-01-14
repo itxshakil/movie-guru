@@ -80,8 +80,8 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
 
     <link rel="canonical" :href="pageUrl" head-key="canonical" />
   </Head>
-    <div class="relative isolate px-6 pt-16 lg:px-8 dark:bg-gray-950 dark:text-gray-100">
-        <div class="mx-auto max-w-5xl py-24 sm:py-40 lg:py-48">
+    <div class="relative isolate px-6 lg:px-8 dark:bg-gray-950 dark:text-gray-100">
+        <div class="mx-auto max-w-5xl py-24 sm:py-32">
             <div class="text-center">
                 <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
                     🎬 Discover. Explore. Enjoy. 🎥

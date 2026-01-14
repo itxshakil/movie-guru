@@ -4,9 +4,10 @@
     "short_name": "Movie Guru",
     "description": "An Open Movie Database with ratings from all major sources at one place. A lightweight alternative to IMDb with a simple UI.",
     "start_url": "/?utm_source=homescreen",
-    "display": "fullscreen",
-    "background_color": "#2A669F",
-    "theme_color": "#2A669F",
+    "display": "standalone",
+    "background_color": "#030712",
+    "theme_color": "#030712",
+    "orientation": "portrait",
     "display_override": ["window-controls-overlay", "fullscreen", "minimal-ui"],
           "icons": [
             {
