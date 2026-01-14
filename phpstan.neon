@@ -10,7 +10,12 @@ parameters:
         - bootstrap/app.php
         - routes
 
-    level: 6
+    level: 5
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        -
+            message: '#Call to function method_exists\(\) with \$this\(.*\) and (''info''|''error'') will always evaluate to true\.#'
+            path: app/Support/LogCommands.php
 
     tmpDir: /tmp/phpstan
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

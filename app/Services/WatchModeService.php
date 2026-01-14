@@ -116,14 +116,14 @@ final class WatchModeService
         return $availability->map(fn(WatchModeSource $source): array => [
             'availability' => $source,
             'meta' => $meta->get($source->sourceId),
-        ]);
+        ])->values();
     }
 
     /**
      * Get all supported streaming sources (metadata)
      * Cached for 24 hours.
      *
-     * @return Collection<WatchModeSourceMeta>
+     * @return Collection<int, WatchModeSourceMeta>
      */
     public function getSources(): Collection
     {
@@ -150,6 +150,7 @@ final class WatchModeService
 
     /**
      * @param array<string, mixed> $params
+     * @return array<string, mixed>
      *
      * @throws Throwable
      */
