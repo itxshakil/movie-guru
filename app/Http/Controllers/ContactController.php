@@ -7,12 +7,13 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Rules\BlockTemporaryEmailRule;
 use App\Rules\SpamKeywordRule;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 final class ContactController extends Controller
 {
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         if ($request->filled('website')) {
             logger()->warning('bot detected', [
@@ -20,7 +21,9 @@ final class ContactController extends Controller
                 'ip' => $request->ip(),
             ]);
 
-            return back()->with('success', "Thanks for your message. We'll be in touch.");
+            return $request->wantsJson()
+                ? response()->json(['message' => "Thanks for your message. We'll be in touch."])
+                : back()->with('success', "Thanks for your message. We'll be in touch.");
         }
 
         $request->validate([
@@ -31,6 +34,8 @@ final class ContactController extends Controller
 
         Contact::create($request->only('email', 'name', 'message'));
 
-        return back()->with('success', "Thanks for your message. We'll be in touch.");
+        return $request->wantsJson()
+            ? response()->json(['message' => "Thanks for your message. We'll be in touch."])
+            : back()->with('success', "Thanks for your message. We'll be in touch.");
     }
 }

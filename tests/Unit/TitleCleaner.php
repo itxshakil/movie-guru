@@ -58,6 +58,30 @@ it('removes redundant or repetitive information', function (): void {
         ->toBe('The Matrix');
 });
 
+it('removes URLs and share messages correctly', function (): void {
+    $cleaner = new TitleCleaner();
+
+    expect($cleaner->clean('Inception https://example.com/movie'))
+        ->toBe('Inception')
+        ->and($cleaner->clean('Tenet share on terabox'))
+        ->toBe('Tenet')
+        ->and($cleaner->clean('Interstellar click here mega.nz'))
+        ->toBe('Interstellar')
+        ->and($cleaner->clean('Dunkirk download from drive.google'))
+        ->toBe('Dunkirk');
+});
+
+it('removes seasons and episodes correctly', function (): void {
+    $cleaner = new TitleCleaner();
+
+    expect($cleaner->clean('Breaking Bad Season 1'))
+        ->toBe('Breaking Bad')
+        ->and($cleaner->clean('Stranger Things episode 5'))
+        ->toBe('Stranger Things')
+        ->and($cleaner->clean('The Witcher Part 2'))
+        ->toBe('The Witcher');
+});
+
 it('handles edge cases and preserves original title when needed', function (): void {
     $cleaner = new TitleCleaner();
 
