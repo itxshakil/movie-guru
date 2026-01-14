@@ -88,14 +88,20 @@
 </template>
 <script setup>
 // TODO: Generate media Object
-import {computed} from "vue";
+import {computed, inject} from "vue";
 
 const props = defineProps({
     movie: Object
 })
 const emit = defineEmits(['selected']);
 
+const gtag = inject("gtag");
+
 const viewDetail = (imdbID) => {
+    // Vibrate on mobile if supported
+    if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+    }
     emit('selected');
 };
 const isValue = function (value) {
@@ -149,17 +155,24 @@ const freeSites = [
 ];
 
 const searchWatchDownload = (title) => {
+    let platform = '';
+    let url = '';
     if (Math.random() > 0.5) {
         // Youtube search
+        platform = 'YouTube';
         const query = `${title} full movie`;
-        const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+        url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 
         window.open(url, '_blank');
     } else {
+        platform = 'Google Search';
         const site = freeSites[Math.floor(Math.random() * freeSites.length)];
         const query = `${site} ${title} full movie`;
         const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
         window.open(url, '_blank');
+    }
+    if (gtag) {
+        gtag.trackExternalClick(platform, url);
     }
 };
 

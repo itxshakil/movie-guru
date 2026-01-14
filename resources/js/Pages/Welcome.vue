@@ -6,8 +6,10 @@ import BaseLayout from '@/Layouts/BaseLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import LoadingSpinnerIcon from '@/Components/Icons/LoadingSpinner.vue';
 import SearchCard from "@/Components/SearchCard.vue";
-import {ref} from "vue";
+import {inject, ref} from "vue";
 import Show from "@/Components/Show.vue";
+
+const gtag = inject('gtag');
 
 const props = defineProps({
   trendingSearchQueries: Array,
@@ -26,6 +28,9 @@ const form = useForm({
 });
 
 const doSearch = () => {
+    if (gtag) {
+        gtag.trackSearch(form.s);
+    }
   form.get(route('search'));
 };
 
@@ -34,16 +39,8 @@ const shuffledTrendingQueries = [...props.trendingSearchQueries].sort(() => Math
 
 const viewDetail = (imdb_id, sectionName) => {
   selectedIMDBId.value = imdb_id;
-
-  // Google Analytics event
-  if (window.gtag) {
-    window.gtag('event', 'view_detail', {
-      event_category: 'View Detail',
-      event_label: sectionName,
-      value: imdb_id
-    });
-  } else {
-    console.warn("Google Analytics not initialized.");
+    if (gtag) {
+        gtag.trackViewDetail(imdb_id, sectionName);
   }
 };
 
@@ -52,7 +49,7 @@ defineOptions({ layout: BaseLayout });
 
 const pageTitle = 'Explore the Best Movies & Series – Hidden Gems & Popular Picks!';
 const pageDescription = 'Explore an extensive database of movies with detailed information, reviews, and ratings. Find your next favorite film effortlessly with our user-friendly search feature. Your gateway to a universe of entertainment awaits!';
-const pageUrl = window.location.href;
+const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
 const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
 
 
@@ -98,7 +95,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                                aria-label="Search Movie or Series"
                                autocomplete="off"
                                autofocus
-                               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-4 pr-32 text-lg text-gray-900 dark:text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm transition"
+                               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-4 pr-12 sm:pr-32 text-lg text-gray-900 dark:text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm transition"
                                enterkeyhint="search"
                                name="s"
                                placeholder="Search movies and series..."
@@ -107,10 +104,15 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                         />
                         <button :class="form.processing ? 'opacity-70 cursor-wait' : ''"
                                 :disabled="form.processing"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-primary-500 px-6 py-3 font-semibold text-white shadow hover:bg-primary-600 transition"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-primary-500 px-4 sm:px-6 py-3 font-semibold text-white shadow hover:bg-primary-600 transition"
                                 type="submit">
-                            <LoadingSpinnerIcon v-show="form.processing" class="w-5 h-5 mr-2"/>
-                            <span>Search</span>
+                            <LoadingSpinnerIcon v-show="form.processing" class="w-5 h-5 sm:mr-2"/>
+                            <span class="hidden sm:inline">Search</span>
+                            <svg v-if="!form.processing" class="w-5 h-5 sm:hidden" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"
+                                      stroke-linejoin="round" stroke-width="2"></path>
+                            </svg>
                         </button>
                     </form>
                 </div>

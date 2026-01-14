@@ -265,9 +265,11 @@
 </template>
 <script setup>
 import DetailSkeletonCard from '@/Components/DetailSkeletonCard.vue';
-import {computed} from 'vue';
+import {computed, inject} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
 import SourceCard from "@/Components/SourceCard.vue";
+
+const gtag = inject('gtag');
 
 const props = defineProps({
     detail: Object,
@@ -401,12 +403,8 @@ const moviePoster = (movie) => {
 };
 
 function sendAnalytics(platform, link) {
-  if (window.gtag) {
-    gtag('event', 'click', {
-      event_category: 'Link',
-      event_label: platform,
-      value: link,
-    });
+    if (gtag) {
+        gtag.trackExternalClick(platform, link);
   }
   console.log(`Analytics Event Sent: Platform - ${platform}, Link - ${link}`);
 }

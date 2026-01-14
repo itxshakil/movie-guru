@@ -897,7 +897,10 @@ function broadcastTrackingEvent(eventType, details) {
     broadcast.postMessage({
         type: 'EVENT_TRACKING',
         title: eventType,
-        details: details,
+        details: {
+            ...details,
+            non_interaction: true
+        },
         timestamp: new Date().toISOString(),
     });
 }

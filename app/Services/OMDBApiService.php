@@ -73,6 +73,10 @@ final class OMDBApiService
         $this->movieType = $movieType ?? $this->movieType ?? null;
         $this->year = $year ?? $this->year ?? null;
 
+        if (empty($this->title)) {
+            return ['Response' => 'False', 'Error' => 'Movie not found!', 'Search' => [], 'totalResults' => '0'];
+        }
+
         $query = $this->generateSearchQuery();
 
         return $this->makeRequest($query);

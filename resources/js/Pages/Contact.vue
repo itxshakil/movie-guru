@@ -6,6 +6,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
+import {inject} from "vue";
+
+const gtag = inject("gtag");
 
 const form = useForm({
     name: '',
@@ -15,6 +18,12 @@ const form = useForm({
 })
 
 const storeContact = ()=>{
+    if (gtag) {
+        gtag.event('contact_form_submit', {
+            event_category: 'Contact',
+            event_label: 'Send Message'
+        });
+    }
     form.post(route('contact.store'), {
         preserveScroll:true,
         preserveState: true,
