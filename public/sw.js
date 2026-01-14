@@ -2,11 +2,11 @@ const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.8.0';
-const SEARCH_CACHE = 'search-cache-v-4.8.0';
-const INFO_CACHE = 'info-cache-v-4.8.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-8.0';
-const POSTER_CACHE = 'poster-cache-v-4.8.0';
+const APP_CACHE = 'v-4.9.0';
+const SEARCH_CACHE = 'search-cache-v-4.9.0';
+const INFO_CACHE = 'info-cache-v-4.9.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-9.0';
+const POSTER_CACHE = 'poster-cache-v-4.9.0';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -446,8 +446,19 @@ async function offlineSyncRequest(offlineRequestUrl) {
 
 }
 
-function dailyNotification() {
+async function dailyNotification() {
+    if (Notification.permission !== 'granted') return;
+
+    const cache = await caches.open(DYNAMIC_CACHE);
+    const lastNotif = await cache.match('last-notification-time');
     const now = new Date();
+
+    if (lastNotif) {
+        const lastTime = new Date(await lastNotif.text());
+        const hoursSinceLast = (now - lastTime) / (1000 * 60 * 60);
+        if (hoursSinceLast < 20) return; // Max once per day
+    }
+
     const hourOfDay = now.getHours();
     const dayOfWeek = now.getDay();
     const month = now.getMonth();
@@ -830,6 +841,8 @@ function dailyNotification() {
         event_category: timeOfDayLabel,
         event_label: timeOfDayLabel,
     });
+
+    await cache.put('last-notification-time', new Response(now.toISOString()));
 }
 
 

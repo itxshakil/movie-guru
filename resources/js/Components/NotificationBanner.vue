@@ -1,5 +1,5 @@
 <script setup>
-import Snackbar from "@/Components/Snackbar.vue";
+import Snackbar from "@/Components/SnackBar.vue";
 import {onMounted, ref} from "vue";
 
 const promptForNotification = ref(false);
@@ -15,12 +15,13 @@ const notificationPromptSecondaryAction = "Maybe Later";
 onMounted(() => {
   // Check if we should prompt for notifications
   if (
+      typeof Notification !== 'undefined' &&
       Notification.permission === "default" &&
       !hasNotificationPermission.value
   ) {
     setTimeout(() => {
       promptForNotification.value = true;
-    }, 5000); // Delay prompt to avoid overwhelming the user
+    }, 15000); // Delay prompt more to not compete with install banner
   }
 });
 

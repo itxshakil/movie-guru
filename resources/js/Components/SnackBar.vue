@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import {nextTick, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 
 const props = defineProps({
     title: String,
@@ -120,19 +120,21 @@ const emit = defineEmits(["close", "confirm"]);
 const show = ref(false);
 
 const onCancel = () => {
-    nextTick(() => {
-        show.value = false;
-    });
-    emit("close");
+    show.value = false;
+    setTimeout(() => {
+        emit("close");
+    }, 500); // Wait for transition
 };
 
 const onConfirm = () => {
-    nextTick(() => {
-        if (props.closeOnConfirm) {
-            show.value = false;
-        }
-    });
-    emit("confirm");
+    if (props.closeOnConfirm) {
+        show.value = false;
+        setTimeout(() => {
+            emit("confirm");
+        }, 500); // Wait for transition
+    } else {
+        emit("confirm");
+    }
 };
 
 onMounted(() => {
