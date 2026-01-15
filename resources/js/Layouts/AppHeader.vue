@@ -10,22 +10,7 @@
                 </Link>
             </div>
 
-            <div class="flex items-center gap-4 lg:flex-1 lg:justify-end">
-                <Link
-                    v-if="!$page.props.auth.user"
-                    :href="route('login')"
-                    class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                    Log in <span aria-hidden="true">&rarr;</span>
-                </Link>
-                <Link
-                    v-else
-                    :href="route('dashboard')"
-                    class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                    Dashboard
-        </Link>
-      </div>
+            <div class="flex items-center gap-4 lg:flex-1 lg:justify-end"></div>
     </nav>
   </header>
 </template>
