@@ -207,16 +207,16 @@ defineExpose({close});
             class="m-auto inset-0 w-full overflow-x-hidden bg-transparent p-2 md:p-4 modal-dialog backdrop:bg-black/40 dark:backdrop:bg-black/60"
         modal-menu="mega">
         <div
-            class="relative rounded-lg bg-white shadow-sm dark:bg-gray-900 modal-content-wrapper overflow-y-auto max-h-[85vh] sm:max-h-none">
+            class="relative rounded-lg bg-white shadow-sm dark:bg-gray-900 modal-content-wrapper overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
             <button
                 tabindex="-1"
-                class="absolute top-2 right-2 ml-auto inline-flex items-center rounded-lg bg-transparent bg-gray-200 p-1 text-sm text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-600 dark:text-gray-100 z-10"
+                class="fixed top-4 right-4 md:absolute md:top-2 md:right-2 ml-auto inline-flex items-center rounded-lg bg-gray-200/50 backdrop-blur-sm p-1 text-sm text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-600/50 dark:text-gray-100 z-50"
                 type="button" @click="close">
                 <TimesIcon class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" />
                 <span class="sr-only">Close modal</span>
             </button>
+            <slot/>
         </div>
-        <slot />
     </dialog>
 </template>
 <style>
@@ -231,6 +231,7 @@ dialog::backdrop {
 
 .modal-dialog {
     transition: opacity 0.3s ease, transform 0.3s ease;
+    border: none;
 }
 
 dialog[open] {
@@ -307,6 +308,7 @@ dialog[open] {
         touch-action: pan-y;
         max-height: 95vh !important;
         background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
+        border: none !important;
     }
 
     .dark .modal-dialog {
@@ -335,6 +337,7 @@ dialog[open] {
         padding-top: 1.5rem;
         background-color: transparent !important;
         box-shadow: none !important;
+        max-height: 95vh !important;
     }
 }
 </style>
