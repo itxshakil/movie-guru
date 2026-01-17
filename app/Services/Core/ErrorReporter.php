@@ -6,6 +6,7 @@ namespace App\Services\Core;
 
 use App\Mail\ExceptionOccurred;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
@@ -64,14 +65,12 @@ final class ErrorReporter
      */
     private static function buildPayload(Throwable $e): array
     {
-        $file = pathinfo($e->getFile(), PATHINFO_BASENAME);
-
         $request = request();
 
         return [
             'message_short' => class_basename($e),
             'message' => $e->getMessage(),
-            'file' => $file,
+            'file' => basename($e->getFile() ?? ''),
             'line' => $e->getLine(),
             'trace' => $e->getTraceAsString(),
             'timestamp' => now()->toDateTimeString(),
@@ -79,17 +78,26 @@ final class ErrorReporter
             'url' => $request->fullUrl(),
             'method' => $request->method(),
             'payload' => self::sanitizePayload($request->all()),
-            'user' => auth()->id(),
+            'user' => auth()->check() ? [
+                'id' => auth()->id(),
+                'email' => auth()->user()?->email,
+            ] : null,
+            'environment' => app()->environment(),
+            'request_id' => Context::get('request_id', 'NA'),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
         ];
     }
 
     private static function sanitizePayload(array $payload): array
     {
-        $fields = config('error_mail.sensitive_fields');
+        $fields = config('error_mail.sensitive_fields', []);
 
-        foreach ($fields as $field) {
-            if (isset($payload[$field])) {
-                $payload[$field] = '****';
+        foreach ($payload as $key => $value) {
+            if (in_array($key, $fields, true)) {
+                $payload[$key] = '****';
+            } elseif (is_array($value)) {
+                $payload[$key] = self::sanitizePayload($value);
             }
         }
 

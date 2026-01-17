@@ -67,6 +67,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'request' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/request.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 365,
+            'replace_placeholders' => true,
+        ],
+
         'spam-keyword' => [
             'driver' => 'daily',
             'path' => storage_path('logs/spam-keyword.log'),
