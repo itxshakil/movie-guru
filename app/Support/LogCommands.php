@@ -34,6 +34,17 @@ trait LogCommands
     /**
      * @param array<string, mixed> $context
      */
+    public function warning(string $message, array $context = []): void
+    {
+        Log::warning($message, $context);
+        if (method_exists($this, 'warn')) {
+            $this->warn($message);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
     public function logException(Throwable $exception, array $context = []): void
     {
         Log::error($exception->getMessage(), array_merge($context, [
