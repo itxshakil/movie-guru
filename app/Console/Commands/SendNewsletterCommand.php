@@ -26,7 +26,7 @@ final class SendNewsletterCommand extends Command
         $type = (string)$this->argument('type');
 
         if (!in_array($type, ['weekly', 'monthly'])) {
-            $this->error('Invalid newsletter type. Use "weekly" or "monthly".');
+            $this->logError('Invalid newsletter type. Use "weekly" or "monthly".');
 
             return;
         }
@@ -38,7 +38,7 @@ final class SendNewsletterCommand extends Command
         $hiddenGem = MovieDetail::hiddenGems()->inRandomOrder()->first();
 
         if ($movies->isEmpty()) {
-            $this->warn("No movies found to include in the $type newsletter.");
+            $this->warning("No movies found to include in the $type newsletter.");
 
             return;
         }
@@ -46,7 +46,7 @@ final class SendNewsletterCommand extends Command
         $subscribers = NewsletterSubscription::query()->take(1)->get();
 
         if ($subscribers->isEmpty()) {
-            $this->info('No subscribers found.');
+            $this->log('No subscribers found.');
 
             return;
         }
@@ -55,7 +55,7 @@ final class SendNewsletterCommand extends Command
             $unsubscribeUrl = URL::temporarySignedRoute(
                 'unsubscribe',
                 now()->addWeeks(2),
-                ['email' => $subscriber->email]
+                ['email' => $subscriber->email],
             );
 
             Mail::to($subscriber->email)->queue(new NewsletterMail(
