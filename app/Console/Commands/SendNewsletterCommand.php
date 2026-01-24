@@ -44,7 +44,7 @@ final class SendNewsletterCommand extends Command
             return;
         }
 
-        $subscribers = NewsletterSubscription::query()->take(1)->get();
+        $subscribers = NewsletterSubscription::query()->get();
 
         if ($subscribers->isEmpty()) {
             $this->log('No subscribers found.');
@@ -79,7 +79,7 @@ final class SendNewsletterCommand extends Command
     private function getMoviesForNewsletter(string $type): Collection
     {
         if ($type === 'weekly') {
-            return MovieDetail::trending()->limit(5)->get();
+            return MovieDetail::recentlyReleased()->limit(5)->get();
         }
 
         return MovieDetail::recentlyReleased()->limit(10)->get();
