@@ -2,11 +2,11 @@ const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.10.1';
-const SEARCH_CACHE = 'search-cache-v-4.10.1';
-const INFO_CACHE = 'info-cache-v-4.10.1';
-const DYNAMIC_CACHE = 'dynamic-cache-v-10.1';
-const POSTER_CACHE = 'poster-cache-v-4.10.1';
+const APP_CACHE = 'v-4.11.0';
+const SEARCH_CACHE = 'search-cache-v-4.11.0';
+const INFO_CACHE = 'info-cache-v-4.11.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-11.0';
+const POSTER_CACHE = 'poster-cache-v-4.11.0';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
