@@ -27,6 +27,7 @@ final class NewsletterMail extends Mailable implements ShouldQueue
         public string       $email,
         public ?MovieDetail $recommendedMovie = null,
         public ?MovieDetail $hiddenGem = null,
+        public ?MovieDetail $trendingMovie = null,
         public ?string      $unsubscribeUrl = null,
     )
     {

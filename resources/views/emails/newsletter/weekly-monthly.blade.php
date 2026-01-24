@@ -61,13 +61,60 @@
         </tr>
     </table>
 
-    @if($recommendedMovie || $hiddenGem)
+    @if($recommendedMovie || $hiddenGem || $trendingMovie)
         <table class="special-selections-container" width="100%" cellpadding="0" cellspacing="0"
                style="margin: 40px 0; background-color: #f1f5f9; border-radius: 20px; border: 1px solid #e2e8f0; border-collapse: separate;">
             <tr>
                 <td style="padding: 30px;">
                     <h2 style="margin: 0 0 24px 0; font-size: 24px; color: #0f172a; text-align: center; font-weight: 800;">
                         ✨ Special Selections</h2>
+
+                    @if($trendingMovie)
+                        <table class="special-card" width="100%" cellpadding="0" cellspacing="0"
+                               style="margin-bottom: 24px; background-color: #ffffff; border-radius: 16px; border-left: 5px solid #eab308; border-collapse: separate; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                            <tr>
+                                <td style="padding: 20px;">
+                                    <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
+                                        🌟 Trending Now</h3>
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td width="90" valign="top" style="padding-right: 20px;">
+                                                <a href="{{ url('/i/' . $trendingMovie->imdb_id) }}">
+                                                    <img src="{{ $trendingMovie->poster }}"
+                                                         alt="{{ $trendingMovie->title }}" width="90" height="130"
+                                                         style="width: 90px; height: 130px; border-radius: 8px; object-fit: cover; display: block; border: none;">
+                                                </a>
+                                            </td>
+                                            <td valign="top">
+                                                <h4 class="movie-title"
+                                                    style="margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #1e293b;">
+                                                    <a href="{{ url('/i/' . $trendingMovie->imdb_id) }}"
+                                                       style="color: #1e293b; text-decoration: none;">{{ $trendingMovie->title }}</a>
+                                                </h4>
+                                                <div class="movie-meta"
+                                                     style="margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">
+                                                    <span>⭐ {{ $trendingMovie->imdb_rating }}</span> • <span
+                                                        class="movie-meta">{{ $trendingMovie->year }}</span>
+                                                </div>
+                                                <p class="movie-plot-special"
+                                                   style="margin: 0 0 12px 0; font-size: 14px; color: #475569; line-height: 1.5;">{{ Str::limit($trendingMovie->details['Plot'] ?? '', 110) }}</p>
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                    <tr>
+                                                        <td align="center" bgcolor="#3b82f6"
+                                                            style="border-radius: 6px;">
+                                                            <a href="{{ url('/i/' . $trendingMovie->imdb_id) }}"
+                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
+                                                                Details →</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    @endif
 
                     @if($recommendedMovie)
                         <table class="special-card" width="100%" cellpadding="0" cellspacing="0"

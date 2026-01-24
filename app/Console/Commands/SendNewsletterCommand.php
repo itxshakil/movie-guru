@@ -36,6 +36,7 @@ final class SendNewsletterCommand extends Command
         $movies = $this->getMoviesForNewsletter($type);
         $recommendedMovie = MovieDetail::recommended()->inRandomOrder()->first();
         $hiddenGem = MovieDetail::hiddenGems()->inRandomOrder()->first();
+        $trendingMovie = MovieDetail::trending()->inRandomOrder()->first();
 
         if ($movies->isEmpty()) {
             $this->warning("No movies found to include in the $type newsletter.");
@@ -64,6 +65,7 @@ final class SendNewsletterCommand extends Command
                 $subscriber->email,
                 $recommendedMovie,
                 $hiddenGem,
+                $trendingMovie,
                 $unsubscribeUrl,
             ));
         }
@@ -77,9 +79,9 @@ final class SendNewsletterCommand extends Command
     private function getMoviesForNewsletter(string $type): Collection
     {
         if ($type === 'weekly') {
-            return MovieDetail::trending()->limit(5)->get();
+            return MovieDetail::recentlyReleased()->limit(5)->get();
         }
 
-        return MovieDetail::popular()->limit(10)->get();
+        return MovieDetail::recentlyReleased()->limit(10)->get();
     }
 }
