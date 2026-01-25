@@ -31,6 +31,7 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 Route::get('/search', [SearchController::class, 'index'])->name('search')->middleware('throttle:search');
 Route::get('/search/{search}', [SearchController::class, 'show'])->name('search.show')->middleware('throttle:search');
 Route::get('/i/{imdbID}', [DetailController::class, 'show'])->name('movie.show')->middleware('throttle:movie-show');
+Route::get('/movie/{imdbID}', [DetailController::class, 'show'])->name('movie.detail.full')->middleware('throttle:movie-show');
 
 Route::post('/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('subscribe')->middleware('throttle:api');
 Route::get('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscribe'])->name('unsubscribe')->middleware(['signed', 'throttle:api']);

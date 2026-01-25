@@ -11,7 +11,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'share']);
 
 const detail = ref(null);
 const sources = ref([]);
@@ -90,7 +90,8 @@ const onClose = () => {
 
 <template>
     <DialogModal @close="onClose" max-width=" w-full md:max-w-2xl lg:max-w-4xl">
-        <DetailCard :affiliateLink="affiliateLink" :detail="detail" :sources="sources" :title="title"/>
+        <DetailCard :affiliateLink="affiliateLink" :detail="detail" :sources="sources" :title="title"
+                    @share="emit('share', detail)"/>
     </DialogModal>
 </template>
 

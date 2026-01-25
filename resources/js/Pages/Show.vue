@@ -24,6 +24,25 @@ const moviePoster = (movie) => {
 };
 const pageUrl = window.location.href;
 
+const shareMovie = async () => {
+    const shareData = {
+        title: props.detail.Title,
+        text: `Check out ${props.detail.Title} on Movie Guru!`,
+        url: route('movie.detail.full', {imdbID: props.detail.imdbID}),
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+};
+
 const generateMetaTitle = (detail) => {
   if (!detail || !detail.Title) {
     return 'MovieGuru - Find Your Next Favorite'; // Fallback
@@ -76,6 +95,7 @@ const ogImage = moviePoster(props.detail);
     </Head>
 
     <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources"
+                @share="shareMovie"
                 class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
 
     <div class="mt-4">

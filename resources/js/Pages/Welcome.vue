@@ -37,11 +37,34 @@ const doSearch = () => {
 // Randomize trending search queries
 const shuffledTrendingQueries = [...props.trendingSearchQueries].sort(() => Math.random() - 0.5);
 
+const shareMovie = async (detail) => {
+    const shareData = {
+        title: detail.Title,
+        text: `Check out ${detail.Title} on Movie Guru!`,
+        url: route('movie.detail.full', {imdbID: detail.imdbID}),
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+};
+
 const viewDetail = (imdb_id, sectionName) => {
-  selectedIMDBId.value = imdb_id;
+    if (window.innerWidth < 1024) {
+        selectedIMDBId.value = imdb_id;
+    } else {
+        window.open(route('movie.detail.full', {imdbID: imdb_id}), '_blank');
+    }
     if (gtag) {
         gtag.trackViewDetail(imdb_id, sectionName);
-  }
+    }
 };
 
 
@@ -242,5 +265,5 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
 
   <NewsletterForm/>
 
-  <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" @close="selectedIMDBId = null;"/>
+    <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" @close="selectedIMDBId = null;" @share="shareMovie"/>
 </template>
