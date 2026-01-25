@@ -122,6 +122,51 @@
                                     >
                                     </SourceCard>
 
+                                    <li v-if="affiliateLink"
+                                        class="flex grow items-center gap-2 p-3 border-2 border-primary-500 rounded-xl shadow-lg bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-gray-900 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 group"
+                                    >
+                                        <a
+                                            :href="affiliateLink.link"
+                                            class="flex items-center gap-4 flex-1"
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            @click="sendAnalytics('Affiliate: ' + affiliateLink.title, affiliateLink.link)"
+                                        >
+                                            <div
+                                                class="h-12 w-12 flex items-center justify-center bg-primary-600 text-white rounded-lg shadow-md group-hover:bg-primary-500 transition-colors">
+                                                <svg class="h-7 w-7" fill="none" stroke="currentColor"
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"></path>
+                                                </svg>
+                                            </div>
+
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <p class="font-bold text-lg text-primary-900 dark:text-primary-100 leading-tight">
+                                                        Book Tickets: {{ affiliateLink.title }}
+                                                    </p>
+                                                    <svg
+                                                        class="h-5 w-5 text-primary-500 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round"
+                                                              stroke-linejoin="round" stroke-width="2"/>
+                                                    </svg>
+                                                </div>
+
+                                                <p class="text-sm text-primary-700/80 dark:text-primary-300/80 mt-0.5 font-medium">
+                                                    Secure your seats for <span
+                                                    class="text-primary-900 dark:text-primary-100 font-semibold">{{
+                                                        detail.Title
+                                                    }}</span> now!
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </li>
+
                                     <!-- Always show Google fallback -->
                                     <li
                                         class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -279,9 +324,14 @@ const props = defineProps({
         required: false,
         default: () => [],
     },
-  title: {
+    title: {
     type: String,
     required: false,
+    },
+    affiliateLink: {
+        type: Object,
+        required: false,
+        default: null,
   }
 });
 

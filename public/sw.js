@@ -2,11 +2,11 @@ const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.11.0';
-const SEARCH_CACHE = 'search-cache-v-4.11.0';
-const INFO_CACHE = 'info-cache-v-4.11.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-11.0';
-const POSTER_CACHE = 'poster-cache-v-4.11.0';
+const APP_CACHE = 'v-4.11.1';
+const SEARCH_CACHE = 'search-cache-v-4.11.1';
+const INFO_CACHE = 'info-cache-v-4.11.1';
+const DYNAMIC_CACHE = 'dynamic-cache-v-11.1';
+const POSTER_CACHE = 'poster-cache-v-4.11.1';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -279,7 +279,7 @@ self.addEventListener('fetch', async event => {
         if (request.url.includes('/search')) {
             event.respondWith(cacheRequest(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60));
         } else if (request.url.includes('/i/')) {
-            event.respondWith(cacheRequest(INFO_CACHE, request, 10, 2 * 24 * 60 * 60));
+            event.respondWith(cacheRequest(INFO_CACHE, request, 10, 24 * 60 * 60));
         } else {
             event.respondWith(cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60));
         }

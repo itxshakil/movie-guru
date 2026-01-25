@@ -17,6 +17,7 @@ const detail = ref(null);
 const sources = ref([]);
 const loading = ref(false);
 const timeout = ref(null);
+const affiliateLink = ref(null);
 const maxRetry  = ref(3);
 
 const loadDetail = async () => {
@@ -41,6 +42,7 @@ const loadDetail = async () => {
             if (response.data.detail && typeof response.data.detail === 'object' && response.data.detail.hasOwnProperty('Title')) {
                 detail.value = response.data.detail;
                 sources.value = response.data.sources;
+                affiliateLink.value = response.data.affiliateLink;
             } else {
                 alert('Unexpected data format');
 
@@ -88,7 +90,7 @@ const onClose = () => {
 
 <template>
     <DialogModal @close="onClose" max-width=" w-full md:max-w-2xl lg:max-w-4xl">
-        <DetailCard :detail="detail" :sources="sources" :title="title"/>
+        <DetailCard :affiliateLink="affiliateLink" :detail="detail" :sources="sources" :title="title"/>
     </DialogModal>
 </template>
 

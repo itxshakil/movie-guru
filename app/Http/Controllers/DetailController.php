@@ -37,6 +37,7 @@ final class DetailController extends Controller
         $movie = Cache::flexible($cacheKey, $cacheTTl, fn(): mixed => $this->fetchDetail($imdbId));
 
         $detail = $movie instanceof MovieDetail ? $movie->details : $movie;
+        $affiliateLink = $movie instanceof MovieDetail ? $movie->affiliate_link : null;
 
         $sources = $movie->sources ?? [];
 
@@ -78,6 +79,7 @@ final class DetailController extends Controller
             return response()->json([
                 'detail' => $detail,
                 'sources' => $sources,
+                'affiliateLink' => $affiliateLink,
             ]);
         }
 
@@ -112,6 +114,7 @@ final class DetailController extends Controller
         return Inertia::render('Show', [
             'detail' => $detail,
             'sources' => $sources,
+            'affiliateLink' => $affiliateLink,
             'recentlyReleasedMovies' => $recentlyReleasedMovies,
             'recommendedMovies' => $recommendedMovies,
         ]);
