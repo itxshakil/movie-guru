@@ -64,7 +64,8 @@
                         <span :title="detail.Released ? 'Released on '+ detail.Released : 'Release Year'"
                               class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" itemprop="datePublished"
                               v-text="detail.Year"></span>
-                        <span class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" title="Genre" itemprop="genre"
+                        <span v-if="isValue(Genre)" class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400"
+                              itemprop="genre" title="Genre"
                               v-text="Genre"></span>
                         <span v-if="detail.Type !== 'series'" class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400"
                               title="Runtime" v-text="runtime" itemprop="duration"></span>
@@ -75,7 +76,7 @@
                         <section aria-labelledby="information-heading" class="mt-2">
                             <h3 id="information-heading" class="sr-only">Product information</h3>
                             <div class="mb-2" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
-                                <div class="flex items-center">
+                                <div v-if="basicRating" class="flex items-center">
                                     <svg
                                         v-for="i in 5"
                                         :key="i"
