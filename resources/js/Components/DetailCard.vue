@@ -5,15 +5,16 @@
                 class="relative rounded-lg flex w-full items-center overflow-hidden bg-white dark:bg-gray-900 dark:text-white px-2 pb-6 pt-6 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="grid w-full grid-cols-1 items-start gap-x-3 gap-y-4 sm:grid-cols-12 lg:gap-x-8">
-                    <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5">
-                      <div class="bg-gray-100 dark:bg-gray-900">
+                    <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5 group/poster">
+                        <div class="bg-gray-100 dark:bg-gray-900 aspect-2/3">
                             <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"
-                                 class="object-cover object-center cursor-pointer w-full">
+                                 class="object-cover object-center cursor-pointer w-full transition-transform duration-700 group-hover/poster:scale-110"
+                                 @error="handlePosterError">
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
                             <button
-                                class="flex items-center gap-1 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-colors"
+                                class="flex items-center gap-1 bg-white/20 hover:bg-white/40 active:scale-90 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all"
                                 title="Share"
                                 @click="shareMovie"
                             >
@@ -136,7 +137,7 @@
                                     </SourceCard>
 
                                     <li v-if="affiliateLink"
-                                        class="flex grow items-center gap-2 p-3 border-2 border-primary-500 rounded-xl shadow-lg bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-gray-900 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 group"
+                                        class="flex grow items-center gap-2 p-3 border-2 border-primary-500 rounded-xl shadow-lg bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-gray-900 hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 group"
                                     >
                                         <a
                                             :href="affiliateLink.link"
@@ -182,7 +183,7 @@
 
                                     <!-- Always show Google fallback -->
                                     <li
-                                        class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
                                     >
                                         <a
                                             :href="googleDownloadLink"
@@ -466,6 +467,11 @@ const runtime = computed(() => {
 
 const moviePoster = (movie) => {
     return movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : '/assets/images/no-poster.jpg';
+};
+
+const handlePosterError = (event) => {
+    event.target.src = '/assets/images/no-poster.jpg';
+    event.target.classList.add('opacity-40', 'grayscale');
 };
 
 function sendAnalytics(platform, link) {

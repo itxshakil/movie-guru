@@ -4,7 +4,6 @@ import NewsletterForm from '@/Components/NewsletterForm.vue';
 import {computed, inject, ref} from 'vue';
 import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
-import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
@@ -31,13 +30,14 @@ const props = defineProps({
 console.log(props.recommendedMovies);
 
 const showSuggestions = ref(false);
-const filteredTrendingQueries = ref([...props.trendingQueries]);
+const filteredTrendingQueries = ref(props.trendingQueries ? [...props.trendingQueries] : []);
 
 const hideSuggestions = () => {
   setTimeout(() => (showSuggestions.value = false), 200); // Delay to allow click event to trigger
 };
 
 const filterTrendingQueries = () => {
+    if (!props.trendingQueries) return;
   filteredTrendingQueries.value = props.trendingQueries.filter((query) =>
       query.toLowerCase().includes(form.s.toLowerCase())
   );
@@ -46,7 +46,16 @@ const filterTrendingQueries = () => {
 const selectTrendingQuery = (query) => {
   form.s = query; // Set the trending query as the search input
   showSuggestions.value = false; // Hide suggestions
+    if (filteredTrendingQueries.value) {
+        filteredTrendingQueries.value = [];
+    }
+    // No delay, but let's see if doSearch works better if we manually set form value
   doSearch(); // Trigger the search
+};
+
+const clearSearch = () => {
+    form.s = '';
+    doSearch();
 };
 
 
@@ -103,10 +112,11 @@ const loadMore = () => {
 };
 
 const shareMovie = async (detail) => {
+    if (!detail) return;
     const shareData = {
-        title: detail.Title,
-        text: `Check out ${detail.Title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: detail.imdbID}),
+        title: detail.Title || detail.title,
+        text: `Check out ${detail.Title || detail.title} on Movie Guru!`,
+        url: route('movie.detail.full', {imdbID: detail.imdbID || detail.imdb_id}),
     };
 
     try {
@@ -119,6 +129,14 @@ const shareMovie = async (detail) => {
     } catch (err) {
         console.error('Error sharing:', err);
     }
+};
+
+const shareMovieFromCard = (movie) => {
+    // Vibrate on mobile
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(10);
+    }
+    shareMovie(movie);
 };
 
 const viewDetail = (imdb_id, sectionName, title = null) => {
@@ -193,22 +211,41 @@ const moviePoster = (movie) => {
                         {{ searchResults.totalResults }} results found for {{ search }}
                     </h1>
 
-                    <form class="flex flex-col sm:flex-row gap-2 items-center w-full" @submit.prevent="doSearch">
-                        <div class="w-full sm:min-w-64 grow">
-                            <InputLabel class="sr-only" for="search-input" value="Search"/>
-                          <div class="relative">
+                    <form class="flex flex-col sm:flex-row gap-2 items-center w-full group/search"
+                          @submit.prevent="doSearch">
+                        <div class="w-full sm:min-w-64 grow relative">
+                            <label class="sr-only" for="search-input">Search</label>
+                            <div class="relative flex items-center">
+                                <svg
+                                    class="absolute left-3.5 h-5 w-5 text-gray-400 group-focus-within/search:text-primary-500 transition-colors pointer-events-none"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2.5"/>
+                                </svg>
                             <TextInput
                                 type="search"
                                 enterkeyhint="search"
                                 id="search-input"
                                 autocomplete="off"
                                 v-model="form.s"
-                                class="w-full"
+                                class="w-full !rounded-xl !border-2 !pl-11 !pr-10 !py-3 focus:!ring-primary-500/20"
                                 placeholder="Search movies and series..."
                                 @focus="showSuggestions = true"
                                 @blur="hideSuggestions"
                                 @input="filterTrendingQueries"
                             />
+                                <button
+                                    v-if="form.s"
+                                    class="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                                    type="button"
+                                    @click="clearSearch"
+                                >
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"/>
+                                    </svg>
+                                </button>
+                            </div>
 
                             <ul
                                 v-if="showSuggestions && filteredTrendingQueries.length > 0"
@@ -236,32 +273,38 @@ const moviePoster = (movie) => {
                             </ul>
                           </div>
                         </div>
-                        <div class="flex gap-2 sm:w-60 w-full">
-                            <div class="w-full sm:w-36">
-                                <InputLabel class="sr-only" for="movie-type-select" value="Select Type"/>
+                <div class="flex gap-2 sm:w-64 w-full relative">
+                    <div class="w-full sm:w-40">
+                        <label class="sr-only" for="movie-type-select">Select Type</label>
                                 <select v-model="form.type" id="movie-type-select"
-                                        class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 rounded-lg focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200">
+                                        class="w-full !rounded-xl !border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 transition duration-75 focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-200 dark:placeholder-gray-400 focus:read-only:text-gray-200">
                                     <option :value="null">All types</option>
-                                    <option v-for="type in movieTypes" :value="type" class="capitalize">{{ type }}
+                                    <option v-for="type in movieTypes" :key="type" :value="type" class="capitalize">
+                                        {{ type }}
                                     </option>
                                 </select>
                             </div>
-                            <div class="w-full sm:w-20">
-                                <InputLabel class="sr-only" for="year-input" value="Year"/>
-                                <TextInput v-model="form.year" id="year-input" class="w-full" placeholder="Year" type="number"/>
+                    <div class="w-full sm:w-24">
+                        <label class="sr-only" for="year-input">Year</label>
+                        <TextInput id="year-input" v-model="form.year" class="w-full !rounded-xl !border-2"
+                                   placeholder="Year" type="number"/>
                             </div>
                         </div>
-                        <LoadingSpinnerButton :is-loading="form.processing" class="w-full sm:w-auto justify-center"
+                <LoadingSpinnerButton :is-loading="form.processing"
+                                      class="w-full sm:w-auto justify-center !rounded-xl !px-6 !py-3 !font-bold"
                                               value="Search"/>
                     </form>
                 </div>
 
-                <div v-if="movieList && movieList.length" class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 sm:space-y-0">
+            <div v-if="movieList && movieList.length"
+                 class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8 sm:space-y-0">
                     <SearchCard
                         v-for="movie in movieList"
                         :key="movie.imdb_id"
                         :movie="movie"
+                        class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Search', movie.title)"
+                        @share="shareMovieFromCard"
                     />
                 </div>
 
@@ -285,12 +328,14 @@ const moviePoster = (movie) => {
                         movies hitting
                         the screens.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <SearchCard
                         v-for="movie in recentlyReleasedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
+                        class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+                        @share="shareMovieFromCard"
                     />
                 </div>
             </div>
@@ -304,12 +349,14 @@ const moviePoster = (movie) => {
                         films for
                         every movie lover.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <SearchCard
                         v-for="movie in recommendedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
+                        class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
+                        @share="shareMovieFromCard"
                     />
                 </div>
             </div>

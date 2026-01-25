@@ -25,6 +25,7 @@ const moviePoster = (movie) => {
 const pageUrl = window.location.href;
 
 const shareMovie = async () => {
+    if (!props.detail) return;
     const shareData = {
         title: props.detail.Title,
         text: `Check out ${props.detail.Title} on Movie Guru!`,
@@ -40,6 +41,40 @@ const shareMovie = async () => {
         }
     } catch (err) {
         console.error('Error sharing:', err);
+    }
+};
+
+const shareMovieFromCard = (movie) => {
+    // Vibrate on mobile
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(10);
+    }
+    // Note: this shareMovie currently doesn't accept arguments, it uses props.detail
+    // We should probably allow it to share the passed movie if needed, but in Show.vue it might be for the current movie.
+    // However, shareMovieFromCard is called from SearchCard in the related sections.
+    // Let's fix shareMovie to be more generic if needed, or handle it here.
+    const shareData = {
+        title: movie.title,
+        text: `Check out ${movie.title} on Movie Guru!`,
+        url: route('movie.detail.full', {imdbID: movie.imdb_id}),
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(err => console.error('Error sharing:', err));
+    } else {
+        navigator.clipboard.writeText(shareData.url);
+        alert('Link copied to clipboard!');
+    }
+};
+
+const viewDetail = (imdb_id, sectionName) => {
+    if (window.innerWidth < 1024) {
+        window.location.href = route('movie.detail.full', {imdbID: imdb_id});
+    } else {
+        window.open(route('movie.detail.full', {imdbID: imdb_id}), '_blank');
+    }
+    if (gtag) {
+        gtag.trackViewDetail(imdb_id, sectionName);
     }
 };
 
@@ -107,12 +142,14 @@ const ogImage = moviePoster(props.detail);
                         movies hitting
                         the screens.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <SearchCard
                         v-for="movie in recentlyReleasedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
+                        class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+                        @share="shareMovieFromCard"
                     />
                 </div>
             </div>
@@ -126,12 +163,14 @@ const ogImage = moviePoster(props.detail);
                         films for
                         every movie lover.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <SearchCard
                         v-for="movie in recommendedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
+                        class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
+                        @share="shareMovieFromCard"
                     />
                 </div>
             </div>

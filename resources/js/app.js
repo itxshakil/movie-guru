@@ -29,6 +29,18 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(Analytics)
             .mixin(useInstallPrompt)
+            .mixin({
+                methods: {
+                    route,
+                    handleViewTransition(callback) {
+                        if (!document.startViewTransition) {
+                            callback();
+                            return;
+                        }
+                        document.startViewTransition(callback);
+                    }
+                }
+            })
             .mount(el);
     },
     progress: {

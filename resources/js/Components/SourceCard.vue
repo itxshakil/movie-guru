@@ -12,7 +12,7 @@ defineProps({
 </script>
 
 <template>
-    <li class="flex items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800">
+    <li class="flex items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
         <a
             :href="source.availability.webUrl"
             class="flex items-center gap-3 flex-2"
