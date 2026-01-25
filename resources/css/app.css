@@ -143,3 +143,29 @@ because the nesting selector cannot represent pseudo-elements. */
     }
 }
 
+/* Scroll-driven animations */
+@keyframes reveal {
+    from {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.scroll-reveal {
+    view-timeline-name: --revealing-item;
+    view-timeline-axis: block;
+    animation: reveal linear both;
+    animation-timeline: --revealing-item;
+    animation-range: entry 10% cover 30%;
+}
+
+/* View Transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.5s;
+}
+

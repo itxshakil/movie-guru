@@ -1,41 +1,46 @@
 <template>
-    <div class="bg-white dark:bg-gray-900 dark:text-white py-24 sm:py-32">
-        <div class="mx-auto max-w-7xl px-4 lg:px-8">
+    <div class="bg-white dark:bg-gray-950 dark:text-white py-24 sm:py-32 relative overflow-hidden">
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-5 dark:opacity-10">
+            <div
+                class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--color-primary-500),transparent_70%)]"></div>
+        </div>
+        <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
             <div class="mx-auto max-w-2xl lg:text-center">
                 <h2
-                    class="text-base font-semibold leading-7 text-primary-600 dark:text-primary-500"
+                    class="text-base font-bold leading-7 text-primary-600 dark:text-primary-500 uppercase tracking-widest"
                 >
-                  Super-fast, minimal and reliable
+                    Premium Cinema Companion
                 </h2>
                 <p
-                    class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                    class="mt-2 text-4xl font-black tracking-tight text-gray-900 dark:text-white sm:text-5xl"
                 >
-                    Everything you need for your binge hunt
+                    Everything you need for your next binge
                 </p>
                 <p
-                    class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400"
+                    class="mt-6 text-xl leading-relaxed text-gray-600 dark:text-gray-400 font-medium"
                 >
-                  Movie detail app where you can <strong>explore movies, series, and episodes.</strong> Find ratings
-                  from major platforms like <strong>Rotten Tomatoes and IMDB</strong>—all in one place! Movie Guru is
-                  designed to be efficient, reliable, and easy to use.
+                    Movie Guru is your ultimate cinematic guide. <strong>Explore movies, series, and episodes</strong>
+                    with ease. Find ratings
+                    from major platforms like <strong>Rotten Tomatoes and IMDB</strong>—all in one elegant interface.
                 </p>
             </div>
             <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
                 <dl
-                    class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16"
+                    class="grid max-w-xl grid-cols-1 gap-x-12 gap-y-12 lg:max-w-none lg:grid-cols-2 lg:gap-y-20"
                 >
-                    <div class="relative pl-16">
+                    <div class="relative pl-20 group">
                         <dt
-                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white"
+                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
-                                    class="h-6 w-6 text-white"
+                                    class="h-7 w-7"
                                     fill="none"
                                     viewBox="0 0 24 24"
-                                    stroke-width="1.5"
+                                    stroke-width="2"
                                     stroke="currentColor"
                                     aria-hidden="true"
                                 >
@@ -56,29 +61,27 @@
                                     <path d="M16 16l4 0" />
                                 </svg>
                             </div>
-                            An Alternative to IMDB
+                            The IMDB Evolution
                         </dt>
                         <dd
-                            class="mt-2 text-base leading-7 text-gray-600 dark:text-gray-400"
+                            class="text-base leading-relaxed text-gray-600 dark:text-gray-400 font-medium"
                         >
-                            Looking for a fresh perspective? Movie Guru provides
-                            an alternative to the traditional IMDB platform,
-                            offering a new way to explore and discover your
-                            favorite films.
+                            Experience a modern alternative to traditional platforms. Movie Guru offers a refined,
+                            distraction-free way to discover your next favorite masterpiece.
                         </dd>
                     </div>
-                    <div class="relative pl-16">
+                    <div class="relative pl-20 group">
                         <dt
-                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white"
+                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
-                                    class="h-6 w-6 text-white"
+                                    class="h-7 w-7"
                                     fill="none"
                                     viewBox="0 0 24 24"
-                                    stroke-width="1.5"
+                                    stroke-width="2"
                                     stroke="currentColor"
                                     aria-hidden="true"
                                 >
@@ -104,29 +107,27 @@
                                     />
                                 </svg>
                             </div>
-                            Ratings from All Major Sources in One Place
+                            Unified Critical Insights
                         </dt>
                         <dd
-                            class="mt-2 text-base leading-7 text-gray-600 dark:text-gray-400"
+                            class="text-base leading-relaxed text-gray-600 dark:text-gray-400 font-medium"
                         >
-                            Get comprehensive movie ratings from all major
-                            sources consolidated in one location. Make informed
-                            decisions about what to watch based on a collective
-                            perspective.
+                            Aggregate wisdom from all major sources in one place. Make informed decisions with
+                            consolidated ratings and reviews from the web's top critics.
                         </dd>
                     </div>
-                    <div class="relative pl-16">
+                    <div class="relative pl-20 group">
                         <dt
-                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white"
+                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
-                                    class="h-6 w-6 text-white"
+                                    class="h-7 w-7"
                                     fill="none"
                                     viewBox="0 0 24 24"
-                                    stroke-width="1.5"
+                                    stroke-width="2"
                                     stroke="currentColor"
                                     aria-hidden="true"
                                 >
@@ -149,29 +150,27 @@
                                     />
                                 </svg>
                             </div>
-                          Blazing Fast & Simple UI
+                            Minimalist & Fluid UI
                         </dt>
                         <dd
-                            class="mt-2 text-base leading-7 text-gray-600 dark:text-gray-400"
+                            class="text-base leading-relaxed text-gray-600 dark:text-gray-400 font-medium"
                         >
-                          It’s a super-fast and minimalistic. Straightforward user
-                            interface that makes navigating through the vast
-                            world of movies a breeze. No clutter, no
-                            confusion—just a clean and user-friendly design.
+                            Navigate the vast world of entertainment with a blazing-fast, app-like interface. Pure
+                            efficiency wrapped in a clean, user-centric design.
                         </dd>
                     </div>
-                    <div class="relative pl-16">
+                    <div class="relative pl-20 group">
                         <dt
-                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white"
+                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
-                                    class="h-6 w-6 text-white"
+                                    class="h-7 w-7"
                                     fill="none"
                                     viewBox="0 0 24 24"
-                                    stroke-width="1.5"
+                                    stroke-width="2"
                                     stroke="currentColor"
                                     aria-hidden="true"
                                 >
@@ -188,14 +187,13 @@
                                     />
                                 </svg>
                             </div>
-                          Always There for You
+                            Resilient & Offline-Ready
                         </dt>
                         <dd
-                            class="mt-2 text-base leading-7 text-gray-600 dark:text-gray-400"
+                            class="text-base leading-relaxed text-gray-600 dark:text-gray-400 font-medium"
                         >
-                            Movie Guru is designed to be light on resources,
-                          ensuring a swift and efficient experience. No internet? No problem! Search offline, and get
-                          notified with results as soon as you're back online.
+                            Movie Guru stays with you. Search offline and get notified the moment you're back online. A
+                            truly native feel that respects your time and data.
                         </dd>
                     </div>
                 </dl>

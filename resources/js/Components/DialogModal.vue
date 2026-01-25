@@ -96,6 +96,8 @@ onMounted(() => {
         // Fallback for browsers that don't support showModal()
         if (dialog.value) {
             dialog.value.setAttribute('open', '');
+            // On Safari or other browsers without backdrop support via CSS when open attribute is used
+            document.body.classList.add('modal-open');
         }
     }
 
@@ -112,7 +114,7 @@ onMounted(() => {
     }
 
     // Vibrate on open if supported
-    if (window.innerWidth < 640 && 'vibrate' in navigator) {
+    if (window.innerWidth < 640 && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(15);
     }
     // Prevent scrolling of the background
@@ -133,7 +135,7 @@ const close = () => {
     if (!dialog.value || dialog.value.classList.contains('modal-out')) return;
 
     // Vibrate on close if supported
-    if ('vibrate' in navigator) {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(5);
     }
 
@@ -147,6 +149,7 @@ const close = () => {
     const openDialogs = document.querySelectorAll('dialog[open]');
     if (openDialogs.length <= 1) {
         document.body.style.overflow = '';
+        document.body.classList.remove('modal-open');
     }
     const timeout = window.innerWidth < 640 ? 400 : 250;
     setTimeout(() => {
@@ -177,9 +180,11 @@ onUnmounted(() => {
         const remainingModals = openDialogs.length - (isDialogOpen ? 1 : 0);
         if (remainingModals <= 0) {
             document.body.style.overflow = '';
+            document.body.classList.remove('modal-open');
         }
     } catch (e) {
         document.body.style.overflow = '';
+        document.body.classList.remove('modal-open');
     }
     if (dialog.value) {
         dialog.value.removeEventListener('touchstart', handleTouchStart);
@@ -205,9 +210,10 @@ defineExpose({close});
 <template>
     <dialog ref="dialog" :class="maxWidth" scroll-region
             class="m-auto inset-0 w-full overflow-x-hidden bg-transparent p-2 md:p-4 modal-dialog backdrop:bg-black/40 dark:backdrop:bg-black/60"
-        modal-menu="mega">
+            modal-menu="mega" style="-webkit-overflow-scrolling: touch;">
         <div
-            class="relative rounded-lg bg-white shadow-sm dark:bg-gray-900 modal-content-wrapper overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
+            class="relative rounded-lg bg-white shadow-sm dark:bg-gray-900 modal-content-wrapper overflow-y-auto max-h-[90vh] sm:max-h-[85vh]"
+            style="-webkit-overflow-scrolling: touch;">
             <button
                 tabindex="-1"
                 class="fixed top-4 right-4 md:absolute md:top-2 md:right-2 ml-auto inline-flex items-center rounded-lg bg-gray-200/50 backdrop-blur-sm p-1 text-sm text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-600/50 dark:text-gray-100 z-50"
@@ -339,5 +345,14 @@ dialog[open] {
         box-shadow: none !important;
         max-height: 95vh !important;
     }
+}
+
+body.modal-open::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px) brightness(0.4) contrast(1.1);
+    z-index: 40;
 }
 </style>
