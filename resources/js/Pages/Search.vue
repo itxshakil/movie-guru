@@ -102,14 +102,37 @@ const loadMore = () => {
     });
 };
 
+const shareMovie = async (detail) => {
+    const shareData = {
+        title: detail.Title,
+        text: `Check out ${detail.Title} on Movie Guru!`,
+        url: route('movie.detail.full', {imdbID: detail.imdbID}),
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+};
+
 const viewDetail = (imdb_id, sectionName, title = null) => {
-  selectedIMDBId.value = imdb_id;
-  if (title) {
-    selectedTitle.value = title;
-  }
+    if (window.innerWidth < 1024) {
+        selectedIMDBId.value = imdb_id;
+        if (title) {
+            selectedTitle.value = title;
+        }
+    } else {
+        window.open(route('movie.detail.full', {imdbID: imdb_id}), '_blank');
+    }
     if (gtag) {
         gtag.trackViewDetail(imdb_id, sectionName, title);
-  }
+    }
 };
 
 defineOptions({ layout: BaseLayout })
@@ -328,7 +351,8 @@ const moviePoster = (movie) => {
         </div>
     </div>
 
-  <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" :title="selectedTitle" @close="selectedIMDBId = null;"/>
+    <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" :title="selectedTitle" @close="selectedIMDBId = null;"
+          @share="shareMovie"/>
 </template>
 <style scoped>
     @media (display-mode: standalone) {

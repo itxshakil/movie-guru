@@ -2,13 +2,13 @@
     <div
         class="dark:bg-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm group relative flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out active:scale-[0.98] cursor-pointer"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"
-        @click="viewDetail(movie.imdb_id)">
+        @click="openDetail(movie.imdb_id, movie.title)">
     <div>
       <div
           class="relative h-96 w-full overflow-hidden rounded-t-2xl bg-gray-100 dark:bg-gray-800 aspect-2/3">
         <img :alt="movie.title + ' Poster'" itemprop="image"
              :src="moviePoster(movie)"
-             @click="viewDetail(movie.imdb_id)"
+             @click="openDetail(movie.imdb_id, movie.title)"
              loading="lazy"
              class="h-full w-full object-cover object-center italic transition-transform duration-500 group-hover:scale-105 cursor-pointer">
       </div>
@@ -29,16 +29,16 @@
       </div>
 
         <div v-if="basicRating" class="flex items-center ml-3 mb-2">
-        <svg
-            v-for="i in 5"
-            :key="i"
-            :class="i <= basicRating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
-            aria-hidden="true" class="h-4 w-4 shrink-0" fill="currentColor"
-            viewBox="0 0 20 20">
-          <path clip-rule="evenodd"
-                d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                fill-rule="evenodd"/>
-        </svg>
+            <svg
+                v-for="i in 5"
+                :key="i"
+                :class="i <= basicRating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
+                aria-hidden="true" class="h-4 w-4 shrink-0" fill="currentColor"
+                viewBox="0 0 20 20">
+                <path clip-rule="evenodd"
+                      d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                      fill-rule="evenodd"/>
+            </svg>
             <span class="ml-2 text-xs font-semibold text-gray-500 dark:text-gray-400">{{ movie.imdb_rating }}</span>
       </div>
 
@@ -73,7 +73,7 @@
             <button
                 class="flex-1 flex justify-center gap-2 items-center bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 px-3 rounded-xl group/detail transition-all duration-200 text-sm shadow-lg shadow-primary-500/20"
                 type="button"
-                @click.stop="viewDetail(movie.imdb_id)">
+                @click.stop="openDetail(movie.imdb_id, movie.title)">
                 <span>Details</span>
                 <svg class="w-4 h-4 transition-transform duration-300 group-hover/detail:translate-x-1"
                      fill="none"
@@ -103,6 +103,19 @@ const viewDetail = (imdbID) => {
         navigator.vibrate(10);
     }
     emit('selected');
+};
+
+const openDetail = (imdbID, title) => {
+    // Vibrate on mobile if supported
+    if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+    }
+
+    if (window.innerWidth < 1024) {
+        emit('selected');
+    } else {
+        window.open(route('movie.detail.full', {imdbID: imdbID}), '_blank');
+    }
 };
 const isValue = function (value) {
   return value && value !== 'N/A';
