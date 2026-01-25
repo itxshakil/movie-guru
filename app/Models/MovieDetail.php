@@ -34,6 +34,7 @@ final class MovieDetail extends Model
         'details',
         'sources',
         'source_last_fetched_at',
+        'affiliate_link',
         'views',
     ];
 
@@ -140,6 +141,7 @@ final class MovieDetail extends Model
         return [
             'details' => 'json',
             'sources' => 'json',
+            'affiliate_link' => 'json',
             'source_last_fetched_at' => 'datetime',
         ];
     }

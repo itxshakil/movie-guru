@@ -14,6 +14,7 @@ const props = defineProps({
     },
     recentlyReleasedMovies: Array,
     recommendedMovies: Array,
+    affiliateLink: Object,
 })
 
 defineOptions({ layout: BaseLayout })
@@ -74,7 +75,7 @@ const ogImage = moviePoster(props.detail);
         <link rel="canonical" :href="pageUrl" head-key="canonical" />
     </Head>
 
-    <DetailCard :detail="detail" :sources="sources"
+    <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources"
                 class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
 
     <div class="mt-4">
