@@ -1,4 +1,3 @@
-<x-mail::message>
 # A Slow Query Occurred
 
 A Slow Query Occurred on **{{ $connectionName }}** that took **{{ number_format($time, 2) }} seconds** to execute.
@@ -10,4 +9,3 @@ A Slow Query Occurred on **{{ $connectionName }}** that took **{{ number_format(
 
 Thanks,<br>
 {{ config('app.name') }}
-</x-mail::message>
