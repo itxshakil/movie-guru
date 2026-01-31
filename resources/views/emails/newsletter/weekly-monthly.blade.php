@@ -51,6 +51,13 @@
                                                style="font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; display: inline-block; border: 1px solid #3b82f6;">View
                                                 Details →</a>
                                         </td>
+                                        @if($movie->affiliate_link && isset($movie->affiliate_link['link']))
+                                            <td style="padding-left: 10px;">
+                                                <a href="{{ $movie->affiliate_link['link'] . (str_contains($movie->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                   style="font-size: 13px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 8px 16px; border-radius: 8px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                    Now</a>
+                                            </td>
+                                        @endif
                                     </tr>
                                 </table>
                             </td>
@@ -106,6 +113,13 @@
                                                                style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
+                                                        @if($trendingMovie->affiliate_link && isset($trendingMovie->affiliate_link['link']))
+                                                            <td style="padding-left: 10px;">
+                                                                <a href="{{ $trendingMovie->affiliate_link['link'] . (str_contains($trendingMovie->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                                    Now</a>
+                                                            </td>
+                                                        @endif
                                                     </tr>
                                                 </table>
                                             </td>
@@ -153,6 +167,13 @@
                                                                style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
+                                                        @if($recommendedMovie->affiliate_link && isset($recommendedMovie->affiliate_link['link']))
+                                                            <td style="padding-left: 10px;">
+                                                                <a href="{{ $recommendedMovie->affiliate_link['link'] . (str_contains($recommendedMovie->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                                    Now</a>
+                                                            </td>
+                                                        @endif
                                                     </tr>
                                                 </table>
                                             </td>
@@ -200,6 +221,13 @@
                                                                style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
+                                                        @if($hiddenGem->affiliate_link && isset($hiddenGem->affiliate_link['link']))
+                                                            <td style="padding-left: 10px;">
+                                                                <a href="{{ $hiddenGem->affiliate_link['link'] . (str_contains($hiddenGem->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                                    Now</a>
+                                                            </td>
+                                                        @endif
                                                     </tr>
                                                 </table>
                                             </td>
