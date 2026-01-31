@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\MovieDetail;
 use Illuminate\Console\Command;
 
-class SetMovieAffiliateLinkCommand extends Command
+final class SetMovieAffiliateLinkCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -42,10 +44,14 @@ class SetMovieAffiliateLinkCommand extends Command
             $link = 'https://www.google.com/search?q=' . urlencode($title . ' movie tickets ' . $movie->title);
         }
 
-        $movie->affiliate_link = [
+        /** @var array<string, string> $affiliateLink */
+        $affiliateLink = [
             'link' => $link,
             'title' => $title,
         ];
+
+        /** @phpstan-ignore-next-line */
+        $movie->affiliate_link = $affiliateLink;
 
         $movie->save();
 
