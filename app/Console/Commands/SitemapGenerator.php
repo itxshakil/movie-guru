@@ -33,7 +33,7 @@ final class SitemapGenerator extends Command
         });
 
         $this->getTopMovies($limit)->each(function (MovieDetail $topMovie) use ($sitemap): void {
-            $sitemap->add(Url::create('/i/' . $topMovie->imdb_id));
+            $sitemap->add(Url::create('/movie/' . $topMovie->imdb_id));
         });
 
         $sitemap->writeToFile(public_path('sitemap.xml'));
