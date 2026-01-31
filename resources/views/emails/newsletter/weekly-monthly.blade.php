@@ -51,9 +51,12 @@
                                                style="font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; display: inline-block; border: 1px solid #3b82f6;">View
                                                 Details →</a>
                                         </td>
-                                        @if($movie->affiliate_link && isset($movie->affiliate_link['link']))
+                                        @if($movie->affiliate_link && (is_array($movie->affiliate_link) ? isset($movie->affiliate_link['link']) : isset(json_decode($movie->affiliate_link, true)['link'])))
+                                            @php
+                                                $link = is_array($movie->affiliate_link) ? $movie->affiliate_link['link'] : json_decode($movie->affiliate_link, true)['link'];
+                                            @endphp
                                             <td style="padding-left: 10px;">
-                                                <a href="{{ $movie->affiliate_link['link'] . (str_contains($movie->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
                                                    style="font-size: 13px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 8px 16px; border-radius: 8px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                     Now</a>
                                             </td>
@@ -113,9 +116,12 @@
                                                                style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
-                                                        @if($trendingMovie->affiliate_link && isset($trendingMovie->affiliate_link['link']))
+                                                        @if($trendingMovie->affiliate_link && (is_array($trendingMovie->affiliate_link) ? isset($trendingMovie->affiliate_link['link']) : isset(json_decode($trendingMovie->affiliate_link, true)['link'])))
+                                                            @php
+                                                                $link = is_array($trendingMovie->affiliate_link) ? $trendingMovie->affiliate_link['link'] : json_decode($trendingMovie->affiliate_link, true)['link'];
+                                                            @endphp
                                                             <td style="padding-left: 10px;">
-                                                                <a href="{{ $trendingMovie->affiliate_link['link'] . (str_contains($trendingMovie->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                                <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
                                                                    style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                                     Now</a>
                                                             </td>
@@ -167,9 +173,12 @@
                                                                style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
-                                                        @if($recommendedMovie->affiliate_link && isset($recommendedMovie->affiliate_link['link']))
+                                                        @if($recommendedMovie->affiliate_link && (is_array($recommendedMovie->affiliate_link) ? isset($recommendedMovie->affiliate_link['link']) : isset(json_decode($recommendedMovie->affiliate_link, true)['link'])))
+                                                            @php
+                                                                $link = is_array($recommendedMovie->affiliate_link) ? $recommendedMovie->affiliate_link['link'] : json_decode($recommendedMovie->affiliate_link, true)['link'];
+                                                            @endphp
                                                             <td style="padding-left: 10px;">
-                                                                <a href="{{ $recommendedMovie->affiliate_link['link'] . (str_contains($recommendedMovie->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                                <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
                                                                    style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                                     Now</a>
                                                             </td>
@@ -221,9 +230,12 @@
                                                                style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
-                                                        @if($hiddenGem->affiliate_link && isset($hiddenGem->affiliate_link['link']))
+                                                        @if($hiddenGem->affiliate_link && (is_array($hiddenGem->affiliate_link) ? isset($hiddenGem->affiliate_link['link']) : isset(json_decode($hiddenGem->affiliate_link, true)['link'])))
+                                                            @php
+                                                                $link = is_array($hiddenGem->affiliate_link) ? $hiddenGem->affiliate_link['link'] : json_decode($hiddenGem->affiliate_link, true)['link'];
+                                                            @endphp
                                                             <td style="padding-left: 10px;">
-                                                                <a href="{{ $hiddenGem->affiliate_link['link'] . (str_contains($hiddenGem->affiliate_link['link'], '?') ? '&' : '?') . 'utm_source=newsletter' }}"
+                                                                <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
                                                                    style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                                     Now</a>
                                                             </td>

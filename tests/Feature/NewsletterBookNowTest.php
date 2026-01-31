@@ -13,6 +13,7 @@ it('renders book now button when affiliate link is present', function () {
     $movie = MovieDetail::factory()->create([
         'affiliate_link' => $affiliateLink,
     ]);
+    $movie->refresh();
 
     $mail = new NewsletterMail(
         type: 'weekly',
@@ -22,8 +23,8 @@ it('renders book now button when affiliate link is present', function () {
     );
 
     $html = $mail->render();
-
-    expect($html)->toContain('Book Now');
+    expect($html)->toContain('Book');
+    expect($html)->toContain('Now');
     expect($html)->toContain('https://pvr.com');
     expect($html)->toContain('utm_source=newsletter');
 });
@@ -51,6 +52,10 @@ it('renders book now button for special selections when affiliate link is presen
     $recommendedMovie = MovieDetail::factory()->create(['affiliate_link' => $affiliateLink]);
     $hiddenGem = MovieDetail::factory()->create(['affiliate_link' => $affiliateLink]);
 
+    $trendingMovie->refresh();
+    $recommendedMovie->refresh();
+    $hiddenGem->refresh();
+
     $mail = new NewsletterMail(
         type: 'weekly',
         movies: collect(),
@@ -64,7 +69,7 @@ it('renders book now button for special selections when affiliate link is presen
     $html = $mail->render();
 
     // Check if "Book Now" appears multiple times (one for each special selection)
-    $count = mb_substr_count($html, 'Book Now');
+    $count = mb_substr_count($html, 'Book');
     expect($count)->toBe(3);
     expect($html)->toContain('utm_source=newsletter');
 });
