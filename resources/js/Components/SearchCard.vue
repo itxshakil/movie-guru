@@ -41,7 +41,7 @@
             </button>
       </div>
 
-        <div v-if="basicRating" class="flex items-center ml-3 mb-2.5">
+        <div v-if="Number(movie.imdb_rating)" class="flex items-center ml-3 mb-2.5">
             <div
                 class="flex items-center bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-800">
                 <svg
@@ -54,7 +54,9 @@
                           d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
                           fill-rule="evenodd"/>
                 </svg>
-                <span class="ml-1.5 text-xs font-black text-gray-700 dark:text-gray-200">{{ movie.imdb_rating }}</span>
+                <span class="ml-1.5 text-xs font-black text-gray-700 dark:text-gray-200">{{
+                        (movie.imdb_rating / 2).toFixed(1)
+                    }}</span>
             </div>
             <span v-if="movie.imdb_votes"
                   class="ml-auto mr-3 text-[10px] text-gray-400 dark:text-gray-500 font-bold tracking-tight">
