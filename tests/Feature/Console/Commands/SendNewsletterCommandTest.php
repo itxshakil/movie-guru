@@ -40,7 +40,7 @@ it('sends monthly newsletter to subscribers', function () {
     Mail::fake();
 
     NewsletterSubscription::factory()->create(['email' => 'test@example.com']);
-    MovieDetail::factory()->count(5)->create(['views' => 1000]);
+    MovieDetail::factory()->count(5)->create(['year' => now()->year]);
 
     $this->artisan('newsletter:send', ['type' => 'monthly'])
         ->assertExitCode(0);
