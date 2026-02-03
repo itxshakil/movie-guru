@@ -20,44 +20,54 @@
                     <table class="movie-card" width="100%" cellpadding="0" cellspacing="0"
                            style="margin-bottom: 24px; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; border-collapse: separate;">
                         <tr>
-                            <td width="130" valign="top" style="padding: 0; line-height: 0;">
+                            <td class="movie-poster-td" width="130" valign="top" style="padding: 0; line-height: 0;">
                                 <a href="{{ url('/i/' . $movie->imdb_id) }}">
                                     <img src="{{ $movie->poster }}" alt="{{ $movie->title }}" width="130" height="190"
-                                         style="width: 130px; height: 190px; object-fit: cover; display: block; border: none;">
+                                         style="width: 130px; height: 150px; object-fit: cover; display: block; border: none;">
                                 </a>
                             </td>
-                            <td valign="top" style="padding: 20px;">
+                            <td class="movie-details-td" valign="top" style="padding: 20px;">
                                 <h2 class="movie-title"
                                     style="margin: 0 0 8px 0; font-size: 20px; color: #1e293b; font-weight: 800;">
                                     <a href="{{ url('/i/' . $movie->imdb_id) }}"
                                        style="color: #1e293b; text-decoration: none;">{{ $movie->title }}</a>
                                 </h2>
                                 <div class="movie-meta" style="margin-bottom: 12px; font-size: 14px; font-weight: 600;">
-                                    <span style="color: #eab308;">⭐ {{ $movie->imdb_rating }}</span>
-                                    <span style="margin: 0 10px; color: #cbd5e1;">|</span>
+                                    @php
+                                        $ratingValue = $movie->imdb_rating;
+                                        $showRating = !empty($ratingValue) && $ratingValue !== 'N/A' && (float)$ratingValue > 0;
+                                    @endphp
+                                    @if($showRating)
+                                        <span style="color: #eab308;">⭐ {{ $movie->imdb_rating }}</span>
+                                        <span style="margin: 0 10px; color: #cbd5e1;">|</span>
+                                    @endif
                                     <span style="color: #64748b;" class="movie-meta">📅 {{ $movie->year }}</span>
                                     <span style="margin: 0 10px; color: #cbd5e1;">|</span>
                                     <span style="color: #64748b;"
                                           class="movie-meta">🎭 {{ Str::limit($movie->genre, 15) }}</span>
                                 </div>
-                                <p class="movie-plot"
-                                   style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #475569;">
-                                    {{ Str::limit($movie->details['Plot'] ?? 'No description available.', 130) }}
-                                </p>
-                                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                @if($movie->details['Plot'] && $movie->details['Plot'] !== 'N/A')
+                                    <p class="movie-plot"
+                                       style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                                        {{ Str::limit($movie->details['Plot'] ?? 'No description available.', 130) }}
+                                    </p>
+                                @endif
+                                <table class="movie-actions-table" border="0" cellpadding="0" cellspacing="0"
+                                       role="presentation" width="100%">
                                     <tr>
-                                        <td align="center" bgcolor="#3b82f6" style="border-radius: 8px;">
+                                        <td class="action-td view-details-td" align="center" bgcolor="#3b82f6"
+                                            style="border-radius: 8px; display: block; margin-bottom: 10px;">
                                             <a href="{{ url('/i/' . $movie->imdb_id) }}"
-                                               style="font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; display: inline-block; border: 1px solid #3b82f6;">View
+                                               style="font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 10px 16px; border-radius: 8px; display: block; border: 1px solid #3b82f6;">View
                                                 Details →</a>
                                         </td>
                                         @if($movie->affiliate_link && (is_array($movie->affiliate_link) ? isset($movie->affiliate_link['link']) : isset(json_decode($movie->affiliate_link, true)['link'])))
                                             @php
                                                 $link = is_array($movie->affiliate_link) ? $movie->affiliate_link['link'] : json_decode($movie->affiliate_link, true)['link'];
                                             @endphp
-                                            <td style="padding-left: 10px;">
+                                            <td class="action-td book-now-td" align="center" style="display: block;">
                                                 <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
-                                                   style="font-size: 13px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 8px 16px; border-radius: 8px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                   style="font-size: 13px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 10px 16px; border-radius: 8px; display: block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                     Now</a>
                                             </td>
                                         @endif
@@ -84,18 +94,20 @@
                                style="margin-bottom: 24px; background-color: #ffffff; border-radius: 16px; border-left: 5px solid #eab308; border-collapse: separate; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                             <tr>
                                 <td style="padding: 20px;">
-                                    <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
+                                    <h3 class="special-header"
+                                        style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
                                         🌟 Trending Now</h3>
                                     <table width="100%" cellpadding="0" cellspacing="0">
                                         <tr>
-                                            <td width="90" valign="top" style="padding-right: 20px;">
+                                            <td class="special-poster-td" width="90" valign="top"
+                                                style="padding-right: 20px;">
                                                 <a href="{{ url('/i/' . $trendingMovie->imdb_id) }}">
                                                     <img src="{{ $trendingMovie->poster }}"
                                                          alt="{{ $trendingMovie->title }}" width="90" height="130"
                                                          style="width: 90px; height: 130px; border-radius: 8px; object-fit: cover; display: block; border: none;">
                                                 </a>
                                             </td>
-                                            <td valign="top">
+                                            <td class="special-details-td" valign="top">
                                                 <h4 class="movie-title"
                                                     style="margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #1e293b;">
                                                     <a href="{{ url('/i/' . $trendingMovie->imdb_id) }}"
@@ -103,26 +115,38 @@
                                                 </h4>
                                                 <div class="movie-meta"
                                                      style="margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">
-                                                    <span>⭐ {{ $trendingMovie->imdb_rating }}</span> • <span
+                                                    @php
+                                                        $ratingValue = $trendingMovie->imdb_rating;
+                                                        $showRating = !empty($ratingValue) && $ratingValue !== 'N/A' && (float)$ratingValue > 0;
+                                                    @endphp
+                                                    @if($showRating)
+                                                        <span>⭐ {{ $trendingMovie->imdb_rating }}</span> •
+                                                    @endif
+                                                    <span
                                                         class="movie-meta">{{ $trendingMovie->year }}</span>
                                                 </div>
-                                                <p class="movie-plot-special"
-                                                   style="margin: 0 0 12px 0; font-size: 14px; color: #475569; line-height: 1.5;">{{ Str::limit($trendingMovie->details['Plot'] ?? '', 110) }}</p>
-                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                @if($trendingMovie->details['Plot'] && $trendingMovie->details['Plot'] !== 'N/A')
+                                                    <p class="movie-plot-special"
+                                                       style="margin: 0 0 12px 0; font-size: 14px; color: #475569; line-height: 1.5;">{{ Str::limit($trendingMovie->details['Plot'] ?? '', 110) }}</p>
+                                                @endif
+                                                <table class="movie-actions-table" border="0" cellpadding="0"
+                                                       cellspacing="0" role="presentation" width="100%">
                                                     <tr>
-                                                        <td align="center" bgcolor="#3b82f6"
-                                                            style="border-radius: 6px;">
+                                                        <td class="action-td view-details-td" align="center"
+                                                            bgcolor="#3b82f6"
+                                                            style="border-radius: 6px; display: block; margin-bottom: 10px;">
                                                             <a href="{{ url('/i/' . $trendingMovie->imdb_id) }}"
-                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
+                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 6px; display: block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
                                                         @if($trendingMovie->affiliate_link && (is_array($trendingMovie->affiliate_link) ? isset($trendingMovie->affiliate_link['link']) : isset(json_decode($trendingMovie->affiliate_link, true)['link'])))
                                                             @php
                                                                 $link = is_array($trendingMovie->affiliate_link) ? $trendingMovie->affiliate_link['link'] : json_decode($trendingMovie->affiliate_link, true)['link'];
                                                             @endphp
-                                                            <td style="padding-left: 10px;">
+                                                            <td class="action-td book-now-td" align="center"
+                                                                style="display: block;">
                                                                 <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
-                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 8px 12px; border-radius: 6px; display: block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                                     Now</a>
                                                             </td>
                                                         @endif
@@ -141,18 +165,20 @@
                                style="margin-bottom: 24px; background-color: #ffffff; border-radius: 16px; border-left: 5px solid #eab308; border-collapse: separate; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                             <tr>
                                 <td style="padding: 20px;">
-                                    <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
+                                    <h3 class="special-header"
+                                        style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
                                         🌟 Recommended for You</h3>
                                     <table width="100%" cellpadding="0" cellspacing="0">
                                         <tr>
-                                            <td width="90" valign="top" style="padding-right: 20px;">
+                                            <td class="special-poster-td" width="90" valign="top"
+                                                style="padding-right: 20px;">
                                                 <a href="{{ url('/i/' . $recommendedMovie->imdb_id) }}">
                                                     <img src="{{ $recommendedMovie->poster }}"
                                                          alt="{{ $recommendedMovie->title }}" width="90" height="130"
                                                          style="width: 90px; height: 130px; border-radius: 8px; object-fit: cover; display: block; border: none;">
                                                 </a>
                                             </td>
-                                            <td valign="top">
+                                            <td class="special-details-td" valign="top">
                                                 <h4 class="movie-title"
                                                     style="margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #1e293b;">
                                                     <a href="{{ url('/i/' . $recommendedMovie->imdb_id) }}"
@@ -160,26 +186,36 @@
                                                 </h4>
                                                 <div class="movie-meta"
                                                      style="margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">
-                                                    <span>⭐ {{ $recommendedMovie->imdb_rating }}</span> • <span
+                                                    @php
+                                                        $ratingValue = $recommendedMovie->imdb_rating;
+                                                        $showRating = !empty($ratingValue) && $ratingValue !== 'N/A' && (float)$ratingValue > 0;
+                                                    @endphp
+                                                    @if($showRating)
+                                                        <span>⭐ {{ $recommendedMovie->imdb_rating }}</span> •
+                                                    @endif
+                                                    <span
                                                         class="movie-meta">{{ $recommendedMovie->year }}</span>
                                                 </div>
                                                 <p class="movie-plot-special"
                                                    style="margin: 0 0 12px 0; font-size: 14px; color: #475569; line-height: 1.5;">{{ Str::limit($recommendedMovie->details['Plot'] ?? '', 110) }}</p>
-                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                <table class="movie-actions-table" border="0" cellpadding="0"
+                                                       cellspacing="0" role="presentation" width="100%">
                                                     <tr>
-                                                        <td align="center" bgcolor="#3b82f6"
-                                                            style="border-radius: 6px;">
+                                                        <td class="action-td view-details-td" align="center"
+                                                            bgcolor="#3b82f6"
+                                                            style="border-radius: 6px; display: block; margin-bottom: 10px;">
                                                             <a href="{{ url('/i/' . $recommendedMovie->imdb_id) }}"
-                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
+                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 6px; display: block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
                                                         @if($recommendedMovie->affiliate_link && (is_array($recommendedMovie->affiliate_link) ? isset($recommendedMovie->affiliate_link['link']) : isset(json_decode($recommendedMovie->affiliate_link, true)['link'])))
                                                             @php
                                                                 $link = is_array($recommendedMovie->affiliate_link) ? $recommendedMovie->affiliate_link['link'] : json_decode($recommendedMovie->affiliate_link, true)['link'];
                                                             @endphp
-                                                            <td style="padding-left: 10px;">
+                                                            <td class="action-td book-now-td" align="center"
+                                                                style="display: block;">
                                                                 <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
-                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 8px 12px; border-radius: 6px; display: block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                                     Now</a>
                                                             </td>
                                                         @endif
@@ -198,18 +234,20 @@
                                style="background-color: #ffffff; border-radius: 16px; border-left: 5px solid #8b5cf6; border-collapse: separate; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                             <tr>
                                 <td style="padding: 20px;">
-                                    <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
+                                    <h3 class="special-header"
+                                        style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 800;">
                                         💎 Hidden Gem</h3>
                                     <table width="100%" cellpadding="0" cellspacing="0">
                                         <tr>
-                                            <td width="90" valign="top" style="padding-right: 20px;">
+                                            <td class="special-poster-td" width="90" valign="top"
+                                                style="padding-right: 20px;">
                                                 <a href="{{ url('/i/' . $hiddenGem->imdb_id) }}">
                                                     <img src="{{ $hiddenGem->poster }}" alt="{{ $hiddenGem->title }}"
                                                          width="90" height="130"
                                                          style="width: 90px; height: 130px; border-radius: 8px; object-fit: cover; display: block; border: none;">
                                                 </a>
                                             </td>
-                                            <td valign="top">
+                                            <td class="special-details-td" valign="top">
                                                 <h4 class="movie-title"
                                                     style="margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #1e293b;">
                                                     <a href="{{ url('/i/' . $hiddenGem->imdb_id) }}"
@@ -217,26 +255,38 @@
                                                 </h4>
                                                 <div class="movie-meta"
                                                      style="margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">
-                                                    <span>⭐ {{ $hiddenGem->imdb_rating }}</span> • <span
+                                                    @php
+                                                        $ratingValue = $hiddenGem->imdb_rating;
+                                                        $showRating = !empty($ratingValue) && $ratingValue !== 'N/A' && (float)$ratingValue > 0;
+                                                    @endphp
+                                                    @if($showRating)
+                                                        <span>⭐ {{ $hiddenGem->imdb_rating }}</span> •
+                                                    @endif
+                                                    <span
                                                         class="movie-meta">{{ $hiddenGem->year }}</span>
                                                 </div>
-                                                <p class="movie-plot-special"
-                                                   style="margin: 0 0 12px 0; font-size: 14px; color: #475569; line-height: 1.5;">{{ Str::limit($hiddenGem->details['Plot'] ?? '', 110) }}</p>
-                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                @if($hiddenGem->details['Plot'] && $hiddenGem->details['Plot'] !== 'N/A')
+                                                    <p class="movie-plot-special"
+                                                       style="margin: 0 0 12px 0; font-size: 14px; color: #475569; line-height: 1.5;">{{ Str::limit($hiddenGem->details['Plot'] ?? '', 110) }}</p>
+                                                @endif
+                                                <table class="movie-actions-table" border="0" cellpadding="0"
+                                                       cellspacing="0" role="presentation" width="100%">
                                                     <tr>
-                                                        <td align="center" bgcolor="#3b82f6"
-                                                            style="border-radius: 6px;">
+                                                        <td class="action-td view-details-td" align="center"
+                                                            bgcolor="#3b82f6"
+                                                            style="border-radius: 6px; display: block; margin-bottom: 10px;">
                                                             <a href="{{ url('/i/' . $hiddenGem->imdb_id) }}"
-                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6;">View
+                                                               style="font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 6px; display: block; border: 1px solid #3b82f6;">View
                                                                 Details →</a>
                                                         </td>
                                                         @if($hiddenGem->affiliate_link && (is_array($hiddenGem->affiliate_link) ? isset($hiddenGem->affiliate_link['link']) : isset(json_decode($hiddenGem->affiliate_link, true)['link'])))
                                                             @php
                                                                 $link = is_array($hiddenGem->affiliate_link) ? $hiddenGem->affiliate_link['link'] : json_decode($hiddenGem->affiliate_link, true)['link'];
                                                             @endphp
-                                                            <td style="padding-left: 10px;">
+                                                            <td class="action-td book-now-td" align="center"
+                                                                style="display: block;">
                                                                 <a href="{{ $link . (str_contains($link, '?') ? '&' : '?') . 'utm_source=newsletter' }}"
-                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
+                                                                   style="font-size: 12px; font-weight: 700; color: #3b82f6; text-decoration: none; padding: 8px 12px; border-radius: 6px; display: block; border: 1px solid #3b82f6; background-color: #ffffff;">Book
                                                                     Now</a>
                                                             </td>
                                                         @endif
