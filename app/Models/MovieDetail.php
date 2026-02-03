@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -144,5 +145,10 @@ final class MovieDetail extends Model
             'affiliate_link' => 'json',
             'source_last_fetched_at' => 'datetime',
         ];
+    }
+
+    protected function poster(): Attribute
+    {
+        return Attribute::get(static fn(string $value): string => ($value && mb_strtolower($value) !== 'n/a') ? $value : asset('/assets/images/no-poster.jpg'));
     }
 }
