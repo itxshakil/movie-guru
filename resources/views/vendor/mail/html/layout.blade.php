@@ -79,6 +79,72 @@
             .footer {
                 width: 100% !important;
             }
+
+            /* Responsive Special Selections for Mobile */
+            .special-card td {
+                display: block !important;
+                width: 100% !important;
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+            }
+
+            .special-card img {
+                width: 100% !important;
+                height: auto !important;
+                border-radius: 8px 8px 0 0 !important;
+            }
+
+            .special-card h3, .special-card h4, .special-card .movie-meta, .special-card .movie-plot-special, .special-card table {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+                box-sizing: border-box !important;
+            }
+
+            .special-card table {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .special-card td[width="90"] {
+                width: 100% !important;
+                padding-right: 0 !important;
+                margin-bottom: 15px !important;
+            }
+
+            .special-poster-td, .special-details-td {
+                display: block !important;
+                width: 100% !important;
+                padding-right: 0 !important;
+            }
+
+            .special-poster-td img {
+                width: 100% !important;
+                height: auto !important;
+                border-radius: 8px !important;
+                margin-bottom: 15px !important;
+            }
+
+            .special-header {
+                text-align: center !important;
+            }
+
+            .movie-poster-td, .movie-details-td {
+                display: block !important;
+                width: 100% !important;
+            }
+
+            .movie-poster-td img {
+                width: 100% !important;
+                height: auto !important;
+                max-height: 200px;
+                border-radius: 16px 16px 0 0 !important;
+            }
+
+            .movie-actions-table td {
+                display: block !important;
+                width: 100% !important;
+                padding-left: 0 !important;
+            }
         }
 
         @media only screen and (max-width: 500px) {
