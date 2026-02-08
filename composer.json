@@ -16,6 +16,7 @@
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
+        "carthage-software/mago": "^1.6",
         "driftingly/rector-laravel": "^2.1",
         "fakerphp/faker": "^1.9.1",
         "larastan/larastan": "^3.8",
@@ -99,6 +100,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "carthage-software/mago": true,
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
