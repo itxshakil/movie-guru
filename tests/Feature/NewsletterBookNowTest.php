@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('renders book now button when affiliate link is present', function () {
+it('renders book now button when affiliate link is present', function (): void {
     $affiliateLink = ['link' => 'https://pvr.com', 'title' => 'PVR'];
     $movie = MovieDetail::factory()->create([
         'affiliate_link' => $affiliateLink,
@@ -29,7 +29,7 @@ it('renders book now button when affiliate link is present', function () {
     expect($html)->toContain('utm_source=newsletter');
 });
 
-it('does not render book now button when affiliate link is missing', function () {
+it('does not render book now button when affiliate link is missing', function (): void {
     $movie = MovieDetail::factory()->create([
         'affiliate_link' => null,
     ]);
@@ -46,7 +46,7 @@ it('does not render book now button when affiliate link is missing', function ()
     expect($html)->not->toContain('Book Now');
 });
 
-it('renders book now button for special selections when affiliate link is present', function () {
+it('renders book now button for special selections when affiliate link is present', function (): void {
     $affiliateLink = ['link' => 'https://pvr.com', 'title' => 'PVR'];
     $trendingMovie = MovieDetail::factory()->create(['affiliate_link' => $affiliateLink]);
     $recommendedMovie = MovieDetail::factory()->create(['affiliate_link' => $affiliateLink]);

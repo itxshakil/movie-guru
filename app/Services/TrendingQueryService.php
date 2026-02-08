@@ -19,7 +19,7 @@ final class TrendingQueryService
         return Cache::remember('trending-search-queries', now()->endOfDay(), function () {
             $queries = Search::recentOnly()->hasResults()->popular()->pluck('query');
 
-            $titleCleaner = app(TitleCleaner::class);
+            $titleCleaner = resolve(TitleCleaner::class);
 
             return $queries->map(fn(?string $query) => Str::title($titleCleaner->clean($query)))->unique()->values();
         });

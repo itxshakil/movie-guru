@@ -47,7 +47,7 @@ final class DetailController extends Controller
                 $movie->source_last_fetched_at->lt(now()->subMonth())
             );
 
-        $botDetector = app(BotDetectorService::class);
+        $botDetector = resolve(BotDetectorService::class);
         if ($botDetector->isBot($request) === false) {
             defer(static function () use ($shouldRefresh, $request, $imdbId): void {
                 ShowPageAnalytics::create([
@@ -57,7 +57,7 @@ final class DetailController extends Controller
                 ]);
 
                 if ($shouldRefresh) {
-                    $watchMode = app(WatchModeService::class);
+                    $watchMode = resolve(WatchModeService::class);
                     $sources = $watchMode->getTitleSources($imdbId, ['IN']);
 
                     if ($sources->isNotEmpty()) {
@@ -157,7 +157,7 @@ final class DetailController extends Controller
             return [];
         }
 
-        $OMDBApiService = app(OMDBApiService::class);
+        $OMDBApiService = resolve(OMDBApiService::class);
         $detail = $OMDBApiService->getById($imdbId);
         $ipAddress = request()->ip();
 
@@ -197,7 +197,7 @@ final class DetailController extends Controller
         defer(/**
          * @throws ConnectionException
          */ function () use ($imdbId): void {
-            $OMDBApiService = app(OMDBApiService::class);
+            $OMDBApiService = resolve(OMDBApiService::class);
             $imdbId = $this->extractImdbId($imdbId);
             $updatedDetail = $OMDBApiService->getById($imdbId);
 

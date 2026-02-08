@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
-it('sends weekly newsletter to subscribers', function () {
+it('sends weekly newsletter to subscribers', function (): void {
     Mail::fake();
 
     NewsletterSubscription::factory()->create(['email' => 'test@example.com']);
@@ -31,12 +31,10 @@ it('sends weekly newsletter to subscribers', function () {
     $this->artisan('newsletter:send', ['type' => 'weekly'])
         ->assertExitCode(0);
 
-    Mail::assertQueued(NewsletterMail::class, function ($mail) {
-        return $mail->recommendedMovie !== null && $mail->hiddenGem !== null && $mail->unsubscribeUrl !== null;
-    });
+    Mail::assertQueued(NewsletterMail::class, fn($mail): bool => $mail->recommendedMovie !== null && $mail->hiddenGem !== null && $mail->unsubscribeUrl !== null);
 });
 
-it('sends monthly newsletter to subscribers', function () {
+it('sends monthly newsletter to subscribers', function (): void {
     Mail::fake();
 
     NewsletterSubscription::factory()->create(['email' => 'test@example.com']);
@@ -48,7 +46,7 @@ it('sends monthly newsletter to subscribers', function () {
     Mail::assertQueued(NewsletterMail::class);
 });
 
-it('does not send newsletter if no movies found', function () {
+it('does not send newsletter if no movies found', function (): void {
     Mail::fake();
 
     NewsletterSubscription::factory()->create(['email' => 'test@example.com']);

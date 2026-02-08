@@ -31,7 +31,7 @@ final class SendNewsletterCommand extends Command
             return;
         }
 
-        $this->log("Starting $type newsletter delivery.");
+        $this->log(sprintf('Starting %s newsletter delivery.', $type));
 
         $movies = $this->getMoviesForNewsletter($type);
         $recommendedMovie = MovieDetail::recommended()->inRandomOrder()->first();
@@ -39,7 +39,7 @@ final class SendNewsletterCommand extends Command
         $trendingMovie = MovieDetail::trending()->inRandomOrder()->first();
 
         if ($movies->isEmpty()) {
-            $this->warning("No movies found to include in the $type newsletter.");
+            $this->warning(sprintf('No movies found to include in the %s newsletter.', $type));
 
             return;
         }
@@ -70,7 +70,7 @@ final class SendNewsletterCommand extends Command
             ));
         }
 
-        $this->log("Finished sending $type newsletter to {$subscribers->count()} subscribers.");
+        $this->log(sprintf('Finished sending %s newsletter to %d subscribers.', $type, $subscribers->count()));
     }
 
     /**

@@ -177,9 +177,9 @@ final class SearchController extends Controller
      */
     public function getSearchData(?string $search, Request $request): array
     {
-        $titleCleaner = app(TitleCleaner::class);
-        $trendingQueryService = app(TrendingQueryService::class);
-        $OMDBApiService = app(OMDBApiService::class);
+        $titleCleaner = resolve(TitleCleaner::class);
+        $trendingQueryService = resolve(TrendingQueryService::class);
+        $OMDBApiService = resolve(OMDBApiService::class);
 
         $page = $request->integer('page', 1);
         $movieType = $request->get('type');
@@ -203,7 +203,7 @@ final class SearchController extends Controller
             fn() => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
         );
 
-        $botdetector = app(BotDetectorService::class);
+        $botdetector = resolve(BotDetectorService::class);
         if ($botdetector->isBot($request) === false) {
             defer(function () use ($request, $year, $movieType, $page, $search, $movies): void {
                 $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
