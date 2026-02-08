@@ -7,8 +7,7 @@ use App\Models\User;
 test('profile page is displayed', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->get('/profile');
 
     $response->assertOk();
@@ -17,8 +16,7 @@ test('profile page is displayed', function (): void {
 test('profile information can be updated', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->patch('/profile', [
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -38,8 +36,7 @@ test('profile information can be updated', function (): void {
 test('email verification status is unchanged when the email address is unchanged', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->patch('/profile', [
             'name' => 'Test User',
             'email' => $user->email,
@@ -55,8 +52,7 @@ test('email verification status is unchanged when the email address is unchanged
 test('user can delete their account', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->delete('/profile', [
             'password' => 'password',
         ]);
@@ -72,8 +68,7 @@ test('user can delete their account', function (): void {
 test('correct password must be provided to delete account', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->from('/profile')
         ->delete('/profile', [
             'password' => 'wrong-password',

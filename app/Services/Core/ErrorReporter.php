@@ -78,10 +78,11 @@ final class ErrorReporter
             'url' => $request->fullUrl(),
             'method' => $request->method(),
             'payload' => self::sanitizePayload($request->all()),
-            'user' => auth()->check() ? [
-                'id' => auth()->id(),
-                'email' => auth()->user()?->email,
-            ] : null,
+            'user' => auth()->check()
+                ? [
+                    'id' => auth()->id(),
+                    'email' => auth()->user()?->email,
+                ] : null,
             'environment' => app()->environment(),
             'request_id' => Context::get('request_id', 'NA'),
             'ip' => $request->ip(),

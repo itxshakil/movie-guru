@@ -16,12 +16,18 @@ final class TrendingQueryService
      */
     public function fetch(): Collection
     {
-        return Cache::remember('trending-search-queries', now()->endOfDay(), function () {
-            $queries = Search::recentOnly()->hasResults()->popular()->pluck('query');
+        return Cache::remember('trending-search-queries', now()->endOfDay(), static function () {
+            $queries = Search::recentOnly()
+                ->hasResults()
+                ->popular()
+                ->pluck('query');
 
             $titleCleaner = resolve(TitleCleaner::class);
 
-            return $queries->map(fn(?string $query) => Str::title($titleCleaner->clean($query)))->unique()->values();
+            return $queries
+                ->map(static fn(?string $query) => Str::title($titleCleaner->clean($query)))
+                ->unique()
+                ->values();
         });
     }
 }

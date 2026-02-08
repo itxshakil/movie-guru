@@ -9,14 +9,14 @@ use App\Enums\WatchModeSourceType;
 final readonly class WatchModeSourceMeta
 {
     public function __construct(
-        public int    $id,
+        public int   $id,
         public string $name,
         public WatchModeSourceType $type,
         public string $logo100px,
         public ?string $iosAppstoreUrl = null,
         public ?string $androidPlaystoreUrl = null,
         /** @var string[] */
-        public array  $regions = [],
+        public array $regions = [],
     )
     {
     }

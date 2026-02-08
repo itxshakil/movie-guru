@@ -21,18 +21,19 @@ final class SitemapGenerator extends Command
     {
         $sitemap = Sitemap::create();
 
-        $sitemap->add(Url::create('/'))
+        $sitemap
+            ->add(Url::create('/'))
             ->add(Url::create('/privacy'))
             ->add(Url::create('/terms'))
             ->add(Url::create('/contact'));
 
         $limit = (int)$this->option('limit');
 
-        $this->getTopSearches($limit)->each(function (Search $topQuery) use ($sitemap): void {
+        $this->getTopSearches($limit)->each(static function (Search $topQuery) use ($sitemap): void {
             $sitemap->add(Url::create('/search/' . $topQuery->query));
         });
 
-        $this->getTopMovies($limit)->each(function (MovieDetail $topMovie) use ($sitemap): void {
+        $this->getTopMovies($limit)->each(static function (MovieDetail $topMovie) use ($sitemap): void {
             $sitemap->add(Url::create('/movie/' . $topMovie->imdb_id));
         });
 

@@ -74,15 +74,17 @@ final class SpamKeywordRule implements Rule
         ];
 
         foreach ($spamKeywords as $spamKeyword) {
-            if (mb_stripos(mb_strtolower((string)$value), mb_strtolower($spamKeyword)) !== false) {
-                try {
-                    Log::channel('spam-keyword')->info('Spam Keyword Detected: ' . $spamKeyword . ' in ' . $value);
-                } catch (Exception $e) {
-                    Log::error('Error logging spam keyword: ' . $e->getMessage());
-                }
-
-                return false;
+            if (mb_stripos(mb_strtolower((string)$value), mb_strtolower($spamKeyword)) === false) {
+                continue;
             }
+
+            try {
+                Log::channel('spam-keyword')->info('Spam Keyword Detected: ' . $spamKeyword . ' in ' . $value);
+            } catch (Exception $e) {
+                Log::error('Error logging spam keyword: ' . $e->getMessage());
+            }
+
+            return false;
         }
 
         return true;

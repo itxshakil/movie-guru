@@ -118,21 +118,27 @@ final class OMDBApiService
         $apiKey = $this->getRandomApiKey();
         $url = 'https://www.omdbapi.com/?apikey=' . $apiKey . '&' . $query;
         $startTime = microtime(true);
-        $response = Http::retry(3)->connectTimeout(3)->get($url)->json();
+        $response = Http::retry(3)
+            ->connectTimeout(3)
+            ->get($url)
+            ->json();
 
         $endTime = microtime(true);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
 
-        Log::channel('omdb')->info(sprintf('OMDB API took %s ms to respond. URL: %s', $responseTime, $url), [
-            $response,
-        ]);
+        Log::channel('omdb')->info(
+            sprintf('OMDB API took %s ms to respond. URL: %s', $responseTime, $url),
+            [
+                $response,
+            ],
+        );
 
         if (
             isset($response['Response'], $response['Search'])
             && $response['Response'] === 'True'
             && count($response['Search']) > 0
         ) {
-            $result = array_map(fn(array $item): array => [
+            $result = array_map(static fn(array $item): array => [
                 'title' => $item['Title'],
                 'year' => $item['Year'],
                 'type' => $item['Type'],

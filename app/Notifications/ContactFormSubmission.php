@@ -16,7 +16,9 @@ final class ContactFormSubmission extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Contact $contact)
+    public function __construct(
+        public Contact $contact,
+    )
     {
     }
 
@@ -35,7 +37,7 @@ final class ContactFormSubmission extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return new MailMessage()->markdown('emails.contact', [
+        return (new MailMessage())->markdown('emails.contact', [
             'contact' => $this->contact,
         ]);
     }
@@ -47,8 +49,6 @@ final class ContactFormSubmission extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 }

@@ -22,10 +22,10 @@ final class TitleCleaner
         $patterns = [
             '/https?:\/\/\S+/i', // Remove URLs
             '/\b(share|shared|click|link|download|copy|view|terabox|mega\.nz|drive\.google)\b.*/i', // Remove share messages
-            '/\s*full[\s-]*movie$/i',       // Remove "full movie" (with optional spaces or hyphen) at the end
-            '/\s*south[\s-]*movie$/i',      // Remove "south movie" (with optional spaces or hyphen) at the end
-            '/\s*movie$/i',                 // Remove "movie" at the end
-            '/\s*\(\d{4}\)$/i',             // Remove years in parentheses (e.g., "(2023)")
+            '/\s*full[\s-]*movie$/i', // Remove "full movie" (with optional spaces or hyphen) at the end
+            '/\s*south[\s-]*movie$/i', // Remove "south movie" (with optional spaces or hyphen) at the end
+            '/\s*movie$/i', // Remove "movie" at the end
+            '/\s*\(\d{4}\)$/i', // Remove years in parentheses (e.g., "(2023)")
             '/\b(?:filmyzilla|123movies|torrent|netflix|hotstar|prime video|hbo max)\b/i',
             // Remove platform names
             '/\b(?:part|episode|season)\s*\d+\b/i', // Remove parts, episodes, or seasons

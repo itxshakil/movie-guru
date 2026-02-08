@@ -28,7 +28,6 @@ final class AppServiceProvider extends ServiceProvider
     #[Override]
     public function register(): void
     {
-        //
     }
 
     /**
@@ -39,12 +38,12 @@ final class AppServiceProvider extends ServiceProvider
         Model::shouldBeStrict();
 
         if ($this->app->isProduction()) {
-            Model::handleLazyLoadingViolationUsing(function ($model, string $relation): void {
+            Model::handleLazyLoadingViolationUsing(static function ($model, string $relation): void {
                 logger()->warning('Attempted to lazy load ' . $model::class . '::' . $relation);
             });
         }
 
-        Event::listen(function (DatabaseBusy $event): void {
+        Event::listen(static function (DatabaseBusy $event): void {
             Notification::route('mail', 'dev@example.com')
                 ->notify(new DatabaseApproachingMaxConnections(
                     $event->connectionName,
@@ -52,14 +51,16 @@ final class AppServiceProvider extends ServiceProvider
                 ));
         });
 
-        DB::whenQueryingForLongerThan(100, function (Connection $connection, QueryExecuted $event): void {
+        DB::whenQueryingForLongerThan(100, static function (Connection $connection, QueryExecuted $event): void {
             Notification::route('mail', config('mail.admin.address'))
                 ->notify(new SlowQueryDetected($connection, $event));
         });
 
-        RateLimiter::for('api', fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('api', static fn(Request $request) => Limit::perMinute(60)->by(
+            $request->user()?->id ?: $request->ip(),
+        ));
 
-        RateLimiter::for('search', function (Request $request) {
+        RateLimiter::for('search', static function (Request $request) {
             $search = $request->get('s');
             $page = $request->get('page', 1);
             $movieType = $request->get('type');
@@ -70,7 +71,7 @@ final class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by($cacheKey);
         });
 
-        RateLimiter::for('movie-show', function (Request $request) {
+        RateLimiter::for('movie-show', static function (Request $request) {
             $imdbId = $request->route('imdbID');
             $cacheKey = 'movie-show.' . $imdbId . '.' . $request->ip();
 

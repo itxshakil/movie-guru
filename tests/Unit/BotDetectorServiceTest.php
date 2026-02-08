@@ -14,6 +14,13 @@ use Tests\TestCase;
 
 final class BotDetectorServiceTest extends TestCase
 {
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Cache::flush();
+    }
+
     public function test_it_detects_bots_by_user_agent(): void
     {
         Log::spy();
@@ -33,7 +40,10 @@ final class BotDetectorServiceTest extends TestCase
         $botDetectorService = new BotDetectorService();
         // 66.249.64.1 is in 66.249.64.0/19
         $request = Request::create('/', 'GET', [], [], [], ['REMOTE_ADDR' => '66.249.64.1']);
-        $request->headers->set('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+        $request->headers->set(
+            'User-Agent',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        );
         $request->headers->set('Accept-Language', 'en-US,en;q=0.9');
         $request->headers->set('Accept-Encoding', 'gzip, deflate, br');
 
@@ -45,7 +55,10 @@ final class BotDetectorServiceTest extends TestCase
         Log::spy();
         $botDetectorService = new BotDetectorService();
         $request = Request::create('/', 'GET');
-        $request->headers->set('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+        $request->headers->set(
+            'User-Agent',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        );
         $request->headers->remove('Accept-Language');
         $request->headers->remove('Accept-Encoding');
 
@@ -56,7 +69,10 @@ final class BotDetectorServiceTest extends TestCase
     {
         $botDetectorService = new BotDetectorService();
         $request = Request::create('/', 'GET');
-        $request->headers->set('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+        $request->headers->set(
+            'User-Agent',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        );
         $request->headers->set('Accept-Language', 'en-US,en;q=0.9');
         $request->headers->set('Accept-Encoding', 'gzip, deflate, br');
 
@@ -75,12 +91,5 @@ final class BotDetectorServiceTest extends TestCase
         $cacheKey = 'bot_detection_' . md5($request->ip() . $request->userAgent());
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertTrue(Cache::get($cacheKey));
-    }
-
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Cache::flush();
     }
 }

@@ -41,10 +41,12 @@ final class DetailController extends Controller
 
         $sources = $movie->sources ?? [];
 
-        $shouldRefresh = $movie instanceof MovieDetail && (
-                empty($sources) ||
-                $movie->source_last_fetched_at === null ||
-                $movie->source_last_fetched_at->lt(now()->subMonth())
+        $shouldRefresh =
+            $movie instanceof MovieDetail
+            && (
+                empty($sources)
+                || $movie->source_last_fetched_at === null
+                || $movie->source_last_fetched_at->lt(now()->subMonth())
             );
 
         $botDetector = resolve(BotDetectorService::class);
@@ -83,33 +85,47 @@ final class DetailController extends Controller
             ]);
         }
 
-        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), fn() => MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
-            'imdb_id',
-            'title',
-            'year',
-            'release_date',
-            'poster',
-            'type',
-            'imdb_rating',
-            'imdb_votes',
-            'director',
-            'writer',
-            'actors',
-        ]));
+        $recentlyReleasedMovies = Cache::remember(
+            'recently-released-movies',
+            now()->endOfDay(),
+            static fn() => MovieDetail::recentlyReleased()
+                ->inRandomOrder()
+                ->take(6)
+                ->get([
+                    'imdb_id',
+                    'title',
+                    'year',
+                    'release_date',
+                    'poster',
+                    'type',
+                    'imdb_rating',
+                    'imdb_votes',
+                    'director',
+                    'writer',
+                    'actors',
+                ]),
+        );
 
-        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), fn() => MovieDetail::recommended()->inRandomOrder()->take(6)->get([
-            'imdb_id',
-            'title',
-            'year',
-            'release_date',
-            'poster',
-            'type',
-            'imdb_rating',
-            'imdb_votes',
-            'director',
-            'writer',
-            'actors',
-        ]));
+        $recommendedMovies = Cache::remember(
+            'recommended-movies',
+            now()->endOfDay(),
+            static fn() => MovieDetail::recommended()
+                ->inRandomOrder()
+                ->take(6)
+                ->get([
+                    'imdb_id',
+                    'title',
+                    'year',
+                    'release_date',
+                    'poster',
+                    'type',
+                    'imdb_rating',
+                    'imdb_votes',
+                    'director',
+                    'writer',
+                    'actors',
+                ]),
+        );
 
         return Inertia::render('Show', [
             'detail' => $detail,
@@ -139,7 +155,7 @@ final class DetailController extends Controller
     public function handleDB(MovieDetail $movie, string $imdbId): MovieDetail
     {
         $ipAddress = request()->ip();
-        defer(fn() => $movie->incrementViews($ipAddress));
+        defer(static fn() => $movie->incrementViews($ipAddress));
         $this->updateDetailInBG($imdbId);
 
         return $movie;
@@ -194,46 +210,52 @@ final class DetailController extends Controller
 
     private function updateDetailInBG(string $imdbId): void
     {
-        defer(/**
+        defer(
+        /**
          * @throws ConnectionException
-         */ function () use ($imdbId): void {
-            $OMDBApiService = resolve(OMDBApiService::class);
-            $imdbId = $this->extractImdbId($imdbId);
-            $updatedDetail = $OMDBApiService->getById($imdbId);
+         */
+            function () use ($imdbId): void {
+                $OMDBApiService = resolve(OMDBApiService::class);
+                $imdbId = $this->extractImdbId($imdbId);
+                $updatedDetail = $OMDBApiService->getById($imdbId);
 
-            if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
+                if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
+                    $response = $updatedDetail['Response'] ?? null;
+                    report(new Exception(
+                        'Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response,
+                        500,
+                    ));
 
-                $response = $updatedDetail['Response'] ?? null;
-                report(new Exception('Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response, 500));
+                    Log::error('Failed to fetch updated details for IMDB ID: ' . $imdbId, [
+                        'response' => $updatedDetail,
+                    ]);
 
-                Log::error('Failed to fetch updated details for IMDB ID: ' . $imdbId, [
-                    'response' => $updatedDetail,
+                    return;
+                }
+
+                MovieDetail::updateOrCreate([
+                    'imdb_id' => $imdbId,
+                ], [
+                    'title' => $updatedDetail['Title'],
+                    'year' => $updatedDetail['Year'],
+                    'release_date' => $updatedDetail['Released'],
+                    'poster' => $updatedDetail['Poster'],
+                    'type' => $updatedDetail['Type'],
+                    'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
+                    'imdb_votes' => $this->isValue($updatedDetail['imdbVotes'] ?? null)
+                        ? str_replace(
+                            ',',
+                            '',
+                            $updatedDetail['imdbVotes'],
+                        ) : 0,
+                    'genre' => $updatedDetail['Genre'],
+                    'director' => mb_substr((string)$updatedDetail['Director'], 0, 255),
+                    'writer' => mb_substr((string)$updatedDetail['Writer'], 0, 255),
+                    'actors' => mb_substr((string)$updatedDetail['Actors'], 0, 255),
+                    'details' => $updatedDetail,
                 ]);
-
-                return;
-            }
-
-            MovieDetail::updateOrCreate([
-                'imdb_id' => $imdbId,
-            ], [
-                'title' => $updatedDetail['Title'],
-                'year' => $updatedDetail['Year'],
-                'release_date' => $updatedDetail['Released'],
-                'poster' => $updatedDetail['Poster'],
-                'type' => $updatedDetail['Type'],
-                'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
-                'imdb_votes' => $this->isValue($updatedDetail['imdbVotes'] ?? null) ? str_replace(
-                    ',',
-                    '',
-                    $updatedDetail['imdbVotes'],
-                ) : 0,
-                'genre' => $updatedDetail['Genre'],
-                'director' => mb_substr((string)$updatedDetail['Director'], 0, 255),
-                'writer' => mb_substr((string)$updatedDetail['Writer'], 0, 255),
-                'actors' => mb_substr((string)$updatedDetail['Actors'], 0, 255),
-                'details' => $updatedDetail,
-            ]);
-        });
+            },
+        );
     }
 
     private function isValue(mixed $value): bool

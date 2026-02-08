@@ -17,7 +17,10 @@ final class SlowQueryDetected extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Connection $queryConnection, public QueryExecuted $event)
+    public function __construct(
+        public Connection    $queryConnection,
+        public QueryExecuted $event,
+    )
     {
     }
 
@@ -41,11 +44,12 @@ final class SlowQueryDetected extends Notification
     {
         $timeInSeconds = $this->event->time / 1000;
 
-        return new MailMessage()->markdown('emails.slow-query-detected', [
+        return (new MailMessage())->markdown('emails.slow-query-detected', [
             'connectionName' => $this->queryConnection->getName(),
             'query' => $this->finalQuery(),
             'time' => $timeInSeconds,
         ]);
+
         // TODO: This gives error
         //        return new MailSlowQueryDetected($this->queryConnection->getName(), $this->finalQuery(), $timeInSeconds);
     }

@@ -37,7 +37,12 @@ it('unsubscribes an email using a signed URL', function (): void {
     $this->assertDatabaseHas('newsletter_subscriptions', [
         'email' => 'test@example.com',
     ]);
-    $this->assertNotNull(NewsletterSubscription::withTrashed()->where('email', 'test@example.com')->first()->unsubscribed_at);
+    $this->assertNotNull(
+        NewsletterSubscription::withTrashed()
+            ->where('email', 'test@example.com')
+            ->first()
+            ->unsubscribed_at,
+    );
 });
 
 it('fails to unsubscribe if signature is invalid', function (): void {

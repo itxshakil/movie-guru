@@ -34,7 +34,10 @@ test('spam keyword rule is case insensitive', function (): void {
 });
 
 test('spam keyword rule logs detected spam keywords', function (): void {
-    Log::shouldReceive('channel')->with('spam-keyword')->once()->andReturnSelf();
+    Log::shouldReceive('channel')
+        ->with('spam-keyword')
+        ->once()
+        ->andReturnSelf();
     Log::shouldReceive('info')->once()->with(Mockery::pattern('/Spam Keyword Detected: make money/'));
 
     $rule = new SpamKeywordRule();

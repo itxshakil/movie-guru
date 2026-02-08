@@ -15,6 +15,13 @@ final class TrendingQueryServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Cache::flush();
+    }
+
     public function test_it_fetches_trending_queries(): void
     {
         Search::create(['query' => 'inception', 'total_results' => 10, 'search_count' => 5]);
@@ -60,12 +67,5 @@ final class TrendingQueryServiceTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertEquals('Inception', $results[0]);
-    }
-
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Cache::flush();
     }
 }

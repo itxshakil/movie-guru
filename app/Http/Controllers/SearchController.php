@@ -31,33 +31,47 @@ final class SearchController extends Controller
 
         $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
 
-        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), fn() => MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
-            'imdb_id',
-            'title',
-            'year',
-            'release_date',
-            'poster',
-            'type',
-            'imdb_rating',
-            'imdb_votes',
-            'director',
-            'writer',
-            'actors',
-        ]));
+        $recentlyReleasedMovies = Cache::remember(
+            'recently-released-movies',
+            now()->endOfDay(),
+            static fn() => MovieDetail::recentlyReleased()
+                ->inRandomOrder()
+                ->take(6)
+                ->get([
+                    'imdb_id',
+                    'title',
+                    'year',
+                    'release_date',
+                    'poster',
+                    'type',
+                    'imdb_rating',
+                    'imdb_votes',
+                    'director',
+                    'writer',
+                    'actors',
+                ]),
+        );
 
-        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), fn() => MovieDetail::recommended()->inRandomOrder()->take(6)->get([
-            'imdb_id',
-            'title',
-            'year',
-            'release_date',
-            'poster',
-            'type',
-            'imdb_rating',
-            'imdb_votes',
-            'director',
-            'writer',
-            'actors',
-        ]));
+        $recommendedMovies = Cache::remember(
+            'recommended-movies',
+            now()->endOfDay(),
+            static fn() => MovieDetail::recommended()
+                ->inRandomOrder()
+                ->take(6)
+                ->get([
+                    'imdb_id',
+                    'title',
+                    'year',
+                    'release_date',
+                    'poster',
+                    'type',
+                    'imdb_rating',
+                    'imdb_votes',
+                    'director',
+                    'writer',
+                    'actors',
+                ]),
+        );
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -98,33 +112,47 @@ final class SearchController extends Controller
 
         $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
 
-        $recentlyReleasedMovies = Cache::remember('recently-released-movies', now()->endOfDay(), fn() => MovieDetail::recentlyReleased()->inRandomOrder()->take(6)->get([
-            'imdb_id',
-            'title',
-            'year',
-            'release_date',
-            'poster',
-            'type',
-            'imdb_rating',
-            'imdb_votes',
-            'director',
-            'writer',
-            'actors',
-        ]));
+        $recentlyReleasedMovies = Cache::remember(
+            'recently-released-movies',
+            now()->endOfDay(),
+            static fn() => MovieDetail::recentlyReleased()
+                ->inRandomOrder()
+                ->take(6)
+                ->get([
+                    'imdb_id',
+                    'title',
+                    'year',
+                    'release_date',
+                    'poster',
+                    'type',
+                    'imdb_rating',
+                    'imdb_votes',
+                    'director',
+                    'writer',
+                    'actors',
+                ]),
+        );
 
-        $recommendedMovies = Cache::remember('recommended-movies', now()->endOfDay(), fn() => MovieDetail::recommended()->inRandomOrder()->take(6)->get([
-            'imdb_id',
-            'title',
-            'year',
-            'release_date',
-            'poster',
-            'type',
-            'imdb_rating',
-            'imdb_votes',
-            'director',
-            'writer',
-            'actors',
-        ]));
+        $recommendedMovies = Cache::remember(
+            'recommended-movies',
+            now()->endOfDay(),
+            static fn() => MovieDetail::recommended()
+                ->inRandomOrder()
+                ->take(6)
+                ->get([
+                    'imdb_id',
+                    'title',
+                    'year',
+                    'release_date',
+                    'poster',
+                    'type',
+                    'imdb_rating',
+                    'imdb_votes',
+                    'director',
+                    'writer',
+                    'actors',
+                ]),
+        );
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -186,9 +214,11 @@ final class SearchController extends Controller
         $year = $request->get('year') ? $request->integer('year') : null;
 
         $trendingQueries = $trendingQueryService->fetch();
-        $defaultSearches = $trendingQueries->count() ? $trendingQueries->random(
-            min(5, $trendingQueries->count()),
-        )->all() : [];
+        $defaultSearches = $trendingQueries->count()
+            ? $trendingQueries->random(
+                min(5, $trendingQueries->count()),
+            )->all()
+            : [];
 
         $search = $titleCleaner->clean($search);
 
@@ -200,7 +230,7 @@ final class SearchController extends Controller
         $movies = Cache::flexible(
             $cacheKey,
             [now()->addHours(16), now()->addHours(24)],
-            fn() => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
+            static fn() => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
         );
 
         $botdetector = resolve(BotDetectorService::class);
