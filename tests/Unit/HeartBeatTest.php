@@ -23,12 +23,12 @@ final class HeartBeatTest extends TestCase
 
         config(['mail.admin.address' => 'admin@example.com']);
 
-        new HeartBeat()->handle();
+        (new HeartBeat())->handle();
 
         DB::shouldReceive('connection')->andReturnSelf();
         DB::shouldReceive('getPdo')->andThrow(new Exception('Database connection failed.'));
 
-        new HeartBeat()->handle();
+        (new HeartBeat())->handle();
 
         $this->assertTrue(true);
     }

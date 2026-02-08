@@ -55,11 +55,11 @@ final class MovieDetail extends Model
     #[Scope]
     protected function topRated(Builder $query): void
     {
-        $query->where(function (\Illuminate\Contracts\Database\Query\Builder $query): void {
-            $query->where(function (Builder $query): void {
+        $query->where(static function (\Illuminate\Contracts\Database\Query\Builder $query): void {
+            $query->where(static function (Builder $query): void {
                 $query->where('imdb_rating', '>=', 8.5)
                     ->where('imdb_votes', '>', 80_000);
-            })->orWhere(function (Builder $query): void {
+            })->orWhere(static function (Builder $query): void {
                 $query->whereBetween('imdb_rating', [8.0, 8.5])
                     ->where('imdb_votes', '>', 1_00_000);
             });
@@ -72,13 +72,14 @@ final class MovieDetail extends Model
     #[Scope]
     protected function trending(Builder $query): void
     {
-        $query->recentlyReleased()
-            ->where(function (Builder $query): void {
-                $query->where(function (\Illuminate\Contracts\Database\Query\Builder $query): void {
-                    $query->where(function (Builder $query): void {
+        $query
+            ->recentlyReleased()
+            ->where(static function (Builder $query): void {
+                $query->where(static function (\Illuminate\Contracts\Database\Query\Builder $query): void {
+                    $query->where(static function (Builder $query): void {
                         $query->where('imdb_rating', '>=', 8.5)
                             ->where('imdb_votes', '>', 8_000);
-                    })->orWhere(function (Builder $query): void {
+                    })->orWhere(static function (Builder $query): void {
                         $query->whereBetween('imdb_rating', [8.0, 8.5])
                             ->where('imdb_votes', '>', 10_000);
                     });
@@ -101,12 +102,13 @@ final class MovieDetail extends Model
     #[Scope]
     protected function recommended(Builder $query): void
     {
-        $query->where(function (Builder $query): void {
-            $query->where(function (Builder $q): void {
-                $q->where('imdb_rating', '>', 7.0)
+        $query->where(static function (Builder $query): void {
+            $query->where(static function (Builder $q): void {
+                $q
+                    ->where('imdb_rating', '>', 7.0)
                     ->where('imdb_rating', '<=', 7.5)
                     ->where('imdb_votes', '>', 50_000);
-            })->orWhere(function (Builder $q): void {
+            })->orWhere(static function (Builder $q): void {
                 $q->where('imdb_rating', '>', 7.5)
                     ->where('imdb_votes', '>', 30_000);
             });
@@ -119,7 +121,7 @@ final class MovieDetail extends Model
     #[Scope]
     protected function hiddenGems(Builder $query): void
     {
-        $query->where(function (\Illuminate\Contracts\Database\Query\Builder $query): void {
+        $query->where(static function (\Illuminate\Contracts\Database\Query\Builder $query): void {
             $query->where('imdb_rating', '>', 8.5)
                 ->whereBetween('imdb_votes', [3_000, 80_000]);
         });
@@ -149,6 +151,8 @@ final class MovieDetail extends Model
 
     protected function poster(): Attribute
     {
-        return Attribute::get(static fn(string $value): string => ($value && mb_strtolower($value) !== 'n/a') ? $value : asset('/assets/images/no-poster.jpg'));
+        return Attribute::get(static fn(string $value): string => $value && mb_strtolower($value) !== 'n/a'
+            ? $value
+            : asset('/assets/images/no-poster.jpg'));
     }
 }

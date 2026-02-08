@@ -35,9 +35,11 @@ final class HeartBeat implements ShouldQueue
             Log::channel('heartbeat')->error($message);
             Log::channel('heartbeat')->error($exception->getMessage());
 
-            $content = 'The application encountered an issue. Please investigate as soon as possible. Error: ' . $exception->getMessage();
+            $content =
+                'The application encountered an issue. Please investigate as soon as possible. Error: '
+                . $exception->getMessage();
 
-            Mail::raw($content, function ($message): void {
+            Mail::raw($content, static function ($message): void {
                 $subject = 'Application Issue Alert';
                 $message->to(config('mail.admin.address'))->subject($subject);
             });

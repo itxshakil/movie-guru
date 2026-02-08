@@ -49,17 +49,17 @@ final class WatchModeService
         ];
 
         if ($types !== []) {
-            $params['types'] = implode(',', array_map(fn($t) => $t->value, $types));
+            $params['types'] = implode(',', array_map(static fn($t) => $t->value, $types));
         }
 
         $raw = $this->request('/search/', $params);
         $results = [];
 
-        foreach (($raw['title_results'] ?? []) as $title) {
+        foreach ($raw['title_results'] ?? [] as $title) {
             $results[] = WatchModeSearchResult::fromArray($title + ['type' => 'title']);
         }
 
-        foreach (($raw['people_results'] ?? []) as $person) {
+        foreach ($raw['people_results'] ?? [] as $person) {
             $results[] = WatchModeSearchResult::fromArray($person + ['type' => 'person']);
         }
 
@@ -95,7 +95,7 @@ final class WatchModeService
 
         try {
             $availability = collect($raw)->map(
-                fn(array $item): WatchModeSource => WatchModeSource::fromArray($item),
+                static fn(array $item): WatchModeSource => WatchModeSource::fromArray($item),
             );
         } catch (Throwable $throwable) {
             Log::error('Error getting title sources', [
@@ -113,7 +113,7 @@ final class WatchModeService
         // Attach cached metadata
         $meta = $this->getSources()->keyBy('id');
 
-        return $availability->map(fn(WatchModeSource $source): array => [
+        return $availability->map(static fn(WatchModeSource $source): array => [
             'availability' => $source,
             'meta' => $meta->get($source->sourceId),
         ])->values();
@@ -131,7 +131,7 @@ final class WatchModeService
             $raw = $this->request('/sources/');
 
             return collect($raw)->map(
-                fn(array $item): WatchModeSourceMeta => WatchModeSourceMeta::fromArray($item),
+                static fn(array $item): WatchModeSourceMeta => WatchModeSourceMeta::fromArray($item),
             );
         });
     }

@@ -14,24 +14,31 @@ it('sends weekly newsletter to subscribers', function (): void {
     Mail::fake();
 
     NewsletterSubscription::factory()->create(['email' => 'test@example.com']);
-    MovieDetail::factory()->count(5)->create(['imdb_rating' => 9.0, 'imdb_votes' => 100000, 'year' => now()->year]);
+    MovieDetail::factory()->count(5)->create(['imdb_rating' => 9.0, 'imdb_votes' => 100_000, 'year' => now()->year]);
 
     // Create recommended movie
     MovieDetail::factory()->create([
         'imdb_rating' => 7.2,
-        'imdb_votes' => 60000,
+        'imdb_votes' => 60_000,
     ]);
 
     // Create hidden gem
     MovieDetail::factory()->create([
         'imdb_rating' => 8.6,
-        'imdb_votes' => 10000,
+        'imdb_votes' => 10_000,
     ]);
 
     $this->artisan('newsletter:send', ['type' => 'weekly'])
         ->assertExitCode(0);
 
-    Mail::assertQueued(NewsletterMail::class, fn($mail): bool => $mail->recommendedMovie !== null && $mail->hiddenGem !== null && $mail->unsubscribeUrl !== null);
+    Mail::assertQueued(
+        NewsletterMail::class,
+        fn($mail): bool => (
+            $mail->recommendedMovie !== null
+            && $mail->hiddenGem !== null
+            && $mail->unsubscribeUrl !== null
+        ),
+    );
 });
 
 it('sends monthly newsletter to subscribers', function (): void {

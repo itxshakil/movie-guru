@@ -12,7 +12,10 @@ final class DatabaseApproachingMaxConnections extends Notification
 {
     use Queueable;
 
-    public function __construct(public string $connectionName, public int $connections)
+    public function __construct(
+        public string $connectionName,
+        public int    $connections,
+    )
     {
     }
 
@@ -28,10 +31,11 @@ final class DatabaseApproachingMaxConnections extends Notification
 
     public function toMail(object $notifiable)
     {
-        return new MailMessage()->markdown('emails.database-approaching-max-connections', [
+        return (new MailMessage())->markdown('emails.database-approaching-max-connections', [
             'connectionName' => $this->connectionName,
             'connections' => $this->connections,
         ]);
+
         // TODO: An email must have a "To", "Cc", or "Bcc" header.
         //        return new MailDatabaseApproachingMaxConnections($this->connectionName, $this->connections);
     }

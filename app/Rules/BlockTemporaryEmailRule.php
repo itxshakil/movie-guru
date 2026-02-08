@@ -15,7 +15,10 @@ final class BlockTemporaryEmailRule implements Rule
             '/\b(?:mailinator\.com|guerrillamail\.com|10mail\.org)\b/i',
         ];
 
-        return array_all($blockedPatterns, fn($blockedPattern): bool => !preg_match($blockedPattern, (string)$value));
+        return array_all(
+            $blockedPatterns,
+            static fn($blockedPattern): bool => !preg_match($blockedPattern, (string)$value),
+        );
     }
 
     public function message(): string

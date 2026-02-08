@@ -90,7 +90,8 @@ final class BotDetectorService
             return Cache::get($cacheKey);
         }
 
-        $isBot = $this->checkUserAgent($browser, $ipAddress, $request)
+        $isBot =
+            $this->checkUserAgent($browser, $ipAddress, $request)
             || $this->checkIpRange($ipAddress)
             || $this->checkBehavioralPatterns($request);
 
@@ -112,11 +113,13 @@ final class BotDetectorService
         }
 
         foreach ($this->botPatterns as $botPattern) {
-            if (mb_stripos($userAgent, (string)$botPattern) !== false) {
-                $this->logBotDetection($ipAddress, $userAgent, $request, 'User agent matched bot pattern: ' . $botPattern);
-
-                return true;
+            if (mb_stripos($userAgent, (string)$botPattern) === false) {
+                continue;
             }
+
+            $this->logBotDetection($ipAddress, $userAgent, $request, 'User agent matched bot pattern: ' . $botPattern);
+
+            return true;
         }
 
         return false;
@@ -153,11 +156,13 @@ final class BotDetectorService
         }
 
         foreach ($this->knownBotIpRanges as $knownBotIpRange) {
-            if ($this->ipInRange($ipAddress, $knownBotIpRange)) {
-                $this->logBotDetection($ipAddress, '', null, 'IP in known bot range: ' . $knownBotIpRange);
-
-                return true;
+            if (!$this->ipInRange($ipAddress, $knownBotIpRange)) {
+                continue;
             }
+
+            $this->logBotDetection($ipAddress, '', null, 'IP in known bot range: ' . $knownBotIpRange);
+
+            return true;
         }
 
         return false;

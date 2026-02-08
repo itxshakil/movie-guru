@@ -9,7 +9,7 @@ enum WatchModeSourceType: string
     case SUBSCRIPTION = 'sub';
     case FREE = 'free';
     case PURCHASE = 'purchase';
-    case BUY = 'buy';       // Purchase (digital copy)
-    case RENTAL = 'rent';        // Rental
-    case TV_EVERYWHERE = 'tve';  // Requires cable subscription login
+    case BUY = 'buy'; // Purchase (digital copy)
+    case RENTAL = 'rent'; // Rental
+    case TV_EVERYWHERE = 'tve'; // Requires cable subscription login
 }

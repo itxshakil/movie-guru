@@ -69,10 +69,14 @@
         "test": "pest --parallel",
         "analyse": "phpstan analyse --memory-limit=1G",
         "lint:fix": [
+            "mago lint --fix",
+            "mago format",
             "rector process",
             "pint --dirty"
         ],
         "lint": [
+            "mago lint",
+            "mago format --check",
             "@analyse",
             "pint --parallel"
         ],

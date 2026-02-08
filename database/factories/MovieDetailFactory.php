@@ -25,7 +25,7 @@ final class MovieDetailFactory extends Factory
             'poster' => $this->faker->imageUrl(),
             'type' => 'movie',
             'imdb_rating' => (string)$this->faker->randomFloat(1, 1, 9),
-            'imdb_votes' => (string)$this->faker->numberBetween(1000, 1000000),
+            'imdb_votes' => (string)$this->faker->numberBetween(1000, 1_000_000),
             'genre' => 'Action, Drama',
             'director' => $this->faker->name(),
             'writer' => $this->faker->name(),

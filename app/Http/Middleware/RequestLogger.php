@@ -29,7 +29,7 @@ final class RequestLogger
 
     public const int WARNING_RESPONSE_TIME = 2000;
 
-    public const int ERROR_RESPONSE_TIME = 10000;
+    public const int ERROR_RESPONSE_TIME = 10_000;
 
     public float $startedAt;
 
@@ -64,6 +64,51 @@ final class RequestLogger
     }
 
     /**
+     * Generate a random request ID.
+     */
+    public function generateRequestId(): int
+    {
+        try {
+            return random_int(100_000, 999_999);
+        } catch (Exception $exception) {
+            $message = 'Could not generate random request ID. Falling back to mt_rand().' . $exception->getMessage();
+            $this->writeWarningMessage($message);
+
+            return mt_rand(100_000, 999_999);
+        }
+    }
+
+    /**
+     * Determine if the request should be logged.
+     */
+    public function shouldLogRequest(Request $request): bool
+    {
+        return $this->inMethodsArray($request) && !$this->isFileRequest($request) && !$this->inExceptArray($request);
+    }
+
+    /**
+     * Check if the request is for a file.
+     */
+    public function isFileRequest(Request $request): bool
+    {
+        $fileExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif'];
+
+        return in_array(pathinfo($request->getPathInfo(), PATHINFO_EXTENSION), $fileExtensions, true);
+    }
+
+    /**
+     * Flatten the files in the request.
+     */
+    public function flattenFiles(mixed $file): string|Collection
+    {
+        if ($file instanceof UploadedFile) {
+            return $file->getClientOriginalName();
+        }
+
+        return collect($file)->map($this->flattenFiles(...));
+    }
+
+    /**
      * Returns the current Unix timestamp with microseconds as a float value.
      *
      * @return float The current Unix timestamp with microseconds.
@@ -73,21 +118,6 @@ final class RequestLogger
         [$usec, $sec] = explode(' ', microtime());
 
         return (float)$usec + (float)$sec;
-    }
-
-    /**
-     * Generate a random request ID.
-     */
-    public function generateRequestId(): int
-    {
-        try {
-            return random_int(100000, 999999);
-        } catch (Exception $exception) {
-            $message = 'Could not generate random request ID. Falling back to mt_rand().' . $exception->getMessage();
-            $this->writeWarningMessage($message);
-
-            return mt_rand(100000, 999999);
-        }
     }
 
     /**
@@ -107,14 +137,6 @@ final class RequestLogger
     }
 
     /**
-     * Determine if the request should be logged.
-     */
-    public function shouldLogRequest(Request $request): bool
-    {
-        return $this->inMethodsArray($request) && !$this->isFileRequest($request) && !$this->inExceptArray($request);
-    }
-
-    /**
      * Check if the request method is in the methods array.
      */
     private function inMethodsArray(Request $request): bool
@@ -125,21 +147,14 @@ final class RequestLogger
     }
 
     /**
-     * Check if the request is for a file.
-     */
-    public function isFileRequest(Request $request): bool
-    {
-        $fileExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif'];
-
-        return in_array(pathinfo($request->getPathInfo(), PATHINFO_EXTENSION), $fileExtensions, true);
-    }
-
-    /**
      * Check if the request is in the except array.
      */
     private function inExceptArray(Request $request): bool
     {
-        return array_any($this->excludePaths, fn(string $excludePath): bool => $this->isRequestInRoute($request, $excludePath));
+        return array_any($this->excludePaths, fn(string $excludePath): bool => $this->isRequestInRoute(
+            $request,
+            $excludePath,
+        ));
     }
 
     /**
@@ -176,7 +191,16 @@ final class RequestLogger
         $files = collect(iterator_to_array($request->files))
             ->map($this->flattenFiles(...))->flatten();
 
-        return 'IP: ' . $request->ip() . ' #' . $this->requestId . sprintf(' %s %s - Body: %s (', $method, $uri, $bodyAsJson) . mb_strlen($bodyAsJson) . ') - Files: ' . $files->implode(',') . $this->referer($request);
+        return
+            'IP: '
+            . $request->ip()
+            . ' #'
+            . $this->requestId
+            . sprintf(' %s %s - Body: %s (', $method, $uri, $bodyAsJson)
+            . mb_strlen($bodyAsJson)
+            . ') - Files: '
+            . $files->implode(',')
+            . $this->referer($request);
     }
 
     private function sanitizeArray(array &$data, array $fields): void
@@ -235,7 +259,7 @@ final class RequestLogger
                 if (!empty($allErrors)) {
                     $flatErrors = collect($allErrors)
                         ->flatten()
-                        ->map(fn($e): string|false => is_scalar($e) ? (string)$e : json_encode($e))
+                        ->map(static fn($e): string|false => is_scalar($e) ? (string)$e : json_encode($e))
                         ->all();
 
                     $validationErrors = ' - Validation Errors: ' . implode('; ', $flatErrors);
@@ -257,9 +281,14 @@ final class RequestLogger
             ? json_encode($responseData)
             : 'Non-JSON content returned';
 
-        return 'IP: ' . $request->ip() . ' #' . $this->requestId .
-            sprintf(' %s - Duration: %sms - UserId %s - Body: %s', $status, $duration, $authenticatableId, $bodyAsJson) .
-            $redirect . $validationErrors;
+        return
+            'IP: '
+            . $request->ip()
+            . ' #'
+            . $this->requestId
+            . sprintf(' %s - Duration: %sms - UserId %s - Body: %s', $status, $duration, $authenticatableId, $bodyAsJson)
+            . $redirect
+            . $validationErrors;
     }
 
     /**
@@ -276,17 +305,5 @@ final class RequestLogger
         } else {
             $this->logChannel()->critical($message);
         }
-    }
-
-    /**
-     * Flatten the files in the request.
-     */
-    public function flattenFiles(mixed $file): string|Collection
-    {
-        if ($file instanceof UploadedFile) {
-            return $file->getClientOriginalName();
-        }
-
-        return collect($file)->map($this->flattenFiles(...));
     }
 }

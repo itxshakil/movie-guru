@@ -86,7 +86,7 @@ it('handles edge cases and preserves original title when needed', function (): v
     $cleaner = new TitleCleaner();
 
     expect($cleaner->clean(null))
-        ->toBe('');
+        ->toBeEmpty();
     expect($cleaner->clean('A'))
         ->toBe('A');
     expect($cleaner->clean('  '))

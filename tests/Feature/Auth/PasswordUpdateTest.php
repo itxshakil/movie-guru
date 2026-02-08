@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Hash;
 test('password can be updated', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->from('/profile')
         ->put('/password', [
             'current_password' => 'password',
@@ -27,8 +26,7 @@ test('password can be updated', function (): void {
 test('correct password must be provided to update password', function (): void {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->from('/profile')
         ->put('/password', [
             'current_password' => 'wrong-password',
