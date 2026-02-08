@@ -79,7 +79,19 @@ final class SendNewsletterCommand extends Command
     private function getMoviesForNewsletter(string $type): Collection
     {
         if ($type === 'weekly') {
-            return MovieDetail::trending()->limit(5)->get();
+            $movies = MovieDetail::trending()->limit(5)->get();
+            $missing = 5 - $movies->count();
+
+            if ($missing > 0) {
+                $recentlyReleasedMovies = MovieDetail::recentlyReleased()
+                    ->whereNotIn('id', $movies->pluck('id'))
+                    ->limit($missing)
+                    ->get();
+
+                return $movies->concat($recentlyReleasedMovies);
+            }
+
+            return $movies;
         }
 
         return MovieDetail::recentlyReleased()->limit(10)->get();
