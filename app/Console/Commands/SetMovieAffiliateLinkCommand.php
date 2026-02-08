@@ -26,7 +26,7 @@ final class SetMovieAffiliateLinkCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $imdbId = $this->argument('imdbid');
         $title = $this->argument('title');
@@ -35,7 +35,7 @@ final class SetMovieAffiliateLinkCommand extends Command
         $movie = MovieDetail::where('imdb_id', $imdbId)->first();
 
         if (!$movie) {
-            $this->error("Movie with IMDB ID {$imdbId} not found.");
+            $this->error(sprintf('Movie with IMDB ID %s not found.', $imdbId));
 
             return 1;
         }
@@ -55,7 +55,7 @@ final class SetMovieAffiliateLinkCommand extends Command
 
         $movie->save();
 
-        $this->info("Affiliate link for movie '{$movie->title}' set to '{$title}' ({$link}).");
+        $this->info(sprintf("Affiliate link for movie '%s' set to '%s' (%s).", $movie->title, $title, $link));
 
         return 0;
     }

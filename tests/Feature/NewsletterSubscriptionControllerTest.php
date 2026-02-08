@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\URL;
 
 uses(RefreshDatabase::class);
 
-it('subscribes a new email', function () {
+it('subscribes a new email', function (): void {
     $response = $this->post('/subscribe', [
         'email' => 'test@example.com',
     ]);
@@ -20,7 +20,7 @@ it('subscribes a new email', function () {
     ]);
 });
 
-it('unsubscribes an email using a signed URL', function () {
+it('unsubscribes an email using a signed URL', function (): void {
     $subscription = NewsletterSubscription::factory()->create([
         'email' => 'test@example.com',
     ]);
@@ -28,7 +28,7 @@ it('unsubscribes an email using a signed URL', function () {
     $url = URL::temporarySignedRoute(
         'unsubscribe',
         now()->addWeeks(2),
-        ['email' => 'test@example.com']
+        ['email' => 'test@example.com'],
     );
 
     $response = $this->get($url);
@@ -40,7 +40,7 @@ it('unsubscribes an email using a signed URL', function () {
     $this->assertNotNull(NewsletterSubscription::withTrashed()->where('email', 'test@example.com')->first()->unsubscribed_at);
 });
 
-it('fails to unsubscribe if signature is invalid', function () {
+it('fails to unsubscribe if signature is invalid', function (): void {
     $subscription = NewsletterSubscription::factory()->create([
         'email' => 'test@example.com',
     ]);
@@ -48,7 +48,7 @@ it('fails to unsubscribe if signature is invalid', function () {
     $url = URL::temporarySignedRoute(
         'unsubscribe',
         now()->addWeeks(2),
-        ['email' => 'test@example.com']
+        ['email' => 'test@example.com'],
     );
 
     $response = $this->get($url . 'tampered');
@@ -60,7 +60,7 @@ it('fails to unsubscribe if signature is invalid', function () {
     ]);
 });
 
-it('fails to unsubscribe if signed URL is expired', function () {
+it('fails to unsubscribe if signed URL is expired', function (): void {
     $subscription = NewsletterSubscription::factory()->create([
         'email' => 'test@example.com',
     ]);
@@ -68,7 +68,7 @@ it('fails to unsubscribe if signed URL is expired', function () {
     $url = URL::temporarySignedRoute(
         'unsubscribe',
         now()->subSecond(),
-        ['email' => 'test@example.com']
+        ['email' => 'test@example.com'],
     );
 
     $response = $this->get($url);

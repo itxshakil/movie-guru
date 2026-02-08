@@ -36,7 +36,7 @@ final class OMDBApiService
     public function __construct()
     {
         $this->apiKeys = explode(',', (string)config('omdb.api_keys'));
-        $this->titleCleaner = app(TitleCleaner::class);
+        $this->titleCleaner = resolve(TitleCleaner::class);
 
         throw_if($this->apiKeys === [], Exception::class, 'OMDB API keys are not configured.');
     }
