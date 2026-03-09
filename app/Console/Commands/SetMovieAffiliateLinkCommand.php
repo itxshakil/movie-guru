@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use App\Models\MovieDetail;
 use Illuminate\Console\Command;
+use function Laravel\Prompts\search;
+use function Laravel\Prompts\text;
 
 final class SetMovieAffiliateLinkCommand extends Command
 {
@@ -14,7 +16,7 @@ final class SetMovieAffiliateLinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'movie:affiliate {imdbid} {title} {link?}';
+    protected $signature = 'movie:affiliate {imdbid?} {title?} {link?}';
 
     /**
      * The console command description.
@@ -32,12 +34,41 @@ final class SetMovieAffiliateLinkCommand extends Command
         $title = $this->argument('title');
         $link = $this->argument('link');
 
+        if (!$imdbId) {
+            $imdbId = search(
+                label: 'Search for a movie by title',
+                options: function (string $query): array {
+                    if (mb_strlen($query) < 2) {
+                        return [];
+                    }
+
+                    return MovieDetail::query()
+                        ->where('title', 'like', '%' . $query . '%')
+                        ->limit(10)
+                        ->get()
+                        ->mapWithKeys(fn(MovieDetail $movie): array => [
+                            $movie->imdb_id => sprintf('%s (%s) [%s]', $movie->title, $movie->year, $movie->type),
+                        ])
+                        ->all();
+                },
+                placeholder: 'Type at least 2 characters to search...',
+            );
+        }
+
         $movie = MovieDetail::where('imdb_id', $imdbId)->first();
 
         if (!$movie) {
             $this->error(sprintf('Movie with IMDB ID %s not found.', $imdbId));
 
             return 1;
+        }
+
+        if (!$title) {
+            $title = text(
+                label: 'Enter the affiliate title label',
+                default: $movie->title,
+                required: true,
+            );
         }
 
         if (!$link) {
