@@ -1,5 +1,5 @@
 <script setup>
-import {Head, useForm} from '@inertiajs/vue3';
+import {Head, useForm, WhenVisible} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import OurFeatures from '@/Components/OurFeatures.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
@@ -18,6 +18,7 @@ const props = defineProps({
   recentlyReleasedMovies: Array,
   topRatedMovies: Array,
   recommendedMovies: Array,
+    mostWatchedMovies: Array,
 });
 
 const selectedIMDBId = ref(null);
@@ -189,7 +190,50 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
     </div>
   <OurFeatures/>
 
-  <div v-if="trendingMovies && trendingMovies.length" class="bg-white dark:bg-gray-900 py-8">
+    <WhenVisible name="mostWatchedMovies">
+        <template #fallback>
+            <div class="bg-white dark:bg-gray-900 py-8">
+                <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                    <div class="text-center mb-8">
+                        <div class="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto"></div>
+                        <div class="h-8 w-72 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto mt-3"></div>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div v-for="i in 6" :key="i"
+                             class="rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 animate-pulse">
+                            <div class="h-96 bg-gray-200 dark:bg-gray-700"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <div v-if="mostWatchedMovies && mostWatchedMovies.length" class="bg-white dark:bg-gray-900 py-8">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">📈 Most Watched This
+                        Week</h2>
+                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">See what everyone has been watching
+                        lately.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <SearchCard
+                        v-for="movie in mostWatchedMovies"
+                        :key="movie.imdb_id"
+                        :movie="movie"
+                        class="scroll-reveal"
+                        @selected="viewDetail(movie.imdb_id, 'Most Watched This Week')"
+                        @share="shareMovieFromCard"
+                    />
+                </div>
+            </div>
+        </div>
+    </WhenVisible>
+
+    <div v-if="trendingMovies && trendingMovies.length" class="bg-white dark:bg-gray-900 py-8">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🔥 Trending Now</h2>

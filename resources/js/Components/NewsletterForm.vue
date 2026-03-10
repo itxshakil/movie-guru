@@ -6,6 +6,7 @@ const gtag = inject("gtag");
 
 const form = useForm({
     email: "",
+    first_name: "",
 });
 
 const subscribe = () => {
@@ -18,7 +19,7 @@ const subscribe = () => {
     form.post(route("subscribe"), {
         preserveScroll: true,
         preserveState: true,
-      onSuccess: () => () => {
+        onSuccess: () => {
         form.reset();
 
         const broadcastChannel = new BroadcastChannel('toast-notifications');
@@ -50,11 +51,20 @@ const subscribe = () => {
                     </p>
                     <form
                         @submit.prevent="subscribe"
-                        class="mt-6 flex max-w-md gap-x-4"
+                        class="mt-6 flex flex-col max-w-md gap-3"
                     >
-                        <label for="email-address" class="sr-only"
-                            >Email address</label
-                        >
+                        <label class="sr-only" for="first-name">First name</label>
+                        <input
+                            id="first-name"
+                            v-model="form.first_name"
+                            autocomplete="given-name"
+                            class="rounded min-w-0 flex-auto px-3.5 py-2 dark:bg-white/5 dark:text-white shadow-xs ring-1 ring-inset ring-white focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                            name="first_name"
+                            placeholder="Your first name (optional)"
+                            type="text"
+                        />
+                        <div class="flex gap-x-4">
+                            <label class="sr-only" for="email-address">Email address</label>
                         <input
                             v-model="form.email"
                             id="email-address"
@@ -62,7 +72,7 @@ const subscribe = () => {
                             type="email"
                             autocomplete="email"
                             required
-                            class="rounded min-w-0 flex-auto rounded-mddark:bg-white/5 px-3.5 py-2 dark:text-white shadow-xs ring-1 ring-inset ring-white focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                            class="rounded min-w-0 flex-auto px-3.5 py-2 dark:bg-white/5 dark:text-white shadow-xs ring-1 ring-inset ring-white focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
                             placeholder="Enter your email"
                         />
                         <button
@@ -72,6 +82,7 @@ const subscribe = () => {
                             class="flex-none rounded-md bg-primary-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-primary-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                         >
                         </button>
+                        </div>
                     </form>
 
                   <p v-if="form.recentlySuccessful" class="mt-4 text-green-500 dark:text-green-400">

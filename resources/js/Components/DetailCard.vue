@@ -13,6 +13,8 @@
                                  @error="handlePosterError">
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
+                            <WatchlistButton
+                                :movie="{ imdb_id: detail.imdbID, title: detail.Title, year: detail.Year, poster: detail.Poster, type: detail.Type, imdb_rating: detail.imdbRating }"/>
                             <button
                                 class="flex items-center gap-1 bg-white/20 hover:bg-white/40 active:scale-90 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all"
                                 title="Share"
@@ -181,27 +183,59 @@
                                         </a>
                                     </li>
 
-                                    <!-- Always show Google fallback -->
+                                    <li v-if="youtubeSearchLink"
+                                        class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
+                                    >
+                                        <a
+                                            :href="youtubeSearchLink"
+                                            class="flex items-center gap-3 flex-1"
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            @click="sendAnalytics('Watch on YouTube', youtubeSearchLink)"
+                                        >
+                                            <div
+                                                class="h-10 w-10 flex items-center justify-center bg-red-600 rounded text-white shrink-0">
+                                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium text-gray-900 dark:text-white">Watch on
+                                                    YouTube</p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">Search on
+                                                    YouTube</p>
+                                            </div>
+                                        </a>
+                                    </li>
+
                                     <li
                                         class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
                                     >
                                         <a
-                                            :href="googleDownloadLink"
+                                            :href="searchFallbackLink.url"
                                             class="flex items-center gap-3 flex-1"
                                             rel="noopener noreferrer"
                                             target="_blank"
-                                            @click="sendAnalytics('Google Download', googleDownloadLink)"
+                                            @click="sendAnalytics(searchFallbackLink.platform + ' Search', searchFallbackLink.url)"
                                         >
-                                            <img alt="Google Logo" class="h-10 w-10 rounded"
+                                            <div v-if="searchFallbackLink.platform === 'YouTube'"
+                                                 class="h-10 w-10 flex items-center justify-center bg-red-600 rounded text-white shrink-0">
+                                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                                </svg>
+                                            </div>
+                                            <img v-else alt="Google Logo" class="h-10 w-10 rounded"
                                                  src="/assets/google-logo.png"/>
 
                                             <div>
                                                 <p class="font-medium text-gray-900 dark:text-white">
-                                                    Google Search
+                                                    {{ searchFallbackLink.platform }} Search
                                                 </p>
 
-                                                <p class="text-sm text-gray-600 dark:text-gray-400 flex flex-wrap gap-1 items-center">
-                                                    Find download or streaming links on Google
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                    Search on {{ searchFallbackLink.platform }}
                                                 </p>
                                             </div>
                                         </a>
@@ -322,12 +356,34 @@
             </div>
         </div>
     </div>
+
+    <Teleport to="body">
+        <div v-if="affiliateLink"
+             class="fixed bottom-0 left-0 right-0 z-50 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-primary-200 dark:border-primary-800 shadow-2xl md:hidden"
+        >
+            <a
+                :href="affiliateLink.link"
+                class="flex items-center justify-center gap-2 w-full py-3.5 px-6 bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white font-bold text-base rounded-xl shadow-lg transition-all active:scale-[0.98]"
+                rel="noopener noreferrer"
+                target="_blank"
+                @click="sendAnalytics('Affiliate Sticky: ' + affiliateLink.title, affiliateLink.link)"
+            >
+                <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                </svg>
+                Book Tickets: {{ affiliateLink.title }}
+            </a>
+        </div>
+    </Teleport>
 </template>
 <script setup>
 import DetailSkeletonCard from '@/Components/DetailSkeletonCard.vue';
 import {computed, inject} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
 import SourceCard from "@/Components/SourceCard.vue";
+import WatchlistButton from "@/Components/WatchlistButton.vue";
 
 const gtag = inject('gtag');
 
@@ -385,17 +441,45 @@ const uniqueSources = computed(() => {
 });
 
 
-const associateTrackingID = "itxshakil0ec-21"; // Replace with your actual tracking ID
+const associateTrackingID = "itxshakil0ec-21";
 const netflixLink = computed(() => props.detail ? `https://www.netflix.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 const amazonAffiliateLink = computed(() => props.detail ? `https://primevideo.com?tag=${associateTrackingID}&searchTerm=${encodeURIComponent(props.detail.Title)}` : '');
 // const huluLink = computed(() => props.detail ? `https://www.hulu.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 // const disneyPlusLink = computed(() => props.detail ? `https://www.disneyplus.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
 // const hboMaxLink = computed(() => props.detail ? `https://play.hbomax.com/search?q=${encodeURIComponent(props.detail.Title)}` : '');
-const googleDownloadLink = computed(() =>
-    props.detail
-        ? `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title)}+("download" OR "watch online") OR (filetype:mkv OR filetype:mp4) OR (inurl:drive.google.com OR inurl:mega.nz OR inurl:mediafire.com)`
-        : ''
-);
+const searchFallbackLink = computed(() => {
+    if (!props.detail?.imdbID) {
+        return {url: '', platform: 'Google'};
+    }
+    const hash = props.detail.imdbID.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const isYouTube = hash % 10 < 3;
+    if (isYouTube) {
+        return {
+            url: `https://www.youtube.com/results?search_query=${encodeURIComponent(props.detail.Title + ' ' + (props.detail.Year ?? '') + ' full movie')}`,
+            platform: 'YouTube',
+        };
+    }
+    return {
+        url: `https://www.google.com/search?q=${encodeURIComponent(props.detail.Title + ' ' + (props.detail.Year ?? '') + ' full movie watch online')}`,
+        platform: 'Google',
+    };
+});
+
+const youtubeSearchLink = computed(() => {
+    if (!props.detail?.imdbID) {
+        return null;
+    }
+    const currentYear = new Date().getFullYear();
+    const movieYear = parseInt(props.detail.Year);
+    if (isNaN(movieYear) || movieYear >= currentYear) {
+        return null;
+    }
+    const hash = props.detail.imdbID.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    if (hash % 3 !== 0) {
+        return null;
+    }
+    return `https://www.youtube.com/results?search_query=${encodeURIComponent(props.detail.Title + ' ' + (props.detail.Year ?? '') + ' full movie')}`;
+});
 
 const isValue = function(value) {
     return value && value !== 'N/A';

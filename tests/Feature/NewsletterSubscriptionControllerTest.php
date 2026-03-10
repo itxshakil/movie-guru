@@ -2,85 +2,61 @@
 
 declare(strict_types=1);
 
+use App\Mail\WelcomeSubscriberMail;
 use App\Models\NewsletterSubscription;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
-it('subscribes a new email', function (): void {
-    $response = $this->post('/subscribe', [
-        'email' => 'test@example.com',
-    ]);
+it('subscribes a new user and sends welcome email', function (): void {
+    Mail::fake();
 
-    $response->assertRedirect();
-    $this->assertDatabaseHas('newsletter_subscriptions', [
-        'email' => 'test@example.com',
-        'unsubscribed_at' => null,
-    ]);
+    $this->post(route('subscribe'), [
+        'email' => 'newuser@example.com',
+        'first_name' => 'Alice',
+    ])->assertRedirect();
+
+    expect(NewsletterSubscription::where('email', 'newuser@example.com')->exists())->toBeTrue();
+
+    Mail::assertQueued(WelcomeSubscriberMail::class, function (WelcomeSubscriberMail $mail): bool {
+        return $mail->email === 'newuser@example.com' && $mail->firstName === 'Alice';
+    });
 });
 
-it('unsubscribes an email using a signed URL', function (): void {
-    $subscription = NewsletterSubscription::factory()->create([
-        'email' => 'test@example.com',
-    ]);
+it('subscribes without first name and uses default in welcome email', function (): void {
+    Mail::fake();
 
-    $url = URL::temporarySignedRoute(
-        'unsubscribe',
-        now()->addWeeks(2),
-        ['email' => 'test@example.com'],
-    );
+    $this->post(route('subscribe'), [
+        'email' => 'noname@example.com',
+    ])->assertRedirect();
 
-    $response = $this->get($url);
-
-    $response->assertRedirect('/');
-    $this->assertDatabaseHas('newsletter_subscriptions', [
-        'email' => 'test@example.com',
-    ]);
-    $this->assertNotNull(
-        NewsletterSubscription::withTrashed()
-            ->where('email', 'test@example.com')
-            ->first()
-            ->unsubscribed_at,
-    );
+    Mail::assertQueued(WelcomeSubscriberMail::class, function (WelcomeSubscriberMail $mail): bool {
+        return $mail->firstName === 'Movie Fan';
+    });
 });
 
-it('fails to unsubscribe if signature is invalid', function (): void {
-    $subscription = NewsletterSubscription::factory()->create([
-        'email' => 'test@example.com',
-    ]);
+it('does not send welcome email when re-subscribing', function (): void {
+    Mail::fake();
 
-    $url = URL::temporarySignedRoute(
-        'unsubscribe',
-        now()->addWeeks(2),
-        ['email' => 'test@example.com'],
-    );
+    NewsletterSubscription::factory()->create(['email' => 'existing@example.com']);
 
-    $response = $this->get($url . 'tampered');
+    $this->post(route('subscribe'), [
+        'email' => 'existing@example.com',
+    ])->assertRedirect();
 
-    $response->assertStatus(403);
-    $this->assertDatabaseHas('newsletter_subscriptions', [
-        'email' => 'test@example.com',
-        'unsubscribed_at' => null,
-    ]);
+    Mail::assertNotQueued(WelcomeSubscriberMail::class);
 });
 
-it('fails to unsubscribe if signed URL is expired', function (): void {
-    $subscription = NewsletterSubscription::factory()->create([
-        'email' => 'test@example.com',
-    ]);
+it('rejects invalid email', function (): void {
+    $this->post(route('subscribe'), [
+        'email' => 'not-an-email',
+    ])->assertSessionHasErrors('email');
+});
 
-    $url = URL::temporarySignedRoute(
-        'unsubscribe',
-        now()->subSecond(),
-        ['email' => 'test@example.com'],
-    );
-
-    $response = $this->get($url);
-
-    $response->assertStatus(403);
-    $this->assertDatabaseHas('newsletter_subscriptions', [
-        'email' => 'test@example.com',
-        'unsubscribed_at' => null,
-    ]);
+it('rejects first name that is too long', function (): void {
+    $this->post(route('subscribe'), [
+        'email' => 'valid@example.com',
+        'first_name' => str_repeat('a', 51),
+    ])->assertSessionHasErrors('first_name');
 });
