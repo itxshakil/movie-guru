@@ -1,5 +1,5 @@
 <script setup>
-import {Head, WhenVisible} from '@inertiajs/vue3';
+import {Head} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import DetailCard from '@/Components/DetailCard.vue';
@@ -177,48 +177,23 @@ const ogImage = moviePoster(props.detail);
             </div>
         </div>
     </div>
-    <div v-if="detail">
-        <WhenVisible name="similarMovies">
-            <template #fallback>
-                <div class="bg-white dark:bg-gray-900 py-8">
-                    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                        <div class="text-center mb-8">
-                            <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto"></div>
-                            <div class="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto mt-3"></div>
-                        </div>
-                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <div v-for="i in 6" :key="i"
-                                 class="rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 animate-pulse">
-                                <div class="h-96 bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="p-4 space-y-2">
-                                    <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                                    <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <div v-if="similarMovies && similarMovies.length" class="bg-white dark:bg-gray-900 py-8">
-                <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                    <div class="text-center mb-12">
-                        <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎬 More Like This</h2>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Similar movies you might
-                            enjoy.</p>
-                    </div>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <SearchCard
-                            v-for="movie in similarMovies"
-                            :key="movie.imdb_id"
-                            :movie="movie"
-                            class="scroll-reveal"
-                            @selected="viewDetail(movie.imdb_id, 'Similar Movies')"
-                            @share="shareMovieFromCard"
-                        />
-                    </div>
-                </div>
+    <div v-if="similarMovies && similarMovies.length" class="bg-white dark:bg-gray-900 py-8">
+        <div class="mx-auto max-w-7xl px-4 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 More Like This</h2>
+                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Similar movies you might enjoy.</p>
             </div>
-        </WhenVisible>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <SearchCard
+                    v-for="movie in similarMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    class="scroll-reveal"
+                    @selected="viewDetail(movie.imdb_id, 'Similar Movies')"
+                    @share="shareMovieFromCard"
+                />
+            </div>
+        </div>
     </div>
     <NewsletterForm/>
 </template>
