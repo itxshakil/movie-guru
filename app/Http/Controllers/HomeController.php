@@ -141,7 +141,7 @@ final class HomeController extends Controller
                 'recentlyReleasedMovies' => $recentlyReleasedMovies,
                 'topRatedMovies' => $topRatedMovies,
                 'recommendedMovies' => $recommendedMovies,
-                'mostWatchedMovies' => Inertia::defer(function () {
+                'mostWatchedMovies' => Cache::remember('most-watched-movies', now()->endOfDay(), function () {
                     $topImdbIds = ShowPageAnalytics::query()
                         ->where('created_at', '>=', now()->subDays(7))
                         ->selectRaw('imdb_id, COUNT(*) as view_count')

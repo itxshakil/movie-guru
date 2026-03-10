@@ -34,7 +34,7 @@ final class DetailController extends Controller
 
         $cacheKey = 'detail.' . $imdbId;
         $cacheTTl = [now()->addHours(18), now()->addHours(24)];
-        $movie = Cache::flexible($cacheKey, $cacheTTl, fn(): mixed => $this->fetchDetail($imdbId));
+        $movie = Cache::flexible($cacheKey, $cacheTTl, fn (): mixed => $this->fetchDetail($imdbId));
 
         $detail = $movie instanceof MovieDetail ? $movie->details : $movie;
         $affiliateLink = $movie instanceof MovieDetail ? $movie->affiliate_link : null;
@@ -64,7 +64,7 @@ final class DetailController extends Controller
 
                     if ($sources->isNotEmpty()) {
                         $movie = MovieDetail::where('imdb_id', $imdbId)->first();
-                        if (!$movie) {
+                        if (! $movie) {
                             return;
                         }
 
@@ -88,7 +88,7 @@ final class DetailController extends Controller
         $recentlyReleasedMovies = Cache::remember(
             'recently-released-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recentlyReleased()
+            static fn () => MovieDetail::recentlyReleased()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -109,7 +109,7 @@ final class DetailController extends Controller
         $recommendedMovies = Cache::remember(
             'recommended-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recommended()
+            static fn () => MovieDetail::recommended()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -136,16 +136,14 @@ final class DetailController extends Controller
             'affiliateLink' => $affiliateLink,
             'recentlyReleasedMovies' => $recentlyReleasedMovies,
             'recommendedMovies' => $recommendedMovies,
-            'similarMovies' => Inertia::defer(
-                fn() => $firstGenre
-                    ? MovieDetail::query()
-                        ->where('genre', 'like', '%' . $firstGenre . '%')
-                        ->where('imdb_id', '!=', $cleanImdbId)
-                        ->orderByDesc('imdb_rating')
-                        ->take(6)
-                        ->get(['imdb_id', 'title', 'year', 'release_date', 'poster', 'type', 'imdb_rating', 'imdb_votes', 'director', 'writer', 'actors'])
-                    : collect(),
-            ),
+            'similarMovies' => $firstGenre
+                ? MovieDetail::query()
+                    ->where('genre', 'like', '%' . $firstGenre . '%')
+                    ->where('imdb_id', '!=', $cleanImdbId)
+                    ->orderByDesc('imdb_rating')
+                    ->take(6)
+                    ->get(['imdb_id', 'title', 'year', 'release_date', 'poster', 'type', 'imdb_rating', 'imdb_votes', 'director', 'writer', 'actors'])
+                : collect(),
         ]);
     }
 
@@ -168,7 +166,7 @@ final class DetailController extends Controller
     public function handleDB(MovieDetail $movie, string $imdbId): MovieDetail
     {
         $ipAddress = request()->ip();
-        defer(static fn() => $movie->incrementViews($ipAddress));
+        defer(static fn () => $movie->incrementViews($ipAddress));
         $this->updateDetailInBG($imdbId);
 
         return $movie;
@@ -182,7 +180,7 @@ final class DetailController extends Controller
     public function fetchFromAPI(string $imdbId): mixed
     {
         $imdbId = $this->extractImdbId($imdbId);
-        if (!$imdbId) {
+        if (! $imdbId) {
             return [];
         }
 
@@ -191,7 +189,7 @@ final class DetailController extends Controller
         $ipAddress = request()->ip();
 
         defer(static function () use ($ipAddress, $detail, $imdbId): void {
-            if ($detail === null || !isset($detail['Title'])) {
+            if ($detail === null || ! isset($detail['Title'])) {
                 $exception = new Exception('Failed to fetch details for IMDB ID: ' . $imdbId, 500);
                 report($exception);
 
@@ -224,15 +222,15 @@ final class DetailController extends Controller
     private function updateDetailInBG(string $imdbId): void
     {
         defer(
-        /**
-         * @throws ConnectionException
-         */
+            /**
+             * @throws ConnectionException
+             */
             function () use ($imdbId): void {
                 $OMDBApiService = resolve(OMDBApiService::class);
                 $imdbId = $this->extractImdbId($imdbId);
                 $updatedDetail = $OMDBApiService->getById($imdbId);
 
-                if ($updatedDetail === null || !isset($updatedDetail['Title'])) {
+                if ($updatedDetail === null || ! isset($updatedDetail['Title'])) {
                     $response = $updatedDetail['Response'] ?? null;
                     report(new Exception(
                         'Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response,
@@ -262,9 +260,9 @@ final class DetailController extends Controller
                             $updatedDetail['imdbVotes'],
                         ) : 0,
                     'genre' => $updatedDetail['Genre'],
-                    'director' => mb_substr((string)$updatedDetail['Director'], 0, 255),
-                    'writer' => mb_substr((string)$updatedDetail['Writer'], 0, 255),
-                    'actors' => mb_substr((string)$updatedDetail['Actors'], 0, 255),
+                    'director' => mb_substr((string) $updatedDetail['Director'], 0, 255),
+                    'writer' => mb_substr((string) $updatedDetail['Writer'], 0, 255),
+                    'actors' => mb_substr((string) $updatedDetail['Actors'], 0, 255),
                     'details' => $updatedDetail,
                 ]);
             },
