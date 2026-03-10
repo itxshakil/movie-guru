@@ -27,21 +27,25 @@ it('sets affiliate link using direct arguments', function (): void {
     ]);
 });
 
-it('generates a default affiliate link when link argument is omitted', function (): void {
+it('prompts for affiliate link with google search default when link argument is omitted', function (): void {
     $movie = MovieDetail::factory()->create([
         'imdb_id' => 'tt1234567',
         'title' => 'Inception',
     ]);
 
+    $expectedDefault = 'https://www.google.com/search?q=' . urlencode('PVR Cinemas movie tickets Inception');
+
     $this->artisan('movie:affiliate', [
         'imdbid' => 'tt1234567',
         'title' => 'PVR Cinemas',
-    ])->assertExitCode(0);
+    ])
+        ->expectsQuestion('Enter the affiliate link', $expectedDefault)
+        ->assertExitCode(0);
 
     $movie->refresh();
 
     expect($movie->affiliate_link['title'])->toBe('PVR Cinemas')
-        ->and($movie->affiliate_link['link'])->toContain('google.com/search');
+        ->and($movie->affiliate_link['link'])->toBe($expectedDefault);
 });
 
 it('returns error when movie is not found by imdb id', function (): void {
