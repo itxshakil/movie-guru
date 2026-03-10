@@ -2,11 +2,11 @@ const DEBUG = false;
 const broadcast = new BroadcastChannel('service-worker-channel');
 const broadcastChannel = new BroadcastChannel('toast-notifications');
 
-const APP_CACHE = 'v-4.15.0';
-const SEARCH_CACHE = 'search-cache-v-4.15.0';
-const INFO_CACHE = 'info-cache-v-4.15.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-14.1';
-const POSTER_CACHE = 'poster-cache-v-4.15.0';
+const APP_CACHE = 'v-4.15.1';
+const SEARCH_CACHE = 'search-cache-v-4.15.1';
+const INFO_CACHE = 'info-cache-v-4.15.1';
+const DYNAMIC_CACHE = 'dynamic-cache-v-15.1';
+const POSTER_CACHE = 'poster-cache-v-4.15.1';
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -20,8 +20,6 @@ const STATIC_ASSETS = [
 ];
 
 const basicPathsToCache = [
-    '/',
-    '/?utm_source=homescreen',
     'build/manifest.json',
     'build/assets/Search-fD_ut_j3.css',
     'build/assets/BaseLayout-pP2Wt1YA.css',
