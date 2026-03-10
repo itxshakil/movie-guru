@@ -95,7 +95,11 @@
       </div>
 
     </div>
-        <div class="flex gap-2 p-3 pt-0 mt-auto">
+        <div class="flex gap-2 p-3 pt-0 mt-auto flex-wrap">
+            <WatchlistButton
+                :movie="movie"
+                class="flex-none !bg-gray-100 dark:!bg-gray-800 hover:!bg-gray-200 dark:hover:!bg-gray-700 !text-gray-900 dark:!text-white !text-xs !font-extrabold !py-2.5 !px-3 !rounded-xl !transition-all !duration-200 !backdrop-blur-none"
+            />
             <button
                 class="flex-1 flex justify-center items-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-extrabold py-2.5 px-3 rounded-xl transition-all duration-200 text-sm active:scale-95"
                 type="button"
@@ -126,8 +130,8 @@
   </div>
 </template>
 <script setup>
-// TODO: Generate media Object
 import {computed, inject} from "vue";
+import WatchlistButton from "@/Components/WatchlistButton.vue";
 
 const props = defineProps({
     movie: Object

@@ -22,7 +22,8 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::inertia('/watchlist', 'Watchlist')->name('watchlist');
 Route::inertia('/terms', 'Terms');
 Route::inertia('/privacy', 'PrivacyPolicy');
 Route::inertia('/contact', 'Contact');

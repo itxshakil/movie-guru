@@ -127,12 +127,25 @@ final class DetailController extends Controller
                 ]),
         );
 
+        $genre = $movie instanceof MovieDetail ? ($movie->genre ?? '') : '';
+        $firstGenre = mb_trim(explode(',', $genre)[0]);
+
         return Inertia::render('Show', [
             'detail' => $detail,
             'sources' => $sources,
             'affiliateLink' => $affiliateLink,
             'recentlyReleasedMovies' => $recentlyReleasedMovies,
             'recommendedMovies' => $recommendedMovies,
+            'similarMovies' => Inertia::defer(
+                fn() => $firstGenre
+                    ? MovieDetail::query()
+                        ->where('genre', 'like', '%' . $firstGenre . '%')
+                        ->where('imdb_id', '!=', $cleanImdbId)
+                        ->orderByDesc('imdb_rating')
+                        ->take(6)
+                        ->get(['imdb_id', 'title', 'year', 'release_date', 'poster', 'type', 'imdb_rating', 'imdb_votes', 'director', 'writer', 'actors'])
+                    : collect(),
+            ),
         ]);
     }
 

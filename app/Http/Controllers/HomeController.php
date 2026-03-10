@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\MovieDetail;
+use App\Models\ShowPageAnalytics;
 use App\Services\TrendingQueryService;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -140,6 +141,21 @@ final class HomeController extends Controller
                 'recentlyReleasedMovies' => $recentlyReleasedMovies,
                 'topRatedMovies' => $topRatedMovies,
                 'recommendedMovies' => $recommendedMovies,
+                'mostWatchedMovies' => Inertia::defer(function () {
+                    $topImdbIds = ShowPageAnalytics::query()
+                        ->where('created_at', '>=', now()->subDays(7))
+                        ->selectRaw('imdb_id, COUNT(*) as view_count')
+                        ->groupBy('imdb_id')
+                        ->orderByDesc('view_count')
+                        ->limit(6)
+                        ->pluck('imdb_id');
+
+                    return MovieDetail::query()
+                        ->whereIn('imdb_id', $topImdbIds)
+                        ->get(['imdb_id', 'title', 'year', 'release_date', 'poster', 'type', 'imdb_rating', 'imdb_votes', 'director', 'writer', 'actors'])
+                        ->sortBy(fn($m) => $topImdbIds->search($m->imdb_id))
+                        ->values();
+                }),
             ],
         );
     }
