@@ -72,7 +72,11 @@ final class SetMovieAffiliateLinkCommand extends Command
         }
 
         if (!$link) {
-            $link = 'https://www.google.com/search?q=' . urlencode($title . ' movie tickets ' . $movie->title);
+            $link = text(
+                label: 'Enter the affiliate link',
+                default: 'https://www.google.com/search?q=' . urlencode($title . ' movie tickets ' . $movie->title),
+                required: true,
+            );
         }
 
         /** @var array<string, string> $affiliateLink */
