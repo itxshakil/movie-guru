@@ -166,6 +166,54 @@ because the nesting selector cannot represent pseudo-elements. */
 /* View Transitions */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-    animation-duration: 0.5s;
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* Global micro-interaction: tactile buttons */
+button:not([disabled]),
+a[href] {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth focus rings */
+:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* Frosted glass navbar enhancement */
+header.sticky {
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* Typography refinements */
+body {
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Input micro-interactions */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+textarea,
+select {
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='search']:focus,
+textarea:focus,
+select:focus {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 

@@ -5,6 +5,7 @@ import {createApp, h} from 'vue';
 import {createInertiaApp} from '@inertiajs/vue3';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {ZiggyVue} from '../../vendor/tightenco/ziggy';
+import {router} from '@inertiajs/vue3';
 import useInstallPrompt from '@/Composables/useInstalPrompt.js';
 import Analytics from '@/Plugins/analytics.js';
 
@@ -19,6 +20,15 @@ broadcast.onmessage = (event) => {
         }
     }
 };
+
+// Wire Inertia page navigations to the View Transitions API
+router.on('navigate', (event) => {
+    if (!document.startViewTransition || document.visibilityState !== 'visible') {
+        return;
+    }
+    document.startViewTransition(() => {
+    });
+});
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

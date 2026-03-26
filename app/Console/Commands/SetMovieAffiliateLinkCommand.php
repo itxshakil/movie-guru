@@ -5,25 +5,16 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\MovieDetail;
+use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
+
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\text;
 
+#[AsCommand(name: 'movie:affiliate', description: 'Set the movie booking affiliate link for a given IMDB ID')]
 final class SetMovieAffiliateLinkCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'movie:affiliate {imdbid?} {title?} {link?}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Set the movie booking affiliate link for a given IMDB ID';
 
     /**
      * Execute the console command.

@@ -6,16 +6,16 @@ namespace App\Console\Commands;
 
 use App\Models\MovieDetail;
 use App\Models\Search;
+use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\LazyCollection;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
+#[AsCommand(name: 'sitemap:generate', description: 'Generate the sitemap.')]
 final class SitemapGenerator extends Command
 {
     protected $signature = 'sitemap:generate {--limit=1000 : Number of top searches and movies to include}';
-
-    protected $description = 'Generate the sitemap.';
 
     public function handle(): void
     {

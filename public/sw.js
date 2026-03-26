@@ -1,12 +1,16 @@
 const DEBUG = false;
-const broadcast = new BroadcastChannel('service-worker-channel');
-const broadcastChannel = new BroadcastChannel('toast-notifications');
+// Item 4: Single shared BroadcastChannel (deduplicated)
+const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.15.2';
-const SEARCH_CACHE = 'search-cache-v-4.15.2';
-const INFO_CACHE = 'info-cache-v-4.15.2';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.15.2';
-const POSTER_CACHE = 'poster-cache-v-4.15.2';
+const APP_CACHE = 'v-4.15.3';
+const SEARCH_CACHE = 'search-cache-v-4.15.3';
+const INFO_CACHE = 'info-cache-v-4.15.3';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.15.3';
+const POSTER_CACHE = 'poster-cache-v-4.15.3';
+const INERTIA_CACHE = 'inertia-cache-v-4.15.3';
+
+// All current caches — used in activate to preserve them all
+const ALL_CACHES = [APP_CACHE, SEARCH_CACHE, INFO_CACHE, DYNAMIC_CACHE, POSTER_CACHE, INERTIA_CACHE];
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -22,41 +26,45 @@ const STATIC_ASSETS = [
 const basicPathsToCache = [
     'build/manifest.json',
     'build/assets/Search-fD_ut_j3.css',
-    'build/assets/BaseLayout-pP2Wt1YA.css',
+    'build/assets/BaseLayout-CPfWl7uE.css',
+    'build/assets/AuthenticatedLayout-BRklnfgK.css',
     'build/assets/Show-O_rbfk1n.css',
-    'build/assets/app-B9Mnzgfv.css',
-    'build/assets/LoadingSpinner-B0q04ZM8.js',
-    'build/assets/ApplicationLogo-CvwSXM_N.js',
-    'build/assets/GuestLayout-CGxIqYYc.js',
-    'build/assets/LoadingSpinnerButton-BA9aP3Yf.js',
-    'build/assets/PrimaryButton-DoeIcwZ9.js',
-    'build/assets/Dashboard-Dv62-6sT.js',
-    'build/assets/TextInput-CUKzXb33.js',
-    'build/assets/InputLabel-FObNglV-.js',
-    'build/assets/Edit-DOr7rw_x.js',
-    'build/assets/ConfirmPassword-CBsXwb7d.js',
-    'build/assets/ForgotPassword-8N2fwGcq.js',
-    'build/assets/VerifyEmail-BXEMUZ9B.js',
-    'build/assets/ResetPassword-QsIUXRqN.js',
-    'build/assets/Error--1B51C-T.js',
-    'build/assets/Register-CDb1dQsJ.js',
-    'build/assets/UpdatePasswordForm-CNrcQ2SL.js',
-    'build/assets/UpdateProfileInformationForm-hcVICaHj.js',
-    'build/assets/Login-BrlQA16u.js',
-    'build/assets/Watchlist-Bue5DIk5.js',
-    'build/assets/Terms-C5WtSGxE.js',
-    'build/assets/NewsletterForm-Bo1hYi3V.js',
-    'build/assets/PrivacyPolicy-GEglHfJo.js',
-    'build/assets/DeleteUserForm-Dlj0mjyR.js',
-    'build/assets/Show-DHRDLRwv.js',
-    'build/assets/Show-DDB1isc8.js',
-    'build/assets/AuthenticatedLayout-C5VSSy7n.js',
-    'build/assets/Contact-CWXiXxp3.js',
-    'build/assets/Search-DoKq7t59.js',
-    'build/assets/Welcome-C-ZXnwGX.js',
-    'build/assets/BaseLayout-BiTaN9aQ.js',
-    'build/assets/SearchCard-PTNtCoGD.js',
-    'build/assets/app-Dss66LrZ.js',
+    'build/assets/app-DTlM8Gv8.css',
+    'build/assets/LoadingSpinner-hg4leelj.js',
+    'build/assets/ApplicationLogo-D9wEWsJU.js',
+    'build/assets/LoadingSpinnerButton-BUa9CIFk.js',
+    'build/assets/PrimaryButton-D9JTqWtv.js',
+    'build/assets/Dashboard-CKoXNENH.js',
+    'build/assets/TextInput-Bs26mqmi.js',
+    'build/assets/InputLabel-CT6j8qGj.js',
+    'build/assets/Edit-BKdF_mAj.js',
+    'build/assets/ConfirmPassword-DyQGkRvE.js',
+    'build/assets/ForgotPassword-Ctb8b4ge.js',
+    'build/assets/VerifyEmail-DPrisHkU.js',
+    'build/assets/Error-Bs3hCaZt.js',
+    'build/assets/UpdatePasswordForm-cFT5uhzG.js',
+    'build/assets/GuestLayout-0oDFHvMc.js',
+    'build/assets/UpdateProfileInformationForm-CDMdYs-0.js',
+    'build/assets/ResetPassword-DTcsojlq.js',
+    'build/assets/MoodDiscovery-BNTmvLhE.js',
+    'build/assets/WatchlistPage-rFi7DTnR.js',
+    'build/assets/Watchlist-BNnimvAx.js',
+    'build/assets/Register-D9oazBZk.js',
+    'build/assets/Login-BDn7Y_bN.js',
+    'build/assets/DeleteUserForm-B_rsqpat.js',
+    'build/assets/Terms-okzYME_D.js',
+    'build/assets/NewsletterForm-0W1Lh9rS.js',
+    'build/assets/PrivacyPolicy-oeNrPfho.js',
+    'build/assets/Show-ClvphOvk.js',
+    'build/assets/MovieMatch-DS6o4Azd.js',
+    'build/assets/AuthenticatedLayout-Ce6246rW.js',
+    'build/assets/Contact-DFuLZ_mX.js',
+    'build/assets/Show-qFBcP_m9.js',
+    'build/assets/Search-DTMhW8fz.js',
+    'build/assets/BaseLayout-1KkFkWq5.js',
+    'build/assets/Welcome-DPRanJXH.js',
+    'build/assets/SearchCard-CCo0Ffut.js',
+    'build/assets/app-BZpuotA5.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -82,10 +90,93 @@ function logError(message, ...optionalParams) {
     }
 }
 
-// Function to fetch and cache a request
-const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
-    // If cache is not supported or request is not a GET request, fall back to network
+/**
+ * Returns true if the request is an Inertia AJAX or partial-reload request.
+ */
+function isInertiaRequest(request) {
+    return request.headers.get('X-Inertia') !== null
+        || request.headers.get('X-Inertia-Partial-Data') !== null;
+}
+
+/**
+ * Returns true only for full Inertia AJAX requests (not partial reloads).
+ * These are safe to cache separately in INERTIA_CACHE.
+ */
+function isFullInertiaRequest(request) {
+    return request.headers.get('X-Inertia') !== null
+        && request.headers.get('X-Inertia-Partial-Data') === null;
+}
+
+/**
+ * Cache strategy for full Inertia AJAX responses.
+ * Responses are tagged with X-SW-Request-Type: inertia.
+ * Partial reloads are never cached and always go to network.
+ */
+const cacheInertiaRequest = async (request, maxEntries, maxAge) => {
     if (!('caches' in self) || request.method !== 'GET') {
+        return fetch(request);
+    }
+
+    if (!isFullInertiaRequest(request)) {
+        log('Inertia partial reload — bypassing cache', request.url);
+        return fetch(request);
+    }
+
+    try {
+        const cache = await caches.open(INERTIA_CACHE);
+        const cachedResponse = await cache.match(request);
+
+        if (cachedResponse) {
+            const cachedType = cachedResponse.headers.get('X-SW-Request-Type');
+            const cachedDate = cachedResponse.headers.get('X-SW-Cached-Date');
+            const isExpired = cachedDate && (Date.now() - parseInt(cachedDate, 10)) > maxAge * 1000;
+
+            if (cachedType === 'inertia' && !isExpired) {
+                log('Inertia cache hit', request.url);
+                return cachedResponse;
+            }
+
+            log('Inertia cache miss/expired — evicting', request.url);
+            await cache.delete(request);
+        }
+
+        const response = await fetch(request);
+
+        if (response.ok) {
+            const headers = new Headers(response.headers);
+            headers.set('X-SW-Request-Type', 'inertia');
+            headers.set('X-SW-Cached-Date', Date.now().toString());
+
+            const taggedResponse = new Response(await response.clone().arrayBuffer(), {
+                status: response.status,
+                statusText: response.statusText,
+                headers,
+            });
+
+            const allKeys = await cache.keys();
+            if (maxEntries && allKeys.length >= maxEntries) {
+                await cache.delete(allKeys[0]);
+            }
+
+            await cache.put(request, taggedResponse);
+        }
+
+        return response;
+    } catch (error) {
+        logError('Error in cacheInertiaRequest', error);
+        return fetch(request);
+    }
+};
+
+// Item 1 & 2: Cache full-page responses only; tag with X-SW-Request-Type: full
+const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
+    if (!('caches' in self) || request.method !== 'GET') {
+        return fetch(request);
+    }
+
+    // Item 1: Never cache Inertia AJAX / partial-reload requests
+    if (isInertiaRequest(request)) {
+        log('Inertia request — bypassing cache', request.url);
         return fetch(request);
     }
 
@@ -94,25 +185,38 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
         const cachedResponse = await cache.match(request);
 
         if (cachedResponse) {
-            const cachedTime = new Date(cachedResponse.headers.get('date')).getTime();
-            const now = Date.now();
-            const isCacheOld = (now - cachedTime) > maxAge * 1000;
-            if (isCacheOld) {
+            // Item 2: Evict if cached entry is not tagged as a full-page response
+            const cachedType = cachedResponse.headers.get('X-SW-Request-Type');
+            if (cachedType !== 'full') {
                 await cache.delete(request);
             } else {
-                return cachedResponse;
+                const cachedTime = new Date(cachedResponse.headers.get('date')).getTime();
+                const now = Date.now();
+                const isCacheOld = (now - cachedTime) > maxAge * 1000;
+                if (isCacheOld) {
+                    await cache.delete(request);
+                } else {
+                    return cachedResponse;
+                }
             }
         }
 
         const response = await fetch(request);
         if (response.ok && request.method === 'GET') {
-            const clonedResponse = response.clone();
+            // Tag the response so we can detect type mismatches on future hits
+            const taggedHeaders = new Headers(response.headers);
+            taggedHeaders.set('X-SW-Request-Type', 'full');
+            const taggedResponse = new Response(await response.clone().arrayBuffer(), {
+                status: response.status,
+                statusText: response.statusText,
+                headers: taggedHeaders,
+            });
             log('Caching New Resource', request.url);
-            await cache.put(request, clonedResponse);
+            await cache.put(request, taggedResponse);
 
             const updatedCachedResponses = await cache.keys();
             if (maxEntries && updatedCachedResponses.length >= maxEntries) {
-                await cache.delete(updatedCachedResponses[0]); // Remove the oldest entry
+                await cache.delete(updatedCachedResponses[0]);
             }
         }
 
@@ -139,6 +243,55 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
     }
 };
 
+/**
+ * Item 3: Stale-while-revalidate — return cached immediately, revalidate in background.
+ */
+const staleWhileRevalidate = async (cacheName, request, maxEntries, maxAge) => {
+    if (!('caches' in self) || request.method !== 'GET') {
+        return fetch(request);
+    }
+
+    if (isInertiaRequest(request)) {
+        log('Inertia request — bypassing SWR cache', request.url);
+        return fetch(request);
+    }
+
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(request);
+
+    const networkFetch = fetch(request).then(async (response) => {
+        if (response.ok) {
+            const taggedHeaders = new Headers(response.headers);
+            taggedHeaders.set('X-SW-Request-Type', 'full');
+            const taggedResponse = new Response(await response.clone().arrayBuffer(), {
+                status: response.status,
+                statusText: response.statusText,
+                headers: taggedHeaders,
+            });
+            await cache.put(request, taggedResponse);
+            const keys = await cache.keys();
+            if (maxEntries && keys.length >= maxEntries) {
+                await cache.delete(keys[0]);
+            }
+        }
+        return response;
+    }).catch((err) => {
+        logError('SWR background fetch failed', err);
+    });
+
+    if (cachedResponse) {
+        const cachedTime = new Date(cachedResponse.headers.get('date')).getTime();
+        const isOld = (Date.now() - cachedTime) > maxAge * 1000;
+        if (!isOld) {
+            log('SWR: returning cached, revalidating in background', request.url);
+            return cachedResponse;
+        }
+        await cache.delete(request);
+    }
+
+    return networkFetch;
+};
+
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(APP_CACHE)
@@ -146,7 +299,7 @@ self.addEventListener('install', event => {
             .then(() => {
                 self.skipWaiting();
                 // Notify the clients that the app is available offline
-                broadcastChannel.postMessage({
+                channel.postMessage({
                     type: 'APP_AVAILABLE_OFFLINE',
                     message: 'The app is now available offline. Enjoy your movie binge!',
                     level: 'success',
@@ -176,20 +329,20 @@ self.addEventListener('periodicsync', async (event) => {
                     if (permission === 'granted') {
                         sendTrendingNotification();
                     } else {
-                        broadcastChannel.postMessage({
+                        channel.postMessage({
                             type: 'NOTIFICATION_PERMISSION_DENIED',
                             message: 'You need to allow push notifications.',
                             level: 'danger',
                         });
                     }
                 } catch (error) {
-                    broadcastChannel.postMessage({
+                    channel.postMessage({
                         type: 'NOTIFICATION_PERMISSION_DENIED',
                         message: 'Error while requesting and/or showing notification.',
                         level: 'danger',
                     });
 
-                    log("Error while requesting and/or showing notification.", e);
+                    log("Error while requesting and/or showing notification.", error);
                 }
             }
         }
@@ -198,19 +351,20 @@ self.addEventListener('periodicsync', async (event) => {
     }
 });
 
+// Item 4: Fixed activate — preserve ALL current caches, not just APP_CACHE
 self.addEventListener('activate', async (e) => {
     log('Activated');
     try {
         const keyList = await caches.keys();
         const promises = keyList.map((key) => {
-            if (key !== APP_CACHE) {
+            if (!ALL_CACHES.includes(key)) {
                 log('Removing Old Cache', key);
                 return caches.delete(key);
             }
         });
         await Promise.all(promises);
 
-        broadcastChannel.postMessage({
+        channel.postMessage({
             type: 'APP_UPDATED',
             message: 'The app has been updated and is ready to use.',
             level: 'success',
@@ -273,11 +427,18 @@ self.addEventListener('fetch', async event => {
     // Cache-first strategy for static assets
     if (STATIC_ASSETS.includes(request.url)) {
         event.respondWith(handleAssetRequest(request));
+    } else if (isFullInertiaRequest(request)) {
+        // Cache full Inertia AJAX requests separately; partial reloads go straight to network
+        event.respondWith(cacheInertiaRequest(request, 30, 5 * 60));
+    } else if (isInertiaRequest(request)) {
+        // Partial reloads — always network
+        event.respondWith(fetch(request));
     } else if (request.url.startsWith(self.location.origin)) {
+        // Item 3: stale-while-revalidate for /search and /i/ routes
         if (request.url.includes('/search')) {
-            event.respondWith(cacheRequest(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60));
+            event.respondWith(staleWhileRevalidate(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60));
         } else if (request.url.includes('/i/')) {
-            event.respondWith(cacheRequest(INFO_CACHE, request, 10, 24 * 60 * 60));
+            event.respondWith(staleWhileRevalidate(INFO_CACHE, request, 10, 24 * 60 * 60));
         } else {
             event.respondWith(cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60));
         }
@@ -379,11 +540,12 @@ function handleNotificationClick(event) {
 
 self.addEventListener('sync', async (event) => {
     if (event.tag === 'offline-search-sync') {
-        broadcast.postMessage({type: 'OFFLINE_SYNC_EVENT'});
+        channel.postMessage({type: 'OFFLINE_SYNC_EVENT'});
     }
 });
 
-broadcast.onmessage = (event) => {
+// Item 4: Single channel handles both tracking and offline sync messages
+channel.onmessage = (event) => {
     if (event.data.type === 'OFFLINE_SYNC_REQUEST') {
         const offlineRequestUrl = event.data.url;
         offlineSyncRequest(offlineRequestUrl);
@@ -401,17 +563,18 @@ async function offlineSyncRequest(offlineRequestUrl) {
         const url = new URL(offlineRequestUrl);
         const searchParams = new URLSearchParams(url.search);
         const searchQuery = searchParams.get('s') || 'search';
-        broadcast.postMessage({
+        channel.postMessage({
             type: 'OFFLINE_SYNC_FETCHED',
             message: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
             level: 'success',
         });
 
-        // Perform actions to notify the user about the stored offline request
-        self.registration.showNotification('Content is Ready!', {
-            body: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
-            badge: 'https://movieguru.shakiltech.com/icons/android/android-launchericon-96-96.png',
-            icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
+        // Item 5: Enriched offline-sync notification with image, badge, structured actions, vibrate
+        self.registration.showNotification('🎬 Content is Ready!', {
+            body: `Your search for "${searchQuery}" is ready. Tap to explore the results! 🚀👀`,
+            badge: '/icons/android/android-launchericon-96-96.png',
+            icon: '/icons/ios/72.png',
+            image: '/assets/images/screenshots/MOVIE_GURU_SEARCH_SCREENSHOT.png',
             actions: [
                 {
                     action: 'close',
@@ -419,14 +582,16 @@ async function offlineSyncRequest(offlineRequestUrl) {
                 },
                 {
                     action: 'open',
-                    title: 'Check Now',
+                    title: '🔍 View Results',
                 },
             ],
             data: {
                 url: offlineRequestUrl,
             },
             requireInteraction: true,
-            vibrate: [100, 50, 100],
+            vibrate: [100, 50, 100, 50, 200],
+            tag: `offline-sync-${searchQuery}`,
+            renotify: true,
         });
 
         broadcastTrackingEvent(`OFFLINE_SYNCED_SUCCESS`, {
@@ -794,11 +959,13 @@ async function dailyNotification() {
 
     const randomMessage = pool[Math.floor(Math.random() * pool.length)];
 
+    // Item 5: Enriched daily notification with image, contextual badge, structured actions
     self.registration.showNotification('🎬 Your Movie Awaits!', {
-        tag: 'alert',
+        tag: 'daily-alert',
         body: randomMessage,
-        badge: 'https://movieguru.shakiltech.com/icons/android/android-launchericon-96-96.png',
-        icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
+        badge: '/icons/android/android-launchericon-96-96.png',
+        icon: '/icons/ios/72.png',
+        image: '/assets/images/screenshots/MOVIE_GURU_HOME_PAGE_SCREENSHOT.png',
         actions: [
             {
                 action: 'close',
@@ -807,7 +974,7 @@ async function dailyNotification() {
             {
                 action: 'open',
                 type: 'button',
-                title: 'Find Today\'s Binge',
+                title: '🍿 Find Today\'s Binge',
             },
         ],
         data: {
@@ -867,22 +1034,34 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', handleNotificationClick);
 
+// Item 4: Track notification dismiss events
+self.addEventListener('notificationclose', (event) => {
+    broadcastTrackingEvent('notification_dismissed', {
+        event_category: 'notification_dismissed',
+        event_label: event.notification.tag || 'unknown',
+    });
+});
+
 function sendTrendingNotification() {
     const notificationTitle = "🔥 What's Trending This Weekend?";
     const notificationBody = "Don't miss out on the latest trends! 🍿 Tap to discover your next favorite binge-worthy experience.";
     const notificationData = {url: '/'};
 
+    // Item 5: Enriched trending notification with image, badge, vibrate pattern
     self.registration.showNotification(notificationTitle, {
         body: notificationBody,
-        icon: 'https://movieguru.shakiltech.com/icons/ios/72.png',
-        badge: 'https://movieguru.shakiltech.com/icons/android/android-launchericon-96-96.png',
+        icon: '/icons/ios/72.png',
+        badge: '/icons/android/android-launchericon-96-96.png',
+        image: '/assets/images/screenshots/MOVIE_GURU_HOME_WIDE_SCREENSHOT.png',
         actions: [
             {action: 'close', title: 'Not Now'},
-            {action: 'open', title: 'Check It Out!'},
+            {action: 'open', title: '🔥 Check It Out!'},
         ],
         data: notificationData,
         requireInteraction: true,
-        vibrate: [200, 100, 200],
+        vibrate: [200, 100, 200, 100, 400],
+        tag: 'weekly-trending',
+        renotify: true,
     });
 
     broadcastTrackingEvent('trending_notification_sent', {
@@ -892,7 +1071,7 @@ function sendTrendingNotification() {
 }
 
 function broadcastTrackingEvent(eventType, details) {
-    broadcast.postMessage({
+    channel.postMessage({
         type: 'EVENT_TRACKING',
         title: eventType,
         details: {

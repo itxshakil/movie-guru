@@ -18,33 +18,33 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
+    <GuestLayout subtitle="This is a secure area. Please confirm your password before continuing."
+                 title="Confirm your password">
         <Head title="Confirm Password" />
 
-        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-            This is a secure area of the application. Please confirm your password before continuing.
-        </div>
-
-        <form @submit.prevent="submit">
+        <form class="space-y-5" @submit.prevent="submit">
             <div>
-                <InputLabel for="password" value="Password" />
+                <InputLabel class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5" for="password"
+                            value="Password"/>
                 <TextInput
                     id="password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                     v-model="form.password"
                     required
                     autocomplete="current-password"
                     autofocus
                 />
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError :message="form.errors.password" class="mt-1.5"/>
             </div>
 
-            <div class="flex justify-end mt-4">
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Confirm
-                </PrimaryButton>
-            </div>
+            <PrimaryButton
+                :class="{ 'opacity-50': form.processing }"
+                :disabled="form.processing"
+                class="w-full justify-center py-3 rounded-xl text-sm font-semibold"
+            >
+                Confirm
+            </PrimaryButton>
         </form>
     </GuestLayout>
 </template>

@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DetailController;
+use App\Http\Controllers\HiddenGemController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MoodDiscoveryController;
+use App\Http\Controllers\MovieMatchController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -39,10 +43,24 @@ Route::get('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscrib
 
 Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/mood', [MoodDiscoveryController::class, 'index'])->name('mood.index');
+Route::get('/mood/{mood}', [MoodDiscoveryController::class, 'show'])->name('mood.show');
+
+Route::get('/movie-match', [MovieMatchController::class, 'create'])->name('movie-match.create');
+Route::post('/movie-match', [MovieMatchController::class, 'store'])->name('movie-match.store');
+Route::get('/movie-match/{token}', [MovieMatchController::class, 'show'])->name('movie-match.show');
+Route::post('/movie-match/{token}/submit', [MovieMatchController::class, 'submit'])->name('movie-match.submit');
+
+Route::get('/hidden-gem', [HiddenGemController::class, 'show'])->name('hidden-gem.show')->middleware('throttle:api');
+
 Route::middleware('auth')->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/my-watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
+    Route::post('/my-watchlist', [WatchlistController::class, 'store'])->name('watchlist.store');
+    Route::delete('/my-watchlist/{imdbId}', [WatchlistController::class, 'destroy'])->name('watchlist.destroy');
 });
 
 require __DIR__ . '/auth.php';

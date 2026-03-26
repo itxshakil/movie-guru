@@ -2,17 +2,19 @@
     <div class="flex min-h-full items-stretch justify-center text-center md:items-center">
         <div class="flex text-left text-base w-full">
             <div
-                class="relative rounded-lg flex w-full items-center overflow-hidden bg-white dark:bg-gray-900 dark:text-white px-2 pb-6 pt-6 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
+                class="relative rounded-xl flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white shadow-2xl">
+
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
-                     class="grid w-full grid-cols-1 items-start gap-x-3 gap-y-4 sm:grid-cols-12 lg:gap-x-8">
-                    <div class="relative overflow-hidden rounded-lg sm:col-span-4 lg:col-span-5 group/poster">
+                     class="relative grid w-full grid-cols-1 items-start gap-x-6 gap-y-4 sm:grid-cols-12 lg:gap-x-8 p-4 sm:p-6 lg:p-8">
+                    <div
+                        class="relative overflow-hidden rounded-xl sm:col-span-4 lg:col-span-4 group/poster shadow-2xl shadow-black/30">
                         <div class="bg-gray-100 dark:bg-gray-900 aspect-2/3">
                             <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"
-                                 class="object-cover object-center cursor-pointer w-full transition-transform duration-700 group-hover/poster:scale-110"
+                                 class="object-cover object-center cursor-pointer w-full h-full"
                                  @error="handlePosterError">
                         </div>
-                        <div class="flex flex-wrap gap-1 absolute top-0 p-1 justify-end w-full">
+                        <div class="flex flex-wrap gap-1 absolute top-0 p-2 justify-end w-full">
                             <WatchlistButton
                                 :movie="{ imdb_id: detail.imdbID, title: detail.Title, year: detail.Year, poster: detail.Poster, type: detail.Type, imdb_rating: detail.imdbRating }"/>
                             <button
@@ -74,24 +76,36 @@
                                 </span>
                         </div>
                     </div>
-                    <div class="sm:col-span-8 lg:col-span-7">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white sm:pr-12" itemprop="name"
-                            v-text="detail.Title"></h1>
-                        <span :title="detail.Released ? 'Released on '+ detail.Released : 'Release Year'"
-                              class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" itemprop="datePublished"
-                              v-text="detail.Year"></span>
-                        <span v-if="isValue(Genre)" class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400"
-                              itemprop="genre" title="Genre"
-                              v-text="Genre"></span>
-                        <span v-if="detail.Type !== 'series'" class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400"
-                              title="Runtime" v-text="runtime" itemprop="duration"></span>
-                        <span v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'" itemprop="contentRating"
-                              class="mt-2 pr-2 text-sm text-gray-500 dark:text-gray-400" title="Rated"
-                              v-text="detail.Rated"></span>
+                    <div class="sm:col-span-8 lg:col-span-8">
+                        <h1
+                            class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight tracking-tight"
+                            itemprop="name"
+                            style="font-feature-settings: 'kern' 1, 'liga' 1;"
+                            v-text="detail.Title"
+                        />
+                        <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span
+                                :title="detail.Released ? 'Released on '+ detail.Released : 'Release Year'"
+                                class="text-sm font-semibold text-gray-500 dark:text-gray-400"
+                                itemprop="datePublished"
+                                v-text="detail.Year"
+                            />
+                            <span v-if="isValue(Genre)" class="text-gray-300 dark:text-gray-600">·</span>
+                            <span v-if="isValue(Genre)" class="text-sm text-gray-500 dark:text-gray-400"
+                                  itemprop="genre" title="Genre" v-text="Genre"/>
+                            <span v-if="detail.Type !== 'series' && runtime"
+                                  class="text-gray-300 dark:text-gray-600">·</span>
+                            <span v-if="detail.Type !== 'series'" class="text-sm text-gray-500 dark:text-gray-400"
+                                  itemprop="duration" title="Runtime" v-text="runtime"/>
+                            <span v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'"
+                                  class="ml-1 text-[10px] font-black tracking-wider uppercase px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
+                                  itemprop="contentRating" v-text="detail.Rated"/>
+                        </div>
 
-                        <section aria-labelledby="information-heading" class="mt-2">
+                        <section aria-labelledby="information-heading" class="mt-4">
                             <h3 id="information-heading" class="sr-only">Product information</h3>
-                            <div class="mb-2" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                            <div class="mb-3" itemprop="aggregateRating" itemscope
+                                 itemtype="https://schema.org/AggregateRating">
                                 <div v-if="basicRating" class="flex items-center">
                                     <svg
                                         v-for="i in 5"
@@ -126,20 +140,21 @@
                             </div>
 
                           <!-- Watch Now Section -->
-                            <section class="mt-2">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white sr-only">Watch Now</h3>
-                                <ul class="space-y-4 flex flex-wrap items-center gap-1">
+                            <section class="mt-3">
+                                <h3 class="text-xs font-black tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-2">
+                                    Where to Watch</h3>
+                                <ul class="flex flex-wrap items-center gap-1.5">
                                     <SourceCard
                                         v-for="source in uniqueSources"
                                         :key="source.availability.sourceId"
                                         :send-analytics="sendAnalytics"
                                         :source="source"
-                                        class="flex grow items-center gap-2 p-2 border rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        class="flex grow items-center gap-2 p-2 border rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors duration-150"
                                     >
                                     </SourceCard>
 
                                     <li v-if="affiliateLink"
-                                        class="flex grow items-center gap-2 p-3 border-2 border-primary-500 rounded-xl shadow-lg bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-gray-900 hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 group"
+                                        class="flex grow items-center gap-2 p-3 border-2 border-primary-500 rounded-xl shadow-lg bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-gray-900 transition-colors duration-150 group"
                                     >
                                         <a
                                             :href="affiliateLink.link"
@@ -243,17 +258,16 @@
                                 </ul>
                             </section>
 
-                            <SnippetText :text="isValue(detail.Plot) ? detail.Plot : 'No Plot detail'"  itemprop="description" class="text-gray-900 dark:text-white mt-2"/>
+                            <SnippetText :text="isValue(detail.Plot) ? detail.Plot : 'No Plot detail'"
+                                         class="text-gray-700 dark:text-gray-300 mt-3 text-sm leading-relaxed"
+                                         itemprop="description"/>
 
-                            <div>
-                                <div class="py-4 pb-2">
-                                    <h3 class="text-base font-semibold leading-7 text-gray-900 dark:text-white capitalize">
-                                        {{ detail.Type }} Information</h3>
-                                    <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500 hidden">Additional detail
-                                        and information</p>
-                                </div>
+                            <div class="mt-4">
+                                <h3 class="text-xs font-black tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-2 capitalize">
+                                    {{ detail.Type }} Details
+                                </h3>
                                 <div>
-                                    <dl class="">
+                                    <dl class="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800/60">
                                         <div itemprop="actor" itemscope itemtype="https://schema.org/Person"
                                             v-if="isValue(detail.Actors)"
                                             class="p-2 sm:py-4 sm:grid sm:grid-cols-4 sm:gap-4 odd:bg-gray-100 dark:odd:bg-gray-800">
@@ -363,7 +377,7 @@
         >
             <a
                 :href="affiliateLink.link"
-                class="flex items-center justify-center gap-2 w-full py-3.5 px-6 bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white font-bold text-base rounded-xl shadow-lg transition-all active:scale-[0.98]"
+                class="flex items-center justify-center gap-2 w-full py-3.5 px-6 bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white font-bold text-base rounded-xl shadow-lg transition-colors"
                 rel="noopener noreferrer"
                 target="_blank"
                 @click="sendAnalytics('Affiliate Sticky: ' + affiliateLink.title, affiliateLink.link)"

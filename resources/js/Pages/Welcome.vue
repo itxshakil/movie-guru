@@ -2,6 +2,7 @@
 import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import OurFeatures from '@/Components/OurFeatures.vue';
+import HiddenGem from '@/Components/HiddenGem.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import LoadingSpinnerIcon from '@/Components/Icons/LoadingSpinner.vue';
 import SearchCard from "@/Components/SearchCard.vue";
@@ -188,13 +189,13 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
             </div>
         </div>
     </div>
+    <HiddenGem/>
   <OurFeatures/>
 
     <div v-if="mostWatchedMovies && mostWatchedMovies.length" class="bg-white dark:bg-gray-900 py-8">
         <div class="mx-auto max-w-7xl px-4 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">📈 Most Watched This
-                    Week</h2>
+                <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">📈 Most Watched This Week</h2>
                 <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">See what everyone has been watching
                     lately.</p>
             </div>
@@ -255,8 +256,8 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">⭐ Top Rated of All Time</h2>
-        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Watch the highest-rated films as voted by movie
-          enthusiasts.</p>
+          <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white text-pretty">Watch the highest-rated films as
+              voted by movie enthusiasts.</p>
       </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         <SearchCard
