@@ -30,65 +30,72 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
+    <GuestLayout subtitle="Sign in to your Movie Guru account." title="Welcome back">
         <Head title="Log in" />
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
+        <div v-if="status"
+             class="mb-6 text-sm text-green-600 font-medium bg-green-50 dark:bg-green-900/20 px-4 py-3 rounded-xl">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form class="space-y-5" @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
-
+                <InputLabel class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5" for="email"
+                            value="Email"/>
                 <TextInput
                     id="email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                     v-model="form.email"
                     required
                     autofocus
                     autocomplete="username"
                 />
-
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError :message="form.errors.email" class="mt-1.5"/>
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <InputLabel class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400" for="password"
+                                value="Password"/>
+                    <Link
+                        v-if="canResetPassword"
+                        :href="route('password.request')"
+                        class="text-xs text-primary-600 dark:text-primary-400 hover:underline font-medium"
+                    >
+                        Forgot password?
+                    </Link>
+                </div>
                 <TextInput
                     id="password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                     v-model="form.password"
                     required
                     autocomplete="current-password"
                 />
-
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError :message="form.errors.password" class="mt-1.5"/>
             </div>
 
-            <div class="block mt-4">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
-                </label>
+            <div class="flex items-center gap-2">
+                <Checkbox v-model:checked="form.remember" name="remember"/>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Remember me</span>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800"
-                >
-                    Forgot your password?
+            <PrimaryButton
+                :class="{ 'opacity-50': form.processing }"
+                :disabled="form.processing"
+                class="w-full justify-center py-3 rounded-xl text-sm font-semibold"
+            >
+                Sign in
+            </PrimaryButton>
+
+            <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+                Don't have an account?
+                <Link :href="route('register')"
+                      class="text-primary-600 dark:text-primary-400 font-semibold hover:underline">Create one
                 </Link>
-
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
-                </PrimaryButton>
-            </div>
+            </p>
         </form>
     </GuestLayout>
 </template>

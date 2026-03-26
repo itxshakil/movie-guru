@@ -1,6 +1,7 @@
 <script setup>
 import {Head} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
+import NewsletterWidget from '@/Components/NewsletterWidget.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import DetailCard from '@/Components/DetailCard.vue';
 import SearchCard from "@/Components/SearchCard.vue";
@@ -25,6 +26,22 @@ const moviePoster = (movie) => {
 };
 const pageUrl = window.location.href;
 
+const copyToClipboard = async (text) => {
+    if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+    } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    }
+};
+
 const shareMovie = async () => {
     if (!props.detail) return;
     const shareData = {
@@ -37,34 +54,37 @@ const shareMovie = async () => {
         if (navigator.share) {
             await navigator.share(shareData);
         } else {
-            await navigator.clipboard.writeText(shareData.url);
+            await copyToClipboard(shareData.url);
             alert('Link copied to clipboard!');
         }
     } catch (err) {
-        console.error('Error sharing:', err);
+        if (err.name !== 'AbortError') {
+            console.error('Error sharing:', err);
+        }
     }
 };
 
-const shareMovieFromCard = (movie) => {
-    // Vibrate on mobile
+const shareMovieFromCard = async (movie) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(10);
     }
-    // Note: this shareMovie currently doesn't accept arguments, it uses props.detail
-    // We should probably allow it to share the passed movie if needed, but in Show.vue it might be for the current movie.
-    // However, shareMovieFromCard is called from SearchCard in the related sections.
-    // Let's fix shareMovie to be more generic if needed, or handle it here.
     const shareData = {
         title: movie.title,
         text: `Check out ${movie.title} on Movie Guru!`,
         url: route('movie.detail.full', {imdbID: movie.imdb_id}),
     };
 
-    if (navigator.share) {
-        navigator.share(shareData).catch(err => console.error('Error sharing:', err));
-    } else {
-        navigator.clipboard.writeText(shareData.url);
-        alert('Link copied to clipboard!');
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await copyToClipboard(shareData.url);
+            alert('Link copied to clipboard!');
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.error('Error sharing:', err);
+        }
     }
 };
 
@@ -133,6 +153,10 @@ const ogImage = moviePoster(props.detail);
     <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources"
                 @share="shareMovie"
                 class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
+
+    <div class="mx-auto max-w-7xl px-4 lg:px-8 py-8">
+        <NewsletterWidget/>
+    </div>
 
     <div class="mt-4">
         <div v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="bg-white dark:bg-gray-900 py-8">

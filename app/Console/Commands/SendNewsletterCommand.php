@@ -8,18 +8,18 @@ use App\Mail\NewsletterMail;
 use App\Models\MovieDetail;
 use App\Models\NewsletterSubscription;
 use App\Support\LogCommands;
+use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
+#[AsCommand(name: 'newsletter:send', description: 'Send weekly or monthly newsletters to subscribers')]
 final class SendNewsletterCommand extends Command
 {
     use LogCommands;
 
     protected $signature = 'newsletter:send {type : The type of newsletter (weekly or monthly)}';
-
-    protected $description = 'Send weekly or monthly newsletters to subscribers';
 
     public function handle(): void
     {

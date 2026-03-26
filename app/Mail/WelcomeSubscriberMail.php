@@ -33,7 +33,7 @@ final class WelcomeSubscriberMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.newsletter.welcome',
+            view: 'emails.newsletter.welcome',
         );
     }
 }
