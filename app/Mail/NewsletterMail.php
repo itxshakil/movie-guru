@@ -22,9 +22,9 @@ final class NewsletterMail extends Mailable implements ShouldQueue
      * @param Collection<int, MovieDetail> $movies
      */
     public function __construct(
-        public string  $type,
+        public string $type,
         public Collection $movies,
-        public string  $email,
+        public string $email,
         public ?MovieDetail $recommendedMovie = null,
         public ?MovieDetail $hiddenGem = null,
         public ?MovieDetail $trendingMovie = null,
