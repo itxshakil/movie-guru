@@ -218,7 +218,7 @@
                         <table width="100%" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td align="center">
-                                    <a href="{{ config('app.url') }}"
+                                    <a href="{{ config('app.url') }}?utm_source=newsletter"
                                        style="display:inline-block;background:#1d1d1f;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:980px;letter-spacing:-0.2px;">Browse
                                         All Movies</a>
                                 </td>
