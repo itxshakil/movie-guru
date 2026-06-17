@@ -137,6 +137,51 @@ final class WatchModeService
     }
 
     /**
+     * Get the YouTube video id of a title's trailer, or null when unavailable.
+     * Cached for a week since trailers rarely change.
+     *
+     * @throws Throwable
+     */
+    public function getTitleTrailer(string|int $titleId): ?string
+    {
+        $value = Cache::remember(
+            'watchmode.trailer.' . $titleId,
+            now()->addWeek(),
+            function () use ($titleId): string {
+                $raw = $this->request(sprintf('/title/%s/details/', $titleId));
+
+                if (isset($raw['error'])) {
+                    return '';
+                }
+
+                $trailer = isset($raw['trailer']) ? (string) $raw['trailer'] : null;
+
+                return self::extractYoutubeId($trailer) ?? '';
+            },
+        );
+
+        return $value === '' ? null : $value;
+    }
+
+    /**
+     * Extract the 11-character YouTube video id from any common YouTube URL.
+     */
+    public static function extractYoutubeId(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return null;
+        }
+
+        $pattern = '#(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|v/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})#';
+
+        if (preg_match($pattern, $url, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
      * Get a random API key from the configured keys.
      *
      * @throws Exception|Throwable

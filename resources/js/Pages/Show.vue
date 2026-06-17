@@ -5,6 +5,7 @@ import NewsletterWidget from '@/Components/NewsletterWidget.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import DetailCard from '@/Components/DetailCard.vue';
 import SearchCard from "@/Components/SearchCard.vue";
+import TrailerPlayer from '@/Components/TrailerPlayer.vue';
 
 const props = defineProps({
     detail: Object,
@@ -17,6 +18,11 @@ const props = defineProps({
     recommendedMovies: Array,
     affiliateLink: Object,
     similarMovies: Array,
+    trailerId: {
+        type: String,
+        required: false,
+        default: null,
+    },
 })
 
 defineOptions({ layout: BaseLayout })
@@ -153,6 +159,13 @@ const ogImage = moviePoster(props.detail);
     <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources"
                 @share="shareMovie"
                 class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
+
+    <div v-if="trailerId" class="mx-auto max-w-4xl px-4 lg:px-8 pt-2 pb-6">
+        <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+            🎬 Watch the Trailer
+        </h2>
+        <TrailerPlayer :video-id="trailerId" :title="detail?.Title ?? 'Movie'"/>
+    </div>
 
     <div class="mx-auto max-w-7xl px-4 lg:px-8 py-8">
         <NewsletterWidget/>
