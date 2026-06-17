@@ -41,6 +41,10 @@ final class DetailController extends Controller
 
         $sources = $movie->sources ?? [];
 
+        $cachedTrailer = Cache::get('watchmode.trailer.' . $cleanImdbId);
+        $trailerId = ($cachedTrailer === null || $cachedTrailer === '') ? null : $cachedTrailer;
+        $shouldWarmTrailer = $cachedTrailer === null;
+
         $shouldRefresh =
             $movie instanceof MovieDetail
             && (
@@ -51,12 +55,16 @@ final class DetailController extends Controller
 
         $botDetector = resolve(BotDetectorService::class);
         if ($botDetector->isBot($request) === false) {
-            defer(static function () use ($shouldRefresh, $request, $imdbId): void {
+            defer(static function () use ($shouldRefresh, $shouldWarmTrailer, $request, $imdbId, $cleanImdbId): void {
                 ShowPageAnalytics::create([
                     'imdb_id' => $imdbId,
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                 ]);
+
+                if ($shouldWarmTrailer) {
+                    resolve(WatchModeService::class)->getTitleTrailer($cleanImdbId);
+                }
 
                 if ($shouldRefresh) {
                     $watchMode = resolve(WatchModeService::class);
@@ -82,6 +90,7 @@ final class DetailController extends Controller
                 'detail' => $detail,
                 'sources' => $sources,
                 'affiliateLink' => $affiliateLink,
+                'trailerId' => $trailerId,
             ]);
         }
 
@@ -134,6 +143,7 @@ final class DetailController extends Controller
             'detail' => $detail,
             'sources' => $sources,
             'affiliateLink' => $affiliateLink,
+            'trailerId' => $trailerId,
             'recentlyReleasedMovies' => $recentlyReleasedMovies,
             'recommendedMovies' => $recommendedMovies,
             'similarMovies' => $firstGenre

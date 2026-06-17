@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.15.3';
-const SEARCH_CACHE = 'search-cache-v-4.15.3';
-const INFO_CACHE = 'info-cache-v-4.15.3';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.15.3';
-const POSTER_CACHE = 'poster-cache-v-4.15.3';
-const INERTIA_CACHE = 'inertia-cache-v-4.15.3';
+const APP_CACHE = 'v-4.15.4';
+const SEARCH_CACHE = 'search-cache-v-4.15.4';
+const INFO_CACHE = 'info-cache-v-4.15.4';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.15.4';
+const POSTER_CACHE = 'poster-cache-v-4.15.4';
+const INERTIA_CACHE = 'inertia-cache-v-4.15.4';
 
 // All current caches — used in activate to preserve them all
 const ALL_CACHES = [APP_CACHE, SEARCH_CACHE, INFO_CACHE, DYNAMIC_CACHE, POSTER_CACHE, INERTIA_CACHE];
@@ -27,44 +27,44 @@ const basicPathsToCache = [
     'build/manifest.json',
     'build/assets/Search-fD_ut_j3.css',
     'build/assets/BaseLayout-CPfWl7uE.css',
-    'build/assets/AuthenticatedLayout-BRklnfgK.css',
+    'build/assets/AuthenticatedLayout-BnAtl9Tp.css',
     'build/assets/Show-O_rbfk1n.css',
-    'build/assets/app-DTlM8Gv8.css',
-    'build/assets/LoadingSpinner-hg4leelj.js',
-    'build/assets/ApplicationLogo-D9wEWsJU.js',
-    'build/assets/LoadingSpinnerButton-BUa9CIFk.js',
-    'build/assets/PrimaryButton-D9JTqWtv.js',
-    'build/assets/Dashboard-CKoXNENH.js',
-    'build/assets/TextInput-Bs26mqmi.js',
-    'build/assets/InputLabel-CT6j8qGj.js',
-    'build/assets/Edit-BKdF_mAj.js',
-    'build/assets/ConfirmPassword-DyQGkRvE.js',
-    'build/assets/ForgotPassword-Ctb8b4ge.js',
-    'build/assets/VerifyEmail-DPrisHkU.js',
-    'build/assets/Error-Bs3hCaZt.js',
-    'build/assets/UpdatePasswordForm-cFT5uhzG.js',
-    'build/assets/GuestLayout-0oDFHvMc.js',
-    'build/assets/UpdateProfileInformationForm-CDMdYs-0.js',
-    'build/assets/ResetPassword-DTcsojlq.js',
-    'build/assets/MoodDiscovery-BNTmvLhE.js',
-    'build/assets/WatchlistPage-rFi7DTnR.js',
-    'build/assets/Watchlist-BNnimvAx.js',
-    'build/assets/Register-D9oazBZk.js',
-    'build/assets/Login-BDn7Y_bN.js',
-    'build/assets/DeleteUserForm-B_rsqpat.js',
-    'build/assets/Terms-okzYME_D.js',
-    'build/assets/NewsletterForm-0W1Lh9rS.js',
-    'build/assets/PrivacyPolicy-oeNrPfho.js',
-    'build/assets/Show-ClvphOvk.js',
-    'build/assets/MovieMatch-DS6o4Azd.js',
-    'build/assets/AuthenticatedLayout-Ce6246rW.js',
-    'build/assets/Contact-DFuLZ_mX.js',
-    'build/assets/Show-qFBcP_m9.js',
-    'build/assets/Search-DTMhW8fz.js',
-    'build/assets/BaseLayout-1KkFkWq5.js',
-    'build/assets/Welcome-DPRanJXH.js',
-    'build/assets/SearchCard-CCo0Ffut.js',
-    'build/assets/app-BZpuotA5.js',
+    'build/assets/app-DbB-A6HJ.css',
+    'build/assets/LoadingSpinner-BTFr3kTn.js',
+    'build/assets/ApplicationLogo-BbBtErcp.js',
+    'build/assets/LoadingSpinnerButton-yjfP59Ob.js',
+    'build/assets/PrimaryButton-cbb7DX8y.js',
+    'build/assets/Dashboard-BDB7IHrE.js',
+    'build/assets/TextInput-CG93TKjw.js',
+    'build/assets/InputLabel-DWfL_PF4.js',
+    'build/assets/Edit-BM2FNukY.js',
+    'build/assets/ConfirmPassword-CQJuCU85.js',
+    'build/assets/ForgotPassword-0VKJkeFc.js',
+    'build/assets/VerifyEmail-DJTFmiU9.js',
+    'build/assets/Error-gWmz7xtl.js',
+    'build/assets/UpdatePasswordForm-MgvZuUTn.js',
+    'build/assets/GuestLayout-ButX5ZXI.js',
+    'build/assets/UpdateProfileInformationForm-C8eouPsw.js',
+    'build/assets/ResetPassword-QSM1oZLn.js',
+    'build/assets/MoodDiscovery-D93tGWoD.js',
+    'build/assets/WatchlistPage-D_kF95N_.js',
+    'build/assets/Watchlist-5FaymnFy.js',
+    'build/assets/Register-1Qd5PS4v.js',
+    'build/assets/Login-CbCmxftV.js',
+    'build/assets/DeleteUserForm-DQDNOheW.js',
+    'build/assets/Terms-CWhYuzoO.js',
+    'build/assets/NewsletterForm--PLLlPfZ.js',
+    'build/assets/PrivacyPolicy-B0VsG7_J.js',
+    'build/assets/Show-Bz3YI1mM.js',
+    'build/assets/MovieMatch-BobaFXIv.js',
+    'build/assets/AuthenticatedLayout-OMiWEmbn.js',
+    'build/assets/Contact-Du5T2nqf.js',
+    'build/assets/Show-B_3wRCkt.js',
+    'build/assets/Search-feA9CUcm.js',
+    'build/assets/BaseLayout-1Rjm1FAi.js',
+    'build/assets/Welcome-C2YDRDDF.js',
+    'build/assets/SearchCard-DDpUQEw0.js',
+    'build/assets/app-PQzKI9Uz.js',
     '/assets/images/no-poster.jpg',
 ];
 
