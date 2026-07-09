@@ -18,11 +18,9 @@ final class SlowQueryDetected extends Notification
      * Create a new notification instance.
      */
     public function __construct(
-        public Connection    $queryConnection,
+        public Connection $queryConnection,
         public QueryExecuted $event,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Get the notification's delivery channels.
@@ -37,21 +35,21 @@ final class SlowQueryDetected extends Notification
     /**
      * Get the mail representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed       $notifiable
      * @return MailMessage
      */
     public function toMail($notifiable)
     {
         $timeInSeconds = $this->event->time / 1000;
 
-        return (new MailMessage())->markdown('emails.slow-query-detected', [
+        return (new MailMessage())->view('emails.slow-query-detected', [
             'connectionName' => $this->queryConnection->getName(),
             'query' => $this->finalQuery(),
             'time' => $timeInSeconds,
+            'severityLabel' => $timeInSeconds >= 0.5 ? 'CRITICAL' : 'SLOW',
+            'severityColor' => $timeInSeconds >= 0.5 ? '#dc2626' : '#d97706',
+            'timestamp' => now()->toDateTimeString(),
         ]);
-
-        // TODO: This gives error
-        //        return new MailSlowQueryDetected($this->queryConnection->getName(), $this->finalQuery(), $timeInSeconds);
     }
 
     /**
@@ -74,7 +72,7 @@ final class SlowQueryDetected extends Notification
         $query = $this->event->sql;
 
         foreach ($this->event->bindings as $binding) {
-            $query = preg_replace('/\?/', sprintf("'%s'", $binding), (string)$query, 1);
+            $query = preg_replace('/\?/', sprintf("'%s'", $binding), (string) $query, 1);
         }
 
         return $query;
