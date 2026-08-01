@@ -329,7 +329,7 @@ const moviePoster = (movie) => {
                         v-for="movie in movieList"
                         :key="movie.imdb_id"
                         :movie="movie"
-                        class="scroll-reveal"
+                        class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Search', movie.title)"
                         @share="shareMovieFromCard"
                     />
@@ -360,7 +360,7 @@ const moviePoster = (movie) => {
                         v-for="movie in recentlyReleasedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
-                        class="scroll-reveal"
+                        class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
                         @share="shareMovieFromCard"
                     />
@@ -381,7 +381,7 @@ const moviePoster = (movie) => {
                         v-for="movie in recommendedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
-                        class="scroll-reveal"
+                        class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
                         @share="shareMovieFromCard"
                     />

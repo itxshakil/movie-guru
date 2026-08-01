@@ -247,6 +247,20 @@ select:focus {
     }
 }
 
+/* Defers layout/style/paint work for off-screen cards in long result grids.
+   contain-intrinsic-block-size reserves an estimated slot so the scrollbar
+   doesn't jump; the "auto" keyword lets the browser remember the real
+   measured size after a card has rendered once. */
+.cv-card {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 560px;
+}
+
+.cv-card-compact {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 340px;
+}
+
 /* Divider rules between grid cards */
 .grid-divided {
     column-rule: 1px solid var(--color-gray-200);
