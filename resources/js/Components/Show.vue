@@ -32,50 +32,40 @@ const loadDetail = async () => {
         return;
     }
     try {
-        const response = await axios.get(`/i/${props.imdbID}`, {
+        const response = await fetch(`/i/${props.imdbID}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
         });
-        if (response.status === 200) {
-            if (response.data.detail && typeof response.data.detail === 'object' && response.data.detail.hasOwnProperty('Title')) {
-                detail.value = response.data.detail;
-                sources.value = response.data.sources;
-                affiliateLink.value = response.data.affiliateLink;
-            } else {
-                alert('Unexpected data format');
 
-                loading.value = false;
-                emit('close');
-            }
-        } else {
+        if (response.status === 429 && maxRetry.value) {
+            const retryAfter = response.headers.get('retry-after');
+            timeout.value = setTimeout(() => {
+                loadDetail()
+            }, retryAfter * 1000);
+            maxRetry.value = maxRetry.value - 1;
+            return;
+        }
+
+        if (!response.ok) {
             alert(`Something went wrong. Error -RE-${response.status}`)
-            loading.value = false;
+            emit('close');
+            return;
+        }
+
+        const data = await response.json();
+        if (data.detail && typeof data.detail === 'object' && data.detail.hasOwnProperty('Title')) {
+            detail.value = data.detail;
+            sources.value = data.sources;
+            affiliateLink.value = data.affiliateLink;
+        } else {
+            alert('Unexpected data format');
             emit('close');
         }
     } catch (error) {
-        if (error.response) {
-            if(error.response.status === 429 && maxRetry.value){
-                const retryAfter = error.response.headers['retry-after'];
-                timeout.value = setTimeout(()=>{
-                    loadDetail()
-                }, retryAfter * 1000);
-                maxRetry.value = maxRetry.value - 1;
-            }else{
-                alert(`Something went wrong. Error -RE-${response.status}`)
-                loading.value = false;
-                emit('close');
-            }
-        } else if (error.request) {
-            alert(`No response received from server`)
-            loading.value = false;
-            emit('close');
-        } else {
-            alert(error.message)
-            loading.value = false;
-            emit('close');
-        }
+        alert('No response received from server');
+        emit('close');
     } finally {
         loading.value = false;
     }

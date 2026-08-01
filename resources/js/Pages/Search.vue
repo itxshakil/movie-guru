@@ -84,18 +84,38 @@ const doSearch = () => {
     });
 };
 
-const loadMore = () => {
+const loadMore = async () => {
     loading.value = true;
     const previousCount = movieList.value.length;
-    axios.get(nextURLLink.value).then(async response => {
-        if (response.data.searchResults.Response === 'False') {
-            alert('Something went wrong. Please try again later. S-100');
-            loading.value = false
+
+    try {
+        const response = await fetch(nextURLLink.value, {
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+        });
+
+        if (response.status === 429 && maxRetry.value) {
+            const retryAfter = response.headers.get('retry-after');
+            timeout.value = setTimeout(() => {
+                loadMore()
+            }, retryAfter * 1000);
+
+            maxRetry.value--;
             return;
         }
 
-        movieList.value = movieList.value.concat(response.data.searchResults.Search);
-        nextURLLink.value = response.data.nextUrl;
+        if (!response.ok) {
+            alert(`Something went wrong. Error -RE-${response.status}`);
+            return;
+        }
+
+        const data = await response.json();
+        if (data.searchResults.Response === 'False') {
+            alert('Something went wrong. Please try again later. S-100');
+            return;
+        }
+
+        movieList.value = movieList.value.concat(data.searchResults.Search);
+        nextURLLink.value = data.nextUrl;
 
         // Bring the first newly-loaded card into view, contained to the
         // results grid so it doesn't jump the whole page under the header.
@@ -107,21 +127,11 @@ const loadMore = () => {
                 await scrolled;
             }
         }
-    }).catch((error) => {
-        if (error.response.status === 429 && maxRetry.value) {
-            const retryAfter = error.response.headers['retry-after'];
-            timeout.value = setTimeout(() => {
-                loadMore()
-            }, retryAfter * 1000);
-
-            maxRetry.value--;
-            return;
-        }
-        alert(`Something went wrong. Error -RE-${response.status}`)
-        loading.value = false
-    }).finally(() => {
+    } catch (error) {
+        alert('Something went wrong. Please try again later.');
+    } finally {
         loading.value = false;
-    });
+    }
 };
 
 const shareMovie = async (detail) => {
