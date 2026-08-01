@@ -116,7 +116,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
     <div class="relative isolate px-6 lg:px-8 dark:bg-gray-950 dark:text-gray-100">
         <div class="mx-auto max-w-5xl py-24 sm:py-32">
             <div class="text-center">
-                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
+                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-6xl text-box-tight">
                     🎬 Discover. Explore. Enjoy. 🎥
                 </h1>
                 <p class="mt-8 text-xl sm:text-2xl leading-relaxed text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-medium text-pretty">

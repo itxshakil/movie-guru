@@ -313,7 +313,8 @@ const moviePoster = (movie) => {
                 </div>
 
                 <div v-if="movieList && movieList.length" ref="resultsGrid"
-                     class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8 sm:space-y-0 grid-divided">
+                     class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8 sm:space-y-0 grid-divided"
+                     style="--card-density: compact;">
                     <SearchCard
                         v-for="movie in movieList"
                         :key="movie.imdb_id"
@@ -344,7 +345,7 @@ const moviePoster = (movie) => {
                         movies hitting
                         the screens.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
                     <SearchCard
                         v-for="movie in recentlyReleasedMovies"
                         :key="movie.imdb_id"
@@ -365,7 +366,7 @@ const moviePoster = (movie) => {
                         films for
                         every movie lover.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
                     <SearchCard
                         v-for="movie in recommendedMovies"
                         :key="movie.imdb_id"

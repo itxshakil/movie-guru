@@ -20,7 +20,7 @@
             </div>
 
             <!-- Meta row: type + date -->
-            <div class="mt-3 px-3 flex items-center gap-1.5">
+            <div class="card-meta mt-3 px-3 flex items-center gap-1.5">
                 <span
                     class="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50">
                     {{ movie.type }}
@@ -33,7 +33,7 @@
             </div>
 
             <!-- Title -->
-            <div class="px-3 pt-1.5 pb-1">
+            <div class="card-title-wrap px-3 pt-1.5 pb-1">
                 <p
                     class="text-[15px] font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug"
                     itemprop="name"
@@ -264,3 +264,18 @@ const searchWatchDownload = (title) => {
 };
 
 </script>
+
+<style scoped>
+/* Reacts to a --card-density custom property set on an ancestor grid (see
+   Search.vue/Show.vue), so cards tighten their padding in denser grids
+   without the grid and card needing to coordinate via props/JS. */
+@container style(--card-density: compact) {
+    .card-meta {
+        padding-inline: 0.5rem;
+    }
+
+    .card-title-wrap {
+        padding-inline: 0.5rem;
+    }
+}
+</style>
