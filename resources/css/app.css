@@ -217,3 +217,49 @@ select:focus {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
+/* Brand spring easing for tactile press/hover feedback */
+:root {
+    --ease-spring: linear(0, 0.42 6.4%, 0.706 12.6%, 0.914 18.2%, 1.005 22.9%, 1.037 27.4%, 1.021 34.3%, 0.99 41.7%, 0.976 51%, 1);
+}
+
+/* Only overrides the easing curve, so it layers onto Tailwind's existing
+   transition-property/duration utilities instead of replacing them. */
+.press-spring {
+    transition-timing-function: var(--ease-spring);
+}
+
+/* Squircle corners: progressive enhancement over the existing border-radius */
+.squircle {
+    corner-shape: squircle;
+}
+
+/* Staggered entrance for sibling lists that mount together (toasts, menus) */
+@supports (transition-delay: calc(sibling-index() * 1s)) {
+    .stagger-siblings > * {
+        transition-delay: calc((sibling-index() - 1) * 0.06s);
+    }
+}
+
+/* Divider rules between grid cards */
+.grid-divided {
+    column-rule: 1px solid var(--color-gray-200);
+    row-rule: 1px solid var(--color-gray-200);
+}
+
+@media (prefers-color-scheme: dark) {
+    .grid-divided {
+        column-rule-color: var(--color-gray-800);
+        row-rule-color: var(--color-gray-800);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-reveal,
+    .toast-item,
+    .stagger-siblings > * {
+        animation: none;
+        transition: none;
+        transition-delay: 0s;
+    }
+}
+
