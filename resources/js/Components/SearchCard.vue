@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800/60 rounded-2xl shadow-sm group relative flex flex-col justify-between
+        class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800/60 rounded-2xl squircle shadow-sm group relative flex flex-col justify-between
                hover:border-gray-200 dark:hover:border-gray-700
                transition-colors duration-200 cursor-pointer overflow-hidden"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"

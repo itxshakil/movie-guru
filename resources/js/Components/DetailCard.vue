@@ -2,12 +2,12 @@
     <div class="flex min-h-full items-stretch justify-center text-center md:items-center">
         <div class="flex text-left text-base w-full">
             <div
-                class="relative rounded-xl flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white shadow-2xl">
+                class="relative rounded-xl squircle flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white shadow-2xl">
 
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="relative grid w-full grid-cols-1 items-start gap-x-6 gap-y-4 sm:grid-cols-12 lg:gap-x-8 p-4 sm:p-6 lg:p-8">
                     <div
-                        class="relative overflow-hidden rounded-xl sm:col-span-4 lg:col-span-4 group/poster shadow-2xl shadow-black/30">
+                        class="relative overflow-hidden rounded-xl squircle sm:col-span-4 lg:col-span-4 group/poster shadow-2xl shadow-black/30">
                         <div class="bg-gray-100 dark:bg-gray-900 aspect-2/3">
                             <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"

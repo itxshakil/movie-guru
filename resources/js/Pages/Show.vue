@@ -180,7 +180,7 @@ const ogImage = moviePoster(props.detail);
                         movies hitting
                         the screens.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided">
                     <SearchCard
                         v-for="movie in recentlyReleasedMovies"
                         :key="movie.imdb_id"
@@ -201,7 +201,7 @@ const ogImage = moviePoster(props.detail);
                         films for
                         every movie lover.</p>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided">
                     <SearchCard
                         v-for="movie in recommendedMovies"
                         :key="movie.imdb_id"
@@ -220,7 +220,7 @@ const ogImage = moviePoster(props.detail);
                 <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 More Like This</h2>
                 <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Similar movies you might enjoy.</p>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided">
                 <SearchCard
                     v-for="movie in similarMovies"
                     :key="movie.imdb_id"
