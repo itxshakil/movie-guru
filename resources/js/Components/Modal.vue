@@ -56,6 +56,7 @@ const maxWidthClass = computed(() => {
         <dialog
             ref="dialogRef"
             :class="maxWidthClass"
+            :closedby="closeable ? 'any' : 'none'"
             class="w-full mx-auto px-4 py-6 sm:px-0 bg-transparent max-h-screen overflow-y-auto"
             @cancel.prevent="close"
             @click.self="close"
