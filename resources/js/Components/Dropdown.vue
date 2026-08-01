@@ -26,11 +26,11 @@ const widthClass = computed(() => {
 
 const alignmentClasses = computed(() => {
     if (props.align === 'left') {
-        return 'origin-top-left left-0';
+        return 'origin-top-left left-0 anchor-align-left';
     } else if (props.align === 'right') {
-        return 'origin-top-right right-0';
+        return 'origin-top-right right-0 anchor-align-right';
     } else {
-        return 'origin-top';
+        return 'origin-top anchor-align-center';
     }
 });
 </script>
@@ -62,6 +62,31 @@ const alignmentClasses = computed(() => {
     transform 0.2s ease-out,
     display 0.2s allow-discrete,
     overlay 0.2s allow-discrete;
+}
+
+/* CSS anchor positioning: replaces the manual mt-2/left-0/right-0 offsets with a
+   declarative position tethered to the trigger button (implicit anchor via
+   popovertarget), with automatic viewport-edge flipping. Browsers without
+   support keep the existing absolute + Tailwind-offset positioning above. */
+@supports (position-area: block-end) {
+    [popover] {
+        inset: auto;
+        margin: 0;
+        margin-block-start: 0.5rem;
+        position-try-fallbacks: flip-block, flip-inline;
+    }
+
+    [popover].anchor-align-left {
+        position-area: block-end span-inline-end;
+    }
+
+    [popover].anchor-align-right {
+        position-area: block-end span-inline-start;
+    }
+
+    [popover].anchor-align-center {
+        position-area: block-end center;
+    }
 }
 
 [popover]:popover-open {
