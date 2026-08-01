@@ -12,6 +12,7 @@
                             <img :alt="detail.Title + ' Poster'" itemprop="image"
                                  :src="moviePoster(detail)"
                                  class="object-cover object-center cursor-pointer w-full h-full"
+                                 fetchpriority="high"
                                  @error="handlePosterError">
                         </div>
                         <div class="flex flex-wrap gap-1 absolute top-0 p-2 justify-end w-full">

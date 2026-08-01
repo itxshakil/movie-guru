@@ -136,6 +136,11 @@ const ogImage = moviePoster(props.detail);
 <template>
     <Head>
         <title>{{ pageTitle }}</title>
+
+        <!-- Warms the connection to the poster CDN before the LCP image request is discovered -->
+        <link rel="preconnect" href="https://m.media-amazon.com" head-key="preconnect-poster">
+        <link rel="dns-prefetch" href="https://m.media-amazon.com" head-key="dns-prefetch-poster">
+
         <meta :content="pageDescription" head-key="description" name="description"/>
         <meta property="subject" :content="pageTitle" head-key="subject">
 
