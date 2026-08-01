@@ -185,7 +185,7 @@ const ogImage = moviePoster(props.detail);
                         v-for="movie in recentlyReleasedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
-                        class="scroll-reveal"
+                        class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
                         @share="shareMovieFromCard"
                     />
@@ -206,7 +206,7 @@ const ogImage = moviePoster(props.detail);
                         v-for="movie in recommendedMovies"
                         :key="movie.imdb_id"
                         :movie="movie"
-                        class="scroll-reveal"
+                        class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
                         @share="shareMovieFromCard"
                     />
@@ -225,7 +225,7 @@ const ogImage = moviePoster(props.detail);
                     v-for="movie in similarMovies"
                     :key="movie.imdb_id"
                     :movie="movie"
-                    class="scroll-reveal"
+                    class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Similar Movies')"
                     @share="shareMovieFromCard"
                 />
