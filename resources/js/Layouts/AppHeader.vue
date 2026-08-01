@@ -37,3 +37,25 @@ const {watchlist} = useWatchlist();
         </nav>
     </header>
 </template>
+
+<style scoped>
+nav {
+    transition: height 0.3s ease;
+}
+
+/* Compact header once the page has scrolled away from the top, reclaiming
+   vertical space, using CSS scroll-state queries instead of a scroll listener. */
+@supports (container-type: scroll-state) {
+    @container scroll-state(scrollable: top) {
+        nav {
+            height: 3.25rem;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    nav {
+        transition: none;
+    }
+}
+</style>

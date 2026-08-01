@@ -1,7 +1,7 @@
 <script setup>
 import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
-import {computed, inject, ref} from 'vue';
+import {computed, inject, nextTick, ref} from 'vue';
 import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -68,6 +68,7 @@ const form = useForm({
 
 const nextURLLink = ref(props.nextUrl);
 const movieList = ref(props.searchResults.Search);
+const resultsGrid = ref(null);
 const loading = ref(false);
 const selectedIMDBId = ref(null);
 const selectedTitle = ref(null);
@@ -85,7 +86,8 @@ const doSearch = () => {
 
 const loadMore = () => {
     loading.value = true;
-    axios.get(nextURLLink.value).then(response => {
+    const previousCount = movieList.value.length;
+    axios.get(nextURLLink.value).then(async response => {
         if (response.data.searchResults.Response === 'False') {
             alert('Something went wrong. Please try again later. S-100');
             loading.value = false
@@ -94,6 +96,17 @@ const loadMore = () => {
 
         movieList.value = movieList.value.concat(response.data.searchResults.Search);
         nextURLLink.value = response.data.nextUrl;
+
+        // Bring the first newly-loaded card into view, contained to the
+        // results grid so it doesn't jump the whole page under the header.
+        await nextTick();
+        const firstNewCard = resultsGrid.value?.children?.[previousCount];
+        if (firstNewCard) {
+            const scrolled = firstNewCard.scrollIntoView({behavior: 'smooth', block: 'nearest', container: 'nearest'});
+            if (scrolled && typeof scrolled.then === 'function') {
+                await scrolled;
+            }
+        }
     }).catch((error) => {
         if (error.response.status === 429 && maxRetry.value) {
             const retryAfter = error.response.headers['retry-after'];
@@ -299,7 +312,7 @@ const moviePoster = (movie) => {
                     </form>
                 </div>
 
-                <div v-if="movieList && movieList.length"
+                <div v-if="movieList && movieList.length" ref="resultsGrid"
                      class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8 sm:space-y-0 grid-divided">
                     <SearchCard
                         v-for="movie in movieList"

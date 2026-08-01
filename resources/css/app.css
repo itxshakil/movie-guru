@@ -253,6 +253,14 @@ select:focus {
     }
 }
 
+/* Establishes the document as a scroll-state query container so descendants
+   (e.g. the sticky header) can react to scroll position without JS listeners. */
+@supports (container-type: scroll-state) {
+    html {
+        container-type: scroll-state;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .scroll-reveal,
     .toast-item,
