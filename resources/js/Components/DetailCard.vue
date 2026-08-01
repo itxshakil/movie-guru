@@ -78,7 +78,7 @@
                     </div>
                     <div class="sm:col-span-8 lg:col-span-8">
                         <h1
-                            class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight tracking-tight"
+                            class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight tracking-tight text-box-tight"
                             itemprop="name"
                             style="font-feature-settings: 'kern' 1, 'liga' 1;"
                             v-text="detail.Title"

@@ -233,6 +233,13 @@ select:focus {
     corner-shape: squircle;
 }
 
+/* Trims the font's internal leading so the heading's box hugs its cap-height
+   and baseline exactly, for pixel-precise vertical alignment. Progressive
+   enhancement: unsupported browsers keep the default (slightly looser) leading. */
+.text-box-tight {
+    text-box: trim-both cap alphabetic;
+}
+
 /* Staggered entrance for sibling lists that mount together (toasts, menus) */
 @supports (transition-delay: calc(sibling-index() * 1s)) {
     .stagger-siblings > * {
