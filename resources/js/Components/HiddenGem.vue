@@ -1,9 +1,12 @@
 <script setup>
 import {ref, onMounted} from 'vue';
 import SearchCard from '@/Components/SearchCard.vue';
+import Show from '@/Components/Show.vue';
 
 const gem = ref(null);
 const loading = ref(true);
+const selectedIMDBId = ref(null);
+const selectedTitle = ref(null);
 
 onMounted(async () => {
     try {
@@ -15,6 +18,11 @@ onMounted(async () => {
         loading.value = false;
     }
 });
+
+const viewDetail = (imdbID, title) => {
+    selectedIMDBId.value = imdbID;
+    selectedTitle.value = title;
+};
 </script>
 
 <template>
@@ -38,8 +46,10 @@ onMounted(async () => {
 
             <!-- Gem card -->
             <div v-else-if="gem" class="md:max-w-sm ">
-                <SearchCard :movie="gem"/>
+                <SearchCard :movie="gem" @selected="viewDetail(gem.imdb_id, gem.title)"/>
             </div>
         </div>
+
+        <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" :title="selectedTitle" @close="selectedIMDBId = null"/>
     </section>
 </template>
