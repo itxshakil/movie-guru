@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800/60 rounded-2xl squircle shadow-sm group relative flex flex-col justify-between
+        class="search-card bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800/60 rounded-2xl squircle shadow-sm group relative flex flex-col justify-between
                hover:border-gray-200 dark:hover:border-gray-700
                transition-colors duration-200 cursor-pointer overflow-hidden"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"
@@ -22,7 +22,7 @@
             <!-- Meta row: type + date -->
             <div class="card-meta mt-3 px-3 flex items-center gap-1.5">
                 <span
-                    class="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50">
+                    class="text-box-tight text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50">
                     {{ movie.type }}
                 </span>
                 <span
@@ -35,7 +35,7 @@
             <!-- Title -->
             <div class="card-title-wrap px-3 pt-1.5 pb-1">
                 <p
-                    class="text-[15px] font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug"
+                    class="text-box-tight text-[15px] font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug"
                     itemprop="name"
                     style="font-feature-settings: 'kern' 1, 'liga' 1;"
                     v-text="movie.title"
@@ -43,7 +43,7 @@
             </div>
 
             <!-- Rating -->
-            <div v-if="Number(movie.imdb_rating)" class="flex items-center gap-2 px-3 mb-2">
+            <div v-if="Number(movie.imdb_rating)" class="rating-row flex items-center gap-2 px-3 mb-2">
                 <div class="flex items-center gap-0.5">
                     <svg
                         v-for="i in 5"
@@ -127,7 +127,7 @@
                 type="button"
                 @click.stop="openDetail(movie.imdb_id, movie.title)"
             >
-                Details
+                <span class="text-box-tight">Details</span>
                 <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover/detail:translate-x-0.5"
                      fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                      viewBox="0 0 24 24">
@@ -276,6 +276,22 @@ const searchWatchDownload = (title) => {
 
     .card-title-wrap {
         padding-inline: 0.5rem;
+    }
+}
+
+/* Nested size container: reacts to the card's own rendered width (distinct
+   from --card-density above, which reflects the grid's declared intent).
+   Stacks the rating row under itself instead of forcing everything onto one
+   line when the card is rendered narrow (e.g. a sidebar/related-movies
+   slot), independent of how many columns the surrounding grid has. */
+.search-card {
+    container-type: inline-size;
+    container-name: search-card;
+}
+
+@container search-card (width < 220px) {
+    .rating-row {
+        flex-wrap: wrap;
     }
 }
 </style>

@@ -55,7 +55,7 @@ const shareMovie = async (detail) => {
             await navigator.share(shareData);
         } else {
             await navigator.clipboard.writeText(shareData.url);
-            alert('Link copied to clipboard!');
+            new BroadcastChannel('toast-notifications').postMessage({message: 'Link copied to clipboard!', level: 'success'});
         }
     } catch (err) {
         console.error('Error sharing:', err);
@@ -199,7 +199,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                 <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">See what everyone has been watching
                     lately.</p>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-flow-row-dense grid-divided">
                 <SearchCard
                     v-for="movie in mostWatchedMovies"
                     :key="movie.imdb_id"
@@ -219,16 +219,16 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
         <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Discover what everyone is watching right now
           and join the buzz.</p>
       </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <SearchCard
-            v-for="movie in trendingMovies"
-            :key="movie.imdb_id"
-            :movie="movie"
-            class="scroll-reveal"
-            @selected="viewDetail(movie.imdb_id, 'Trending Movies')"
-            @share="shareMovieFromCard"
-        />
-      </div>
+        <ul class="trending-carousel flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 lg:-mx-8 lg:px-8">
+            <li v-for="movie in trendingMovies" :key="movie.imdb_id" class="trending-carousel__item w-72 shrink-0">
+                <SearchCard
+                    :movie="movie"
+                    class="scroll-reveal"
+                    @selected="viewDetail(movie.imdb_id, 'Trending Movies')"
+                    @share="shareMovieFromCard"
+                />
+            </li>
+        </ul>
     </div>
   </div>
 
@@ -239,7 +239,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
         <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Stay up-to-date with the latest movies hitting
           the screens.</p>
       </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-flow-row-dense grid-divided">
         <SearchCard
             v-for="movie in recentlyReleasedMovies"
             :key="movie.imdb_id"
@@ -259,7 +259,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
           <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white text-pretty">Watch the highest-rated films as
               voted by movie enthusiasts.</p>
       </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-flow-row-dense grid-divided">
         <SearchCard
             v-for="movie in topRatedMovies"
             :key="movie.imdb_id"
@@ -280,7 +280,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     to be
                     explored.</p>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-flow-row-dense grid-divided">
                 <SearchCard
                     v-for="movie in hiddenGemsMovies"
                     :key="movie.imdb_id"
@@ -300,7 +300,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
         <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Timeless classics and must-watch films for
           every movie lover.</p>
       </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-flow-row-dense grid-divided">
         <SearchCard
             v-for="movie in recommendedMovies"
             :key="movie.imdb_id"
@@ -319,7 +319,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                 <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">Popular Movies</h2>
                 <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Explore What's Popular Right Now</p>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-flow-row-dense grid-divided">
                 <SearchCard
                     v-for="movie in popularMovies"
                     :key="movie.imdb_id"
@@ -336,3 +336,56 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
 
     <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" @close="selectedIMDBId = null;" @share="shareMovie"/>
 </template>
+
+<style scoped>
+.trending-carousel {
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.trending-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.trending-carousel__item {
+    scroll-snap-align: start;
+}
+
+/* Native CSS Carousel controls (scroll markers + prev/next buttons) as a
+   pure progressive enhancement. Feature-detected via selector() so
+   unsupporting browsers skip the whole block cleanly rather than getting a
+   partial/broken result — the plain scroll-snap carousel above already
+   works fully via touch/trackpad/scrollbar without this. */
+@supports selector(::scroll-marker) {
+    .trending-carousel {
+        scroll-marker-group: after;
+    }
+
+    .trending-carousel__item::scroll-marker {
+        content: '';
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 999px;
+        background: var(--color-gray-300);
+    }
+
+    .trending-carousel__item::scroll-marker:target-current {
+        background: var(--color-primary-500);
+    }
+
+    .trending-carousel::scroll-button(inline-start) {
+        content: '‹';
+    }
+
+    .trending-carousel::scroll-button(inline-end) {
+        content: '›';
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trending-carousel {
+        scroll-behavior: auto;
+    }
+}
+</style>

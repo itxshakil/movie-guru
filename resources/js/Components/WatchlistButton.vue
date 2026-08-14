@@ -1,8 +1,8 @@
 <template>
     <button
-        :class="isInWatchlist ? 'bg-primary-500/80 hover:bg-primary-600/80' : 'bg-white/20 hover:bg-white/40'"
+        :class="[isInWatchlist ? 'watchlist-btn--saved bg-primary-500/80 hover:bg-primary-600/80' : 'bg-white/20 hover:bg-white/40']"
         :title="isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'"
-        class="flex items-center gap-1 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all active:scale-90"
+        class="watchlist-btn squircle flex items-center gap-1 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all active:scale-90"
         @click.stop="toggleWatchlist"
     >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
                 stroke-width="2"
             />
         </svg>
-        {{ isInWatchlist ? 'Saved' : 'Watchlist' }}
+        <span class="text-box-tight watchlist-btn__label">{{ isInWatchlist ? 'Saved' : 'Watchlist' }}</span>
     </button>
 </template>
 
@@ -44,3 +44,32 @@ const toggleWatchlist = () => {
     toggleMovie(props.movie);
 };
 </script>
+
+<style scoped>
+/* Same --card-density mechanism as SearchCard.vue: collapses to icon-only
+   in compact grids. No-op (falls back to the default label+icon layout)
+   wherever WatchlistButton renders outside a --card-density container,
+   e.g. DetailCard.vue's standalone usage. */
+@container style(--card-density: compact) {
+    .watchlist-btn__label {
+        display: none;
+    }
+}
+
+.watchlist-btn--saved {
+    /* Fallback first, then the @function-consolidated version — see
+       --tint() in resources/css/app.css. */
+    background-color: color-mix(in srgb, var(--color-primary-500) 80%, transparent);
+    background-color: --tint(var(--color-primary-500), 80%);
+}
+
+/* Experimental, decorative only: picks a readable text color for the
+   "saved" background automatically instead of assuming white always
+   contrasts. Falls back to the existing text-white utility everywhere
+   contrast-color() isn't supported. */
+@supports (color: contrast-color(white)) {
+    .watchlist-btn--saved {
+        color: contrast-color(var(--color-primary-500));
+    }
+}
+</style>
