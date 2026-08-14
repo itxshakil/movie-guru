@@ -15,14 +15,14 @@ final class HiddenGemController extends Controller
         $cacheKey = 'hidden_gem_' . now()->format('Y-m-d');
 
         $gem = Cache::remember($cacheKey, now()->endOfDay(), function () {
-            $seed = (int)now()->format('Ymd');
+            $seed = (int) now()->format('Ymd');
 
             return MovieDetail::query()
                 ->where('imdb_rating', '>=', 7.0)
                 ->where('imdb_votes', '<=', 50000)
                 ->whereNotNull('poster')
                 ->where('poster', '!=', 'N/A')
-                ->orderByRaw('RAND(?)', [$seed])
+                ->inRandomOrder((string) $seed)
                 ->first(['imdb_id', 'title', 'year', 'poster', 'imdb_rating', 'genre', 'director']);
         });
 
