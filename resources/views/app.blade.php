@@ -33,8 +33,8 @@
 
     <meta name="owner" content="Movie Guru" />
     <meta name="author" content="Movie Guru Team, info@movieguru.com" />
-    <meta name="theme-color" content="#2A669F" />
-    <meta name="msapplication-navbutton-color" content="#2A669F" />
+    <meta name="theme-color" content="#030712" />
+    <meta name="msapplication-navbutton-color" content="#030712" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="apple-touch-icon" href="/icons/ios/192.png">
@@ -123,6 +123,11 @@
 </head>
 <body class="font-sans antialiased accent-primary-500 dark:bg-gray-900 dark:text-white">
     @inertia
+    <noscript>
+        <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+            Movie Guru requires JavaScript to run. Please enable it in your browser to continue.
+        </div>
+    </noscript>
     <script type="text/javascript">
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

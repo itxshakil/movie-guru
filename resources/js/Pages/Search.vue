@@ -27,8 +27,6 @@ const props = defineProps({
     recommendedMovies: Array,
 });
 
-console.log(props.recommendedMovies);
-
 const showSuggestions = ref(false);
 const filteredTrendingQueries = ref(props.trendingQueries ? [...props.trendingQueries] : []);
 
@@ -84,13 +82,17 @@ const doSearch = () => {
     });
 };
 
+const notifyError = (message) => {
+    new BroadcastChannel('toast-notifications').postMessage({message, level: 'danger'});
+};
+
 const loadMore = async () => {
     loading.value = true;
     const previousCount = movieList.value.length;
 
     try {
         const response = await fetch(nextURLLink.value, {
-            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
         });
 
         if (response.status === 429 && maxRetry.value) {
@@ -104,13 +106,13 @@ const loadMore = async () => {
         }
 
         if (!response.ok) {
-            alert(`Something went wrong. Error -RE-${response.status}`);
+            notifyError(`Something went wrong. Error -RE-${response.status}`);
             return;
         }
 
         const data = await response.json();
         if (data.searchResults.Response === 'False') {
-            alert('Something went wrong. Please try again later. S-100');
+            notifyError('Something went wrong. Please try again later. S-100');
             return;
         }
 
@@ -128,7 +130,7 @@ const loadMore = async () => {
             }
         }
     } catch (error) {
-        alert('Something went wrong. Please try again later.');
+        notifyError('Something went wrong. Please try again later.');
     } finally {
         loading.value = false;
     }
@@ -147,7 +149,7 @@ const shareMovie = async (detail) => {
             await navigator.share(shareData);
         } else {
             await navigator.clipboard.writeText(shareData.url);
-            alert('Link copied to clipboard!');
+            new BroadcastChannel('toast-notifications').postMessage({message: 'Link copied to clipboard!', level: 'success'});
         }
     } catch (err) {
         console.error('Error sharing:', err);
@@ -235,7 +237,8 @@ const moviePoster = (movie) => {
                         {{ searchResults.totalResults }} results found for {{ search }}
                     </h1>
 
-                    <form class="flex flex-col sm:flex-row gap-2 items-center w-full group/search"
+                    <form :action="route('search')" class="flex flex-col sm:flex-row gap-2 items-center w-full group/search"
+                          method="get"
                           @submit.prevent="doSearch">
                         <div class="w-full sm:min-w-64 grow relative">
                             <label class="sr-only" for="search-input">Search</label>
@@ -253,6 +256,7 @@ const moviePoster = (movie) => {
                                     autocomplete="off"
                                     class="w-full !rounded-xl !border-2 !pl-11 !pr-10 !py-3 focus:!ring-primary-500/20"
                                     enterkeyhint="search"
+                                    name="s"
                                     placeholder="Search movies and series..."
                                     type="search"
                                     @blur="hideSuggestions"
@@ -274,7 +278,7 @@ const moviePoster = (movie) => {
 
                             <ul
                                 v-if="showSuggestions && filteredTrendingQueries.length > 0"
-                                class="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 w-full z-10 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                class="search-suggestions absolute bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 w-full z-10 border border-gray-200 dark:border-gray-700 overflow-hidden">
                                 <li class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900/50 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
                                     <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                          xmlns="http://www.w3.org/2000/svg">
@@ -303,7 +307,8 @@ const moviePoster = (movie) => {
                             <div class="w-full sm:w-40">
                                 <label class="sr-only" for="movie-type-select">Select Type</label>
                                 <select id="movie-type-select" v-model="form.type"
-                                        class="w-full !rounded-xl !border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 transition duration-75 focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-200 dark:placeholder-gray-400 focus:read-only:text-gray-200">
+                                        class="w-full !rounded-xl !border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 transition duration-75 focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-200 dark:placeholder-gray-400 focus:read-only:text-gray-200"
+                                        name="type">
                                     <option :value="null">All types</option>
                                     <option v-for="type in movieTypes" :key="type" :value="type" class="capitalize">
                                         {{ type }}
@@ -313,7 +318,7 @@ const moviePoster = (movie) => {
                             <div class="w-full sm:w-24">
                                 <label class="sr-only" for="year-input">Year</label>
                                 <TextInput id="year-input" v-model="form.year" class="w-full !rounded-xl !border-2"
-                                           placeholder="Year" type="number"/>
+                                           name="year" placeholder="Year" type="number"/>
                             </div>
                         </div>
                         <LoadingSpinnerButton :is-loading="form.processing"
@@ -336,10 +341,11 @@ const moviePoster = (movie) => {
                 </div>
 
                 <div v-show="nextURLLink" class="flex justify-center my-2">
-                    <button v-show="nextURLLink && loading === false"
-                            class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-sm hover:scale-105 transition-all duration-300"
-                            @click="loadMore">Load More
-                    </button>
+                    <a v-show="nextURLLink && loading === false"
+                       :href="nextURLLink"
+                       class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-sm hover:scale-105 transition-all duration-300"
+                       @click.prevent="loadMore">Load More
+                    </a>
                     <LoadingSpinnerButton v-show="loading" :isLoading="true" value="Loading..."/>
                 </div>
             </div>
@@ -439,5 +445,24 @@ const moviePoster = (movie) => {
 
 ul {
     transition: all 0.2s ease-in-out;
+}
+
+/* Anchors the trending-suggestions dropdown directly to the search input,
+   so it stays correctly positioned regardless of the surrounding form's
+   layout (it reflows between column/row at the sm breakpoint). Falls back
+   to the existing .absolute/.relative wrapper-based positioning above in
+   browsers without anchor positioning support. */
+@supports (anchor-name: --search-input) {
+    #search-input {
+        anchor-name: --search-input;
+    }
+
+    .search-suggestions {
+        position: absolute;
+        position-anchor: --search-input;
+        position-area: bottom span-right;
+        top: auto;
+        left: auto;
+    }
 }
 </style>
