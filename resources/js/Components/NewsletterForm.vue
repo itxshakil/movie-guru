@@ -63,7 +63,7 @@ const subscribe = () => {
                             placeholder="Your first name (optional)"
                             type="text"
                         />
-                        <div class="flex gap-x-4">
+                        <div class="newsletter-field-group flex gap-x-4">
                             <label class="sr-only" for="email-address">Email address</label>
                         <input
                             v-model="form.email"
@@ -150,3 +150,13 @@ const subscribe = () => {
         </div>
     </div>
 </template>
+
+<style scoped>
+/* Flags the field row (not just the input) once the user has interacted
+   with an invalid email, so the error is visible even though the label
+   itself is visually hidden (sr-only). Purely additive — there is no
+   existing JS-driven validation-class-toggling being replaced here. */
+.newsletter-field-group:has(:user-invalid) input {
+    box-shadow: 0 0 0 2px #f87171;
+}
+</style>

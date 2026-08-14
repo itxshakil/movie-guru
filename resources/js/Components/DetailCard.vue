@@ -577,7 +577,6 @@ function sendAnalytics(platform, link) {
     if (gtag) {
         gtag.trackExternalClick(platform, link);
   }
-  console.log(`Analytics Event Sent: Platform - ${platform}, Link - ${link}`);
 }
 
 const shareMovie = async () => {
