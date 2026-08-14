@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.15.4';
-const SEARCH_CACHE = 'search-cache-v-4.15.4';
-const INFO_CACHE = 'info-cache-v-4.15.4';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.15.4';
-const POSTER_CACHE = 'poster-cache-v-4.15.4';
-const INERTIA_CACHE = 'inertia-cache-v-4.15.4';
+const APP_CACHE = 'v-4.16.0';
+const SEARCH_CACHE = 'search-cache-v-4.16.0';
+const INFO_CACHE = 'info-cache-v-4.16.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.16.0';
+const POSTER_CACHE = 'poster-cache-v-4.16.0';
+const INERTIA_CACHE = 'inertia-cache-v-4.16.0';
 
 // All current caches — used in activate to preserve them all
 const ALL_CACHES = [APP_CACHE, SEARCH_CACHE, INFO_CACHE, DYNAMIC_CACHE, POSTER_CACHE, INERTIA_CACHE];
@@ -21,50 +21,6 @@ const STATIC_ASSETS = [
     '/assets/images/screenshots/MOVIE_GURU_INFO_WIDE_SCREENSHOT.jpeg',
     '/assets/images/screenshots/MOVIE_GURU_HOME_WIDE_SCREENSHOT.png',
     '/assets/images/screenshots/MOVIE_GURU_FEAURES_WIDE_SCREENSHOT.png',
-];
-
-const basicPathsToCache = [
-    'build/manifest.json',
-    'build/assets/Search-fD_ut_j3.css',
-    'build/assets/BaseLayout-CPfWl7uE.css',
-    'build/assets/AuthenticatedLayout-BnAtl9Tp.css',
-    'build/assets/Show-O_rbfk1n.css',
-    'build/assets/app-DbB-A6HJ.css',
-    'build/assets/LoadingSpinner-BTFr3kTn.js',
-    'build/assets/ApplicationLogo-BbBtErcp.js',
-    'build/assets/LoadingSpinnerButton-yjfP59Ob.js',
-    'build/assets/PrimaryButton-cbb7DX8y.js',
-    'build/assets/Dashboard-BDB7IHrE.js',
-    'build/assets/TextInput-CG93TKjw.js',
-    'build/assets/InputLabel-DWfL_PF4.js',
-    'build/assets/Edit-BM2FNukY.js',
-    'build/assets/ConfirmPassword-CQJuCU85.js',
-    'build/assets/ForgotPassword-0VKJkeFc.js',
-    'build/assets/VerifyEmail-DJTFmiU9.js',
-    'build/assets/Error-gWmz7xtl.js',
-    'build/assets/UpdatePasswordForm-MgvZuUTn.js',
-    'build/assets/GuestLayout-ButX5ZXI.js',
-    'build/assets/UpdateProfileInformationForm-C8eouPsw.js',
-    'build/assets/ResetPassword-QSM1oZLn.js',
-    'build/assets/MoodDiscovery-D93tGWoD.js',
-    'build/assets/WatchlistPage-D_kF95N_.js',
-    'build/assets/Watchlist-5FaymnFy.js',
-    'build/assets/Register-1Qd5PS4v.js',
-    'build/assets/Login-CbCmxftV.js',
-    'build/assets/DeleteUserForm-DQDNOheW.js',
-    'build/assets/Terms-CWhYuzoO.js',
-    'build/assets/NewsletterForm--PLLlPfZ.js',
-    'build/assets/PrivacyPolicy-B0VsG7_J.js',
-    'build/assets/Show-Bz3YI1mM.js',
-    'build/assets/MovieMatch-BobaFXIv.js',
-    'build/assets/AuthenticatedLayout-OMiWEmbn.js',
-    'build/assets/Contact-Du5T2nqf.js',
-    'build/assets/Show-B_3wRCkt.js',
-    'build/assets/Search-feA9CUcm.js',
-    'build/assets/BaseLayout-1Rjm1FAi.js',
-    'build/assets/Welcome-C2YDRDDF.js',
-    'build/assets/SearchCard-DDpUQEw0.js',
-    'build/assets/app-PQzKI9Uz.js',
     '/assets/images/no-poster.jpg',
 ];
 
@@ -293,24 +249,41 @@ const staleWhileRevalidate = async (cacheName, request, maxEntries, maxAge) => {
 };
 
 self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(APP_CACHE)
-            .then(cache => cache.addAll(basicPathsToCache))
-            .then(() => {
-                self.skipWaiting();
-                // Notify the clients that the app is available offline
-                channel.postMessage({
-                    type: 'APP_AVAILABLE_OFFLINE',
-                    message: 'The app is now available offline. Enjoy your movie binge!',
-                    level: 'success',
-                });
-            })
-            .catch(error => {
-                logError('Error during installation', error);
-                throw error;
-            })
-    );
+    event.waitUntil(precacheAssets());
 });
+
+// Precaches static assets and the current build's hashed assets (via a
+// manifest generated at build time — see scripts/generate-sw-precache.mjs).
+// Each step is caught independently so a single missing/stale entry can't
+// block installation: the /build/assets/* runtime cache-first branch in the
+// fetch handler below covers assets regardless of whether precaching succeeds.
+async function precacheAssets() {
+    const cache = await caches.open(APP_CACHE);
+
+    try {
+        await cache.addAll(STATIC_ASSETS);
+    } catch (error) {
+        logError('Error precaching static assets', error);
+    }
+
+    try {
+        const response = await fetch('/build/sw-precache.json', {cache: 'no-store'});
+        if (response.ok) {
+            const precacheList = await response.json();
+            await cache.addAll(precacheList);
+        }
+    } catch (error) {
+        logError('Error precaching build assets', error);
+    }
+
+    self.skipWaiting();
+    // Notify the clients that the app is available offline
+    channel.postMessage({
+        type: 'APP_AVAILABLE_OFFLINE',
+        message: 'The app is now available offline. Enjoy your movie binge!',
+        level: 'success',
+    });
+}
 
 self.addEventListener('periodicsync', async (event) => {
     log('Periodic sync', event);
@@ -421,35 +394,44 @@ async function handleAssetRequest(request) {
 }
 
 // Event listener for fetching requests
-self.addEventListener('fetch', async event => {
+self.addEventListener('fetch', event => {
+    event.respondWith(handleFetch(event));
+});
+
+async function handleFetch(event) {
     const request = event.request;
+    const url = new URL(request.url);
+    const isSameOrigin = url.origin === self.location.origin;
 
     // Cache-first strategy for static assets
-    if (STATIC_ASSETS.includes(request.url)) {
-        event.respondWith(handleAssetRequest(request));
+    if (isSameOrigin && STATIC_ASSETS.includes(url.pathname)) {
+        return handleAssetRequest(request);
+    } else if (isSameOrigin && url.pathname.startsWith('/build/assets/')) {
+        // Vite content-hashes every filename, so a cached /build/assets/*
+        // response is immutable for the lifetime of that hash — cache-first
+        // with no expiry, and no manifest bookkeeping required.
+        return handleAssetRequest(request);
     } else if (isFullInertiaRequest(request)) {
         // Cache full Inertia AJAX requests separately; partial reloads go straight to network
-        event.respondWith(cacheInertiaRequest(request, 30, 5 * 60));
+        return cacheInertiaRequest(request, 30, 5 * 60);
     } else if (isInertiaRequest(request)) {
         // Partial reloads — always network
-        event.respondWith(fetch(request));
-    } else if (request.url.startsWith(self.location.origin)) {
+        return fetch(request);
+    } else if (isSameOrigin) {
         // Item 3: stale-while-revalidate for /search and /i/ routes
-        if (request.url.includes('/search')) {
-            event.respondWith(staleWhileRevalidate(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60));
-        } else if (request.url.includes('/i/')) {
-            event.respondWith(staleWhileRevalidate(INFO_CACHE, request, 10, 24 * 60 * 60));
+        if (url.pathname.includes('/search')) {
+            return staleWhileRevalidate(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60);
+        } else if (url.pathname.includes('/i/')) {
+            return staleWhileRevalidate(INFO_CACHE, request, 10, 24 * 60 * 60);
         } else {
-            event.respondWith(cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60));
+            return cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60);
         }
-    } else if (request.url.includes('m.media-amazon.com/images/')) {
-        event.respondWith(cacheRequest(POSTER_CACHE, request, 15, 7 * 24 * 60 * 60));
-    } else if (request.url.includes('bunny.net') && false) {
-        event.respondWith(cacheRequest(APP_CACHE, request, null, 7 * 24 * 60 * 60));
+    } else if (url.hostname === 'm.media-amazon.com' && url.pathname.startsWith('/images/')) {
+        return cacheRequest(POSTER_CACHE, request, 15, 7 * 24 * 60 * 60);
     } else {
-        event.respondWith(fetch(event.request));
+        return fetch(request);
     }
-});
+}
 // Listen for messages from the page to the service worker
 self.addEventListener('message', event => {
     log('Message Received', event.data);
