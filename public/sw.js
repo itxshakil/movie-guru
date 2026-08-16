@@ -422,6 +422,11 @@ async function handleFetch(event) {
         if (url.pathname.includes('/search')) {
             return staleWhileRevalidate(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60);
         } else if (url.pathname.includes('/i/')) {
+            if (request.headers.get('Accept')?.includes('application/json')) {
+                // AJAX detail fetch (quick-view modal) - never mixed into the full-page HTML cache,
+                // since email links to the same URL cache the full Inertia page under the same key.
+                return fetch(request);
+            }
             return staleWhileRevalidate(INFO_CACHE, request, 10, 24 * 60 * 60);
         } else {
             return cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60);

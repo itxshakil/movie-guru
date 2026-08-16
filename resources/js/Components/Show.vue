@@ -35,6 +35,7 @@ const loadDetail = async () => {
         const response = await fetch(`/i/${props.imdbID}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             },
         });
