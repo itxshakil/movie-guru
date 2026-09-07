@@ -25,3 +25,9 @@ Schedule::command('newsletter:send weekly')
 
 Schedule::command('newsletter:send monthly')
     ->lastDayOfMonth('18:00');
+
+Schedule::command('admin:digest weekly')
+    ->mondays()->at('08:00');
+
+Schedule::command('admin:digest monthly')
+    ->monthlyOn(1, '08:00');

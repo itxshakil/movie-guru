@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Notifications\ContactFormSubmission;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
 use Override;
 
 final class Contact extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['email', 'name', 'message'];
 
     #[Override]
