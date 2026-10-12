@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\OmdbUnavailableException;
 use App\OMDB\MovieType;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -35,7 +37,7 @@ final class OMDBApiService
      */
     public function __construct()
     {
-        $this->apiKeys = explode(',', (string)config('omdb.api_keys'));
+        $this->apiKeys = explode(',', (string) config('omdb.api_keys'));
         $this->titleCleaner = resolve(TitleCleaner::class);
 
         throw_if($this->apiKeys === [], Exception::class, 'OMDB API keys are not configured.');
@@ -70,10 +72,10 @@ final class OMDBApiService
     {
         $this->title = $this->titleCleaner->clean($title ?? $this->title ?? '');
         $this->page = $page;
-        $this->movieType = $movieType ?? $this->movieType ?? null;
-        $this->year = $year ?? $this->year ?? null;
+        $this->movieType = $movieType ?? $this->movieType;
+        $this->year = $year ?? $this->year;
 
-        if (empty($this->title)) {
+        if ($this->title === '') {
             return ['Response' => 'False', 'Error' => 'Movie not found!', 'Search' => [], 'totalResults' => '0'];
         }
 
@@ -117,28 +119,34 @@ final class OMDBApiService
     {
         $apiKey = $this->getRandomApiKey();
         $url = 'https://www.omdbapi.com/?apikey=' . $apiKey . '&' . $query;
-        $startTime = microtime(true);
-        $response = Http::retry(3)
-            ->connectTimeout(3)
-            ->get($url)
-            ->json();
+        $startTime = microtime(as_float: true);
 
-        $endTime = microtime(true);
+        try {
+            $response = Http::retry(3, 200, OmdbUnavailableException::isTransient(...))
+                ->connectTimeout(3)
+                ->timeout(10)
+                ->get($url)
+                ->json();
+        } catch (ConnectionException|RequestException $exception) {
+            $unavailable = OmdbUnavailableException::fromHttpFailure($exception);
+
+            Log::channel('omdb')->warning($unavailable->getMessage(), ['query' => $query]);
+
+            throw $unavailable;
+        }
+
+        $endTime = microtime(as_float: true);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
 
         Log::channel('omdb')->info(
-            sprintf('OMDB API took %s ms to respond. URL: %s', $responseTime, $url),
+            sprintf('OMDB API took %s ms to respond. Query: %s', $responseTime, $query),
             [
                 $response,
             ],
         );
 
-        if (
-            isset($response['Response'], $response['Search'])
-            && $response['Response'] === 'True'
-            && count($response['Search']) > 0
-        ) {
-            $result = array_map(static fn(array $item): array => [
+        if (($response['Response'] ?? null) === 'True' && ($response['Search'] ?? []) !== []) {
+            $result = array_map(static fn (array $item): array => [
                 'title' => $item['Title'],
                 'year' => $item['Year'],
                 'type' => $item['Type'],
