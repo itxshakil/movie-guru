@@ -6,6 +6,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DetailController;
 use App\Http\Controllers\HiddenGemController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\MoodDiscoveryController;
 use App\Http\Controllers\MovieMatchController;
 use App\Http\Controllers\NewsletterSubscriptionController;
@@ -67,6 +68,13 @@ Route::middleware('auth')->group(function (): void {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::put('/library/{imdbId}', [LibraryController::class, 'update'])
+        ->where('imdbId', 'tt[0-9]{7,8}')
+        ->name('library.update');
+    Route::delete('/library/{imdbId}', [LibraryController::class, 'destroy'])
+        ->where('imdbId', 'tt[0-9]{7,8}')
+        ->name('library.destroy');
 });
 
 require __DIR__ . '/auth.php';
