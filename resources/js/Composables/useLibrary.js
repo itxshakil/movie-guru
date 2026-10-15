@@ -210,6 +210,15 @@ function showToast(message) {
 
 const findItem = (imdbId) => library.value.find((item) => item.imdb_id === imdbId) ?? null;
 
+/**
+ * Puts one title back to how it was (or drops it if it was not there), leaving the rest of the
+ * current list alone so other actions that finished in the meantime are kept.
+ */
+function restoreItem(imdbId, previousItem) {
+    const others = library.value.filter((item) => item.imdb_id !== imdbId);
+    library.value = previousItem ? [previousItem, ...others] : others;
+}
+
 export function useLibrary() {
     const page = usePage();
 
@@ -248,24 +257,23 @@ export function useLibrary() {
     };
 
     /**
-     * Applies a change optimistically, saves it, and restores this action's snapshot on failure.
+     * Applies a change optimistically, saves it, and restores only this title on failure.
      */
     const commit = async (nextItem, failureMessage) => {
-        const snapshot = library.value;
-        library.value = [nextItem, ...snapshot.filter((item) => item.imdb_id !== nextItem.imdb_id)];
+        const previousItem = findItem(nextItem.imdb_id);
+        library.value = [nextItem, ...library.value.filter((item) => item.imdb_id !== nextItem.imdb_id)];
 
         try {
             await persist(nextItem);
         } catch (error) {
             console.error('Saving the library failed', error);
-            library.value = snapshot;
+            restoreItem(nextItem.imdb_id, previousItem);
             showToast(navigator.onLine ? failureMessage : "Couldn't sync, try again when you're online.");
-            return false;
+            return;
         }
 
         requestPersistentStorage();
         cacheForOffline([nextItem]);
-        return true;
     };
 
     const addToWatchlist = async (movie) => {
@@ -296,14 +304,14 @@ export function useLibrary() {
     };
 
     const remove = async (imdbId) => {
-        const snapshot = library.value;
-        library.value = snapshot.filter((item) => item.imdb_id !== imdbId);
+        const previousItem = findItem(imdbId);
+        library.value = library.value.filter((item) => item.imdb_id !== imdbId);
 
         try {
             await destroy(imdbId);
         } catch (error) {
             console.error('Removing from the library failed', error);
-            library.value = snapshot;
+            restoreItem(imdbId, previousItem);
             showToast(navigator.onLine
                 ? "Couldn't remove that title. Please try again."
                 : "Couldn't sync, try again when you're online.");
