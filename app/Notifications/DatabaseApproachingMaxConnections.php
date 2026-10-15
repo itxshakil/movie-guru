@@ -14,10 +14,8 @@ final class DatabaseApproachingMaxConnections extends Notification
 
     public function __construct(
         public string $connectionName,
-        public int    $connections,
-    )
-    {
-    }
+        public int $connections,
+    ) {}
 
     /**
      * Get the notification's delivery channels.

@@ -18,9 +18,7 @@ final class ContactFormSubmission extends Notification
      */
     public function __construct(
         public Contact $contact,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Get the notification's delivery channels.

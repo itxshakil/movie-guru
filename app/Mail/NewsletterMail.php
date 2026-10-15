@@ -29,9 +29,7 @@ final class NewsletterMail extends Mailable implements ShouldQueue
         public ?MovieDetail $hiddenGem = null,
         public ?MovieDetail $trendingMovie = null,
         public ?string $unsubscribeUrl = null,
-    )
-    {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

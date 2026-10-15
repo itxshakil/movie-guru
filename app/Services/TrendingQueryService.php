@@ -25,7 +25,7 @@ final class TrendingQueryService
             $titleCleaner = resolve(TitleCleaner::class);
 
             return $queries
-                ->map(static fn(?string $query) => Str::title($titleCleaner->clean($query)))
+                ->map(static fn (?string $query) => Str::title($titleCleaner->clean($query)))
                 ->unique()
                 ->values();
         });

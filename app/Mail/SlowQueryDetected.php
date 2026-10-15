@@ -20,9 +20,7 @@ final class SlowQueryDetected extends Mailable
         public string $connectionName,
         public string $query,
         public string $time,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Get the message envelope.

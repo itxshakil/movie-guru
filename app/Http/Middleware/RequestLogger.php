@@ -47,13 +47,13 @@ final class RequestLogger
         $this->requestId = $this->generateRequestId();
 
         Context::add('request_id', $this->requestId);
-        $request->headers->set(self::X_REQUEST_ID, (string)$this->requestId);
+        $request->headers->set(self::X_REQUEST_ID, (string) $this->requestId);
 
         if ($this->shouldLogRequest($request)) {
             $this->logRequest($request);
 
             $response = $next($request);
-            $response->headers->set(self::X_REQUEST_ID, (string)$this->requestId);
+            $response->headers->set(self::X_REQUEST_ID, (string) $this->requestId);
 
             $this->logResponse($response, $request);
 
@@ -83,7 +83,7 @@ final class RequestLogger
      */
     public function shouldLogRequest(Request $request): bool
     {
-        return $this->inMethodsArray($request) && !$this->isFileRequest($request) && !$this->inExceptArray($request);
+        return $this->inMethodsArray($request) && ! $this->isFileRequest($request) && ! $this->inExceptArray($request);
     }
 
     /**
@@ -117,7 +117,7 @@ final class RequestLogger
     {
         [$usec, $sec] = explode(' ', microtime());
 
-        return (float)$usec + (float)$sec;
+        return (float) $usec + (float) $sec;
     }
 
     /**
@@ -151,7 +151,7 @@ final class RequestLogger
      */
     private function inExceptArray(Request $request): bool
     {
-        return array_any($this->excludePaths, fn(string $excludePath): bool => $this->isRequestInRoute(
+        return array_any($this->excludePaths, fn (string $excludePath): bool => $this->isRequestInRoute(
             $request,
             $excludePath,
         ));
@@ -256,10 +256,10 @@ final class RequestLogger
 
                 $allErrors = $errors->all();
 
-                if (!empty($allErrors)) {
+                if (! empty($allErrors)) {
                     $flatErrors = collect($allErrors)
                         ->flatten()
-                        ->map(static fn($e): string|false => is_scalar($e) ? (string)$e : json_encode($e))
+                        ->map(static fn ($e): string|false => is_scalar($e) ? (string) $e : json_encode($e))
                         ->all();
 
                     $validationErrors = ' - Validation Errors: ' . implode('; ', $flatErrors);
@@ -271,7 +271,7 @@ final class RequestLogger
         $authenticatableId = $authenticatable ? $authenticatable->id : 'Guest';
 
         $sensitiveFields = config('error_mail.sensitive_fields', ['password', 'password_confirmation']);
-        $responseData = json_decode((string)$response->getContent(), true);
+        $responseData = json_decode((string) $response->getContent(), true);
 
         if (is_array($responseData)) {
             $this->sanitizeArray($responseData, $sensitiveFields);

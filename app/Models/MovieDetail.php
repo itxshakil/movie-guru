@@ -44,7 +44,7 @@ final class MovieDetail extends Model
     {
         $cacheKey = 'movie-view-' . $this->imdb_id . '-' . $ipAddress;
 
-        if (!Cache::has($cacheKey)) {
+        if (! Cache::has($cacheKey)) {
             $this->increment('views');
             Cache::put($cacheKey, true, now()->addHour());
         }
@@ -152,7 +152,7 @@ final class MovieDetail extends Model
 
     protected function poster(): Attribute
     {
-        return Attribute::get(static fn(string $value): string => $value && mb_strtolower($value) !== 'n/a'
+        return Attribute::get(static fn (string $value): string => $value && mb_strtolower($value) !== 'n/a'
             ? $value
             : asset('/assets/images/no-poster.jpg'));
     }

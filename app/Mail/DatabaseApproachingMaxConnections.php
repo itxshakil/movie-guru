@@ -18,10 +18,8 @@ final class DatabaseApproachingMaxConnections extends Mailable
 
     public function __construct(
         public string $connectionName,
-        public int    $connections,
-    )
-    {
-    }
+        public int $connections,
+    ) {}
 
     /**
      * Get the message envelope.

@@ -22,7 +22,7 @@ final class Search extends Model
         $ipAddress = request()->ip();
         $cacheKey = 'search-query-' . $this->query . '-' . $ipAddress;
 
-        if (!Cache::has($cacheKey)) {
+        if (! Cache::has($cacheKey)) {
             $this->increment('search_count');
             Cache::put($cacheKey, true, now()->addHour());
         }

@@ -113,7 +113,7 @@ final class BotDetectorService
         }
 
         foreach ($this->botPatterns as $botPattern) {
-            if (mb_stripos($userAgent, (string)$botPattern) === false) {
+            if (mb_stripos($userAgent, (string) $botPattern) === false) {
                 continue;
             }
 
@@ -156,7 +156,7 @@ final class BotDetectorService
         }
 
         foreach ($this->knownBotIpRanges as $knownBotIpRange) {
-            if (!$this->ipInRange($ipAddress, $knownBotIpRange)) {
+            if (! $this->ipInRange($ipAddress, $knownBotIpRange)) {
                 continue;
             }
 
@@ -175,12 +175,12 @@ final class BotDetectorService
      */
     private function ipInRange(string $ip, string $range): bool
     {
-        if (!str_contains($range, '/')) {
+        if (! str_contains($range, '/')) {
             return $ip === $range;
         }
 
         [$subnet, $bits] = explode('/', $range);
-        $bits = (int)$bits;
+        $bits = (int) $bits;
         $ip = ip2long($ip);
         $subnet = ip2long($subnet);
         $mask = -1 << (32 - $bits);
@@ -195,7 +195,7 @@ final class BotDetectorService
     private function checkBehavioralPatterns(Request $request): bool
     {
         // Check request headers that are commonly missing in bots
-        if (!$request->header('Accept-Language') && !$request->header('Accept-Encoding')) {
+        if (! $request->header('Accept-Language') && ! $request->header('Accept-Encoding')) {
             $this->logBotDetection($request->ip(), $request->userAgent(), $request, 'Missing critical headers');
 
             return true;

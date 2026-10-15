@@ -45,15 +45,15 @@ final class TitleCleaner
 
         // Apply regex patterns
         foreach ($patterns as $pattern) {
-            $cleanedTitle = preg_replace($pattern, '', (string)$cleanedTitle);
+            $cleanedTitle = preg_replace($pattern, '', (string) $cleanedTitle);
         }
 
         // Handle duplicate consecutive words
-        $cleanedTitle = preg_replace('/\b(\w+)(?:\s+\1)+\b/i', '$1', (string)$cleanedTitle);
+        $cleanedTitle = preg_replace('/\b(\w+)(?:\s+\1)+\b/i', '$1', (string) $cleanedTitle);
 
         // Standardize whitespace and trim
-        $cleanedTitle = preg_replace('/\s{2,}/', ' ', (string)$cleanedTitle); // Reduce multiple spaces to one
-        $cleanedTitle = mb_trim((string)$cleanedTitle); // Final trim after all cleaning
+        $cleanedTitle = preg_replace('/\s{2,}/', ' ', (string) $cleanedTitle); // Reduce multiple spaces to one
+        $cleanedTitle = mb_trim((string) $cleanedTitle); // Final trim after all cleaning
 
         // Fallback to original title if the result is empty or too short
         if ($cleanedTitle === '' || $cleanedTitle === '0' || mb_strlen($cleanedTitle) < 2) {

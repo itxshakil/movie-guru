@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'enabled' => env('ERROR_MAIL_ENABLED', true),
 
-    'recipients' => explode(',', (string)env('ERROR_MAIL_RECIPIENTS', '')),
+    'recipients' => explode(',', (string) env('ERROR_MAIL_RECIPIENTS', '')),
 
     'rate_limit_minutes' => env('ERROR_MAIL_RATE_LIMIT', 5),
 

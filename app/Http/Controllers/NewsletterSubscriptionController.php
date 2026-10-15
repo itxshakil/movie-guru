@@ -19,7 +19,7 @@ final class NewsletterSubscriptionController extends Controller
             'first_name' => ['nullable', 'string', 'max:50'],
         ]);
 
-        $isNew = !NewsletterSubscription::withTrashed()->where('email', $validated['email'])->exists();
+        $isNew = ! NewsletterSubscription::withTrashed()->where('email', $validated['email'])->exists();
 
         $subscription = NewsletterSubscription::withTrashed()->firstOrCreate(
             ['email' => $validated['email']],
