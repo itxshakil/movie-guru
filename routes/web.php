@@ -7,6 +7,7 @@ use App\Http\Controllers\DetailController;
 use App\Http\Controllers\HiddenGemController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\LibraryImportController;
 use App\Http\Controllers\MoodDiscoveryController;
 use App\Http\Controllers\MovieMatchController;
 use App\Http\Controllers\NewsletterSubscriptionController;
@@ -69,6 +70,7 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::post('/library/import', [LibraryImportController::class, 'store'])->name('library.import.store');
     Route::put('/library/{imdbId}', [LibraryController::class, 'update'])
         ->where('imdbId', 'tt[0-9]{7,8}')
         ->name('library.update');
