@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovieDetail;
 use App\Models\ShowPageAnalytics;
+use App\Services\MovieCollectionService;
 use App\Services\TrendingMovieService;
 use App\Services\TrendingQueryService;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,7 @@ final class HomeController extends Controller
     public function index(
         TrendingQueryService $trendingQueryService,
         TrendingMovieService $trendingMovieService,
+        MovieCollectionService $movieCollectionService,
     ): Response {
         $trendingSearchQueries = $trendingQueryService->fetch();
         $popularMovies = Cache::remember(
@@ -60,47 +62,9 @@ final class HomeController extends Controller
                 ]),
         );
 
-        $recentlyReleasedMovies = Cache::remember(
-            'recently-released-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recentlyReleased()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
+        $recentlyReleasedMovies = $movieCollectionService->recentlyReleased();
 
-        $recommendedMovies = Cache::remember(
-            'recommended-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recommended()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
+        $recommendedMovies = $movieCollectionService->recommended();
 
         $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), static fn () => MovieDetail::topRated()
             ->inRandomOrder()
