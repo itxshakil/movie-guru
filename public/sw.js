@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.17.0';
-const SEARCH_CACHE = 'search-cache-v-4.17.0';
-const INFO_CACHE = 'info-cache-v-4.17.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.17.0';
-const POSTER_CACHE = 'poster-cache-v-4.17.0';
-const INERTIA_CACHE = 'inertia-cache-v-4.17.0';
+const APP_CACHE = 'v-4.18.0';
+const SEARCH_CACHE = 'search-cache-v-4.18.0';
+const INFO_CACHE = 'info-cache-v-4.18.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.0';
+const POSTER_CACHE = 'poster-cache-v-4.18.0';
+const INERTIA_CACHE = 'inertia-cache-v-4.18.0';
 // Not versioned: saved titles must survive app updates. Entries are only removed when unsaved.
 const WATCHLIST_CACHE = 'watchlist-cache-v1';
 
@@ -813,8 +813,8 @@ async function handleFetch(event) {
     } else if (isSameOrigin && ['/hidden-gem', '/trending'].includes(url.pathname) && request.method === 'GET') {
         // Daily and shuffled picks must be fresh online; the cached copy is the offline fallback.
         return networkFirst(DYNAMIC_CACHE, request);
-    } else if (isSameOrigin && url.pathname === '/my-watchlist' && request.method === 'GET') {
-        // A member's watchlist changes on every save, so always ask the network first.
+    } else if (isSameOrigin && url.pathname === '/library' && request.method === 'GET') {
+        // A member's library changes on every save, so always ask the network first.
         return networkFirst(WATCHLIST_CACHE, request);
     } else if (isSameOrigin) {
         // Item 3: stale-while-revalidate for /search and /i/ routes
@@ -843,10 +843,10 @@ self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting().then(r => log('Skip waiting')).catch(
             error => logError('Error skipping waiting', error));
-    } else if (event.data?.type === 'CACHE_WATCHLIST') {
+    } else if (event.data?.type === 'CACHE_LIBRARY') {
         event.waitUntil(cacheWatchlistTitles(event.data.items ?? [], {reset: event.data.reset === true})
             .catch((error) => logError('Caching the watchlist failed', error)));
-    } else if (event.data?.type === 'UNCACHE_WATCHLIST_TITLE') {
+    } else if (event.data?.type === 'UNCACHE_LIBRARY_TITLE') {
         event.waitUntil(uncacheWatchlistTitle(event.data.imdbId).catch((error) => logError('Uncaching a watchlist title failed', error)));
     } else if (event.data?.type === 'MARK_TRENDING_SEEN') {
         event.waitUntil(markTrendingSeen().catch((error) => logError('Marking trending as seen failed', error)));
