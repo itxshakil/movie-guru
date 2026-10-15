@@ -48,7 +48,7 @@ final class MoodDiscoveryController extends Controller
     public function index(): Response
     {
         return Inertia::render('MoodDiscovery', [
-            'moods' => array_map(fn($key, $mood) => ['slug' => $key, ...$mood], array_keys(self::MOODS), self::MOODS),
+            'moods' => array_map(fn ($key, $mood) => ['slug' => $key, ...$mood], array_keys(self::MOODS), self::MOODS),
             'selectedMood' => null,
             'movies' => [],
         ]);
@@ -72,7 +72,7 @@ final class MoodDiscoveryController extends Controller
             ->get(['imdb_id', 'title', 'year', 'poster', 'imdb_rating', 'genre']);
 
         return Inertia::render('MoodDiscovery', [
-            'moods' => array_map(fn($key, $m) => ['slug' => $key, ...$m], array_keys(self::MOODS), self::MOODS),
+            'moods' => array_map(fn ($key, $m) => ['slug' => $key, ...$m], array_keys(self::MOODS), self::MOODS),
             'selectedMood' => ['slug' => $mood, ...$config],
             'movies' => $movies,
         ]);

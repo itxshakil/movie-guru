@@ -33,7 +33,7 @@ it('sends weekly newsletter to subscribers', function (): void {
 
     Mail::assertQueued(
         NewsletterMail::class,
-        fn($mail): bool => (
+        fn ($mail): bool => (
             $mail->recommendedMovie !== null
             && $mail->hiddenGem !== null
             && $mail->unsubscribeUrl !== null

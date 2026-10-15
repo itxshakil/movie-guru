@@ -20,8 +20,7 @@ final class ExceptionOccurred extends Mailable
 
     public function __construct(
         public array $data,
-    )
-    {
+    ) {
         $this->environment = $this->data['environment'] ?? app()->environment();
     }
 

@@ -26,9 +26,7 @@ final class AppServiceProvider extends ServiceProvider
      * Register any application services.
      */
     #[Override]
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.
@@ -56,7 +54,7 @@ final class AppServiceProvider extends ServiceProvider
                 ->notify(new SlowQueryDetected($connection, $event));
         });
 
-        RateLimiter::for('api', static fn(Request $request) => Limit::perMinute(60)->by(
+        RateLimiter::for('api', static fn (Request $request) => Limit::perMinute(60)->by(
             $request->user()?->id ?: $request->ip(),
         ));
 

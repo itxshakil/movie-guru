@@ -74,7 +74,7 @@ final class SpamKeywordRule implements Rule
         ];
 
         foreach ($spamKeywords as $spamKeyword) {
-            if (mb_stripos(mb_strtolower((string)$value), mb_strtolower($spamKeyword)) === false) {
+            if (mb_stripos(mb_strtolower((string) $value), mb_strtolower($spamKeyword)) === false) {
                 continue;
             }
 
