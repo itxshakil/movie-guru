@@ -315,3 +315,24 @@ div:has(> input:user-invalid) > .input-label {
     }
 }
 
+
+/* Window Controls Overlay on layouts without AppHeader (auth and profile pages):
+   keep content out of the title bar area and give the window a drag handle. */
+@media (display-mode: window-controls-overlay) {
+    body:not(:has(.app-header)) {
+        padding-top: env(titlebar-area-height, 0px);
+    }
+
+    body:not(:has(.app-header))::before {
+        content: '';
+        position: fixed;
+        z-index: 60;
+        top: env(titlebar-area-y, 0px);
+        left: env(titlebar-area-x, 0px);
+        width: env(titlebar-area-width, 100%);
+        height: env(titlebar-area-height, 0px);
+        background-color: var(--color-gray-950);
+        app-region: drag;
+        -webkit-app-region: drag;
+    }
+}
