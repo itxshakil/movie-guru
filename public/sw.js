@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.18.0';
-const SEARCH_CACHE = 'search-cache-v-4.18.0';
-const INFO_CACHE = 'info-cache-v-4.18.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.0';
-const POSTER_CACHE = 'poster-cache-v-4.18.0';
-const INERTIA_CACHE = 'inertia-cache-v-4.18.0';
+const APP_CACHE = 'v-4.18.1';
+const SEARCH_CACHE = 'search-cache-v-4.18.1';
+const INFO_CACHE = 'info-cache-v-4.18.1';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.1';
+const POSTER_CACHE = 'poster-cache-v-4.18.1';
+const INERTIA_CACHE = 'inertia-cache-v-4.18.1';
 // Not versioned: saved titles must survive app updates. Entries are only removed when unsaved.
 const WATCHLIST_CACHE = 'watchlist-cache-v1';
 
@@ -687,13 +687,14 @@ async function handleFetchWithOfflineFallback(event) {
 const WATCHLIST_TITLE_PATH = /^\/(?:movie|i)\/(tt\d{7,8})\/?$/i;
 
 function watchlistCacheKey(url) {
-    const {origin, pathname} = new URL(url);
+    const {origin, pathname, searchParams} = new URL(url);
     if (origin !== self.location.origin) {
         return url;
     }
 
+    // Each tab has its own copy: the cached page embeds its URL, which Inertia uses to pick the tab.
     if (pathname === '/watchlist') {
-        return '/watchlist';
+        return searchParams.get('tab') === 'watched' ? '/watchlist?tab=watched' : '/watchlist';
     }
 
     const match = pathname.match(WATCHLIST_TITLE_PATH);
@@ -743,7 +744,7 @@ async function purgeWatchlistPages() {
 }
 
 /**
- * Caches the full detail page and poster of each saved title, plus the watchlist page,
+ * Caches the full detail page and poster of each saved title, plus both watchlist tabs,
  * so the whole watchlist works offline. Anything already cached is skipped.
  */
 async function cacheWatchlistTitles(items, {reset = false} = {}) {
@@ -767,7 +768,10 @@ async function cacheWatchlistTitles(items, {reset = false} = {}) {
         return titleJobs;
     });
 
-    jobs.push(cacheIfMissing(cache, '/watchlist', {headers: {Accept: 'text/html'}}));
+    jobs.push(
+        cacheIfMissing(cache, '/watchlist', {headers: {Accept: 'text/html'}}),
+        cacheIfMissing(cache, '/watchlist?tab=watched', {headers: {Accept: 'text/html'}}),
+    );
 
     const results = await Promise.allSettled(jobs);
     results
