@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 beforeEach(function (): void {
     Http::fake([
@@ -61,7 +62,11 @@ test('protocol links open the matching page', function (string $protocolUrl, str
     'search path' => fn (): array => ['web+movieguru://search/the%20matrix', route('search', ['s' => 'the matrix'])],
     'search query' => fn (): array => ['web+movieguru://search?s=the+matrix', route('search', ['s' => 'the matrix'])],
     'mood' => fn (): array => ['web+movieguru://mood/cozy', route('mood.show', ['mood' => 'cozy'])],
-    'movie match' => fn (): array => ['web+movieguru://movie-match/abc123', route('movie-match.show', ['token' => 'abc123'])],
+    'movie match' => function (): array {
+        $matchToken = Str::random(32);
+
+        return ['web+movieguru://movie-match/' . $matchToken, route('movie-match.show', ['token' => $matchToken])];
+    },
     'watchlist' => fn (): array => ['web+movieguru://watchlist', route('watchlist')],
     'unknown path' => fn (): array => ['web+movieguru://something-else', route('home')],
 ]);

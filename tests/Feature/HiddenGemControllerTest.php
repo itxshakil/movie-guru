@@ -5,7 +5,9 @@ declare(strict_types=1);
 use App\Models\MovieDetail;
 use Illuminate\Support\Facades\Cache;
 
-beforeEach(fn () => Cache::flush());
+beforeEach(function (): void {
+    Cache::flush();
+});
 
 test('hidden gem endpoint returns a qualifying movie with imdb_id for the detail modal', function (): void {
     MovieDetail::factory()->create([
