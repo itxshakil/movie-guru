@@ -2,7 +2,10 @@
  * Shares a generated file (an image or a calendar event) with the Web Share API when the
  * browser can share files, and downloads it otherwise.
  *
- * @returns {Promise<'shared'|'downloaded'|'cancelled'>}
+ * Returns 'needs-activation' when the browser refused because the tap that started the work
+ * has expired (slow rendering); the caller should keep the file and share it on the next tap.
+ *
+ * @returns {Promise<'shared'|'downloaded'|'cancelled'|'needs-activation'>}
  */
 export async function shareOrDownloadFile(file, {title, text} = {}) {
     if (navigator.canShare?.({files: [file]})) {
@@ -12,6 +15,9 @@ export async function shareOrDownloadFile(file, {title, text} = {}) {
         } catch (error) {
             if (error.name === 'AbortError') {
                 return 'cancelled';
+            }
+            if (error.name === 'NotAllowedError' && !navigator.userActivation?.isActive) {
+                return 'needs-activation';
             }
             console.error('Sharing the file failed, downloading it instead', error);
         }
