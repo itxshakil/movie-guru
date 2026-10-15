@@ -256,7 +256,7 @@ final class RequestLogger
 
                 $allErrors = $errors->all();
 
-                if (! empty($allErrors)) {
+                if ($allErrors !== []) {
                     $flatErrors = collect($allErrors)
                         ->flatten()
                         ->map(static fn ($e): string|false => is_scalar($e) ? (string) $e : json_encode($e))

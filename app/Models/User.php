@@ -46,6 +46,7 @@ final class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            // @mago-expect lint:no-literal-password - a cast type, not a secret
             'password' => 'hashed',
         ];
     }

@@ -236,7 +236,7 @@ final class SearchController extends Controller
 
         $search = $titleCleaner->clean($search);
 
-        if (empty($search)) {
+        if ($search === '' && $defaultSearches !== []) {
             $search = $defaultSearches[array_rand($defaultSearches)];
         }
 
