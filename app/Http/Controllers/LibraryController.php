@@ -27,9 +27,20 @@ final class LibraryController extends Controller
         );
     }
 
-    public function update(LibraryItemRequest $request, string $imdbId, UpdateLibraryItem $updateLibraryItem): LibraryItemResource
-    {
-        /** @var array{title: string, poster?: string|null, year?: string|null, status: string, reaction?: string|null} $validated */
+    public function update(
+        LibraryItemRequest $request,
+        string $imdbId,
+        UpdateLibraryItem $updateLibraryItem,
+    ): LibraryItemResource {
+        /**
+         * @var array{
+         *     title: string,
+         *     poster?: string|null,
+         *     year?: string|null,
+         *     status: string,
+         *     reaction?: string|null,
+         * } $validated
+         */
         $validated = $request->validated();
 
         return new LibraryItemResource($updateLibraryItem->handle($request->user(), $imdbId, $validated));

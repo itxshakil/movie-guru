@@ -14,7 +14,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 final class LibraryItemResource extends JsonResource
 {
     /**
-     * @return array{imdb_id: string, title: string, poster: string|null, year: string|null, status: string, reaction: string|null, watched_at: string|null, saved_at: string|null}
+     * @return array{
+     *     imdb_id: string,
+     *     title: string,
+     *     poster: string|null,
+     *     year: string|null,
+     *     status: string,
+     *     reaction: string|null,
+     *     watched_at: string|null,
+     *     saved_at: string|null,
+     * }
      */
     public function toArray(Request $request): array
     {

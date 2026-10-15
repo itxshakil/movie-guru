@@ -27,7 +27,13 @@ test('titles new to the account are added as sent', function (): void {
     $this->actingAs($user)
         ->postJson(route('library.import.store'), ['items' => [
             guestItem(),
-            guestItem(['imdb_id' => 'tt0816692', 'title' => 'Interstellar', 'status' => 'watched', 'reaction' => 'liked', 'watched_at' => '2026-10-01T20:00:00+00:00']),
+            guestItem([
+                'imdb_id' => 'tt0816692',
+                'title' => 'Interstellar',
+                'status' => 'watched',
+                'reaction' => 'liked',
+                'watched_at' => '2026-10-01T20:00:00+00:00',
+            ]),
         ]])
         ->assertSuccessful()
         ->assertJsonCount(2, 'data');
@@ -43,11 +49,15 @@ test('watched on the device beats to watch in the account', function (): void {
     LibraryItem::factory()->for($user)->create(['imdb_id' => 'tt1375666']);
 
     $this->actingAs($user)
-        ->postJson(route('library.import.store'), ['items' => [guestItem(['status' => 'watched', 'reaction' => 'liked', 'watched_at' => '2026-10-01T20:00:00+00:00'])]])
+        ->postJson(route('library.import.store'), ['items' => [
+            guestItem(['status' => 'watched', 'reaction' => 'liked', 'watched_at' => '2026-10-01T20:00:00+00:00']),
+        ]])
         ->assertSuccessful();
 
     $item = LibraryItem::query()->forUser($user)->sole();
-    expect($item->status)->toBe(LibraryStatus::Watched)->and($item->reaction)->toBe(LibraryReaction::Liked);
+    expect($item->status)->toBe(LibraryStatus::Watched)
+        ->and($item->reaction)->toBe(LibraryReaction::Liked)
+        ->and($item->watched_at->toIso8601String())->toBe('2026-10-01T20:00:00+00:00');
 });
 
 test('the account reaction wins over the device reaction', function (): void {
@@ -55,7 +65,9 @@ test('the account reaction wins over the device reaction', function (): void {
     LibraryItem::factory()->for($user)->disliked()->create(['imdb_id' => 'tt1375666']);
 
     $this->actingAs($user)
-        ->postJson(route('library.import.store'), ['items' => [guestItem(['status' => 'watched', 'reaction' => 'liked'])]])
+        ->postJson(route('library.import.store'), ['items' => [
+            guestItem(['status' => 'watched', 'reaction' => 'liked']),
+        ]])
         ->assertSuccessful();
 
     expect(LibraryItem::query()->forUser($user)->sole()->reaction)->toBe(LibraryReaction::Disliked);
@@ -66,7 +78,9 @@ test('a device reaction fills an account title that has none', function (): void
     LibraryItem::factory()->for($user)->watched()->create(['imdb_id' => 'tt1375666']);
 
     $this->actingAs($user)
-        ->postJson(route('library.import.store'), ['items' => [guestItem(['status' => 'watched', 'reaction' => 'liked'])]])
+        ->postJson(route('library.import.store'), ['items' => [
+            guestItem(['status' => 'watched', 'reaction' => 'liked']),
+        ]])
         ->assertSuccessful();
 
     expect(LibraryItem::query()->forUser($user)->sole()->reaction)->toBe(LibraryReaction::Liked);
@@ -109,11 +123,38 @@ test('a watched date with an offset is stored in the app timezone', function ():
 
 test('imported items are validated', function (): void {
     $this->actingAs(User::factory()->create())
-        ->postJson(route('library.import.store'), ['items' => [guestItem(['status' => 'to_watch', 'reaction' => 'liked'])]])
+        ->postJson(route('library.import.store'), ['items' => [
+            guestItem(['status' => 'to_watch', 'reaction' => 'liked']),
+        ]])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('items.0.reaction');
 });
 
 test('guests cannot import a library', function (): void {
     $this->postJson(route('library.import.store'), ['items' => [guestItem()]])->assertUnauthorized();
+});
+
+test('an import of up to 500 titles is accepted', function (): void {
+    $user = User::factory()->create();
+    $items = array_map(
+        static fn (int $index): array => guestItem(['imdb_id' => sprintf('tt%07d', $index)]),
+        range(1, 500),
+    );
+
+    $this->actingAs($user)
+        ->postJson(route('library.import.store'), ['items' => $items])
+        ->assertSuccessful()
+        ->assertJsonCount(500, 'data');
+});
+
+test('an import of more than 500 titles is rejected', function (): void {
+    $items = array_map(
+        static fn (int $index): array => guestItem(['imdb_id' => sprintf('tt%07d', $index)]),
+        range(1, 501),
+    );
+
+    $this->actingAs(User::factory()->create())
+        ->postJson(route('library.import.store'), ['items' => $items])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('items');
 });
