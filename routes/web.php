@@ -12,6 +12,7 @@ use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProtocolLinkController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TrailerEmbedController;
 use App\Http\Controllers\TrendingMovieController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\WatchlistImportController;
@@ -55,6 +56,9 @@ Route::get('/movie-match/{token}', [MovieMatchController::class, 'show'])->name(
 Route::post('/movie-match/{token}/submit', [MovieMatchController::class, 'submit'])->name('movie-match.submit');
 
 Route::get('/open', [ProtocolLinkController::class, 'show'])->name('protocol-link.show');
+Route::get('/trailer-embed/{videoId}', [TrailerEmbedController::class, 'show'])
+    ->where('videoId', '[A-Za-z0-9_-]{11}')
+    ->name('trailer-embed.show');
 
 Route::get('/trending', [TrendingMovieController::class, 'index'])->name('trending.index')->middleware('throttle:api');
 Route::get('/hidden-gem', [HiddenGemController::class, 'show'])->name('hidden-gem.show')->middleware('throttle:api');
