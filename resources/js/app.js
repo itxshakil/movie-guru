@@ -7,7 +7,7 @@ import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {ZiggyVue} from '../../vendor/tightenco/ziggy';
 import useInstallPrompt from '@/Composables/useInstalPrompt.js';
 import Analytics from '@/Plugins/analytics.js';
-import {requestPersistentStorage} from '@/Composables/useWatchlist.js';
+import {requestPersistentStorage} from '@/Composables/useLibrary.js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Movie Guru';
 
