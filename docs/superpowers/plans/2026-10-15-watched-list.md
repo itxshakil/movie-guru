@@ -15,7 +15,7 @@
 - Every PHP file starts with `declare(strict_types=1);`, and classes are `final` with typed properties and return types.
 - Validation goes in Form Requests and responses in API Resources; controllers stay thin, and business rules live in `app/Actions`.
 - Use `Model::query()->...`, never static query calls on models (mago `no-implicit-model-query`).
-- Never use the em dash character "—" in code, comments, copy or commit messages; use "-".
+- Never use the em dash character " - " in code, comments, copy or commit messages; use "-".
 - Do not add composer or npm dependencies. The JS tests use Node's built-in `node:test` and `node:assert/strict`.
 - No `console.log` in committed code; `console.error` for real failures is fine.
 - Every commit must pass `composer lint`, `composer test` and `npm run build`. Run `vendor/bin/pint --dirty --format agent` after PHP edits.
@@ -2221,7 +2221,7 @@ composer test
 npm run test:js
 npm run build
 node --check public/sw.js
-git diff main --stat | grep -c "—" || true
+git diff main --stat | grep -c " - " || true
 git grep -n "Watchlist::\|watchlist\.store\|watchlist\.destroy\|watchlist\.import\|my-watchlist" -- app routes resources tests public
 ```
 
