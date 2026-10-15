@@ -72,16 +72,22 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         v-bind="$attrs"
         :aria-label="watched ? `${movie.title}: watched${reaction ? `, ${reaction}` : ''}. Change` : `Mark ${movie.title} as watched`"
         :aria-pressed="watched"
-        :class="watched ? 'watched-btn--on bg-emerald-600/85 hover:bg-emerald-600' : 'bg-white/20 hover:bg-white/40'"
+        :class="watched ? 'bg-emerald-600/85 hover:bg-emerald-600' : 'bg-white/20 hover:bg-white/40'"
         :style="{anchorName}"
         class="watched-btn squircle flex items-center gap-1 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all active:scale-90"
         type="button"
         @click.stop="onButtonClick"
     >
-        <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z" stroke-linejoin="round"/>
-            <circle cx="12" cy="12" r="3"/>
-        </svg>
+        <span aria-hidden="true" class="relative flex">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path v-if="watched" d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+                <template v-else>
+                    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </template>
+            </svg>
+            <span v-if="reactionEmoji" class="watched-btn__badge absolute -top-1.5 -right-2 text-[10px] leading-none">{{ reactionEmoji }}</span>
+        </span>
         <span class="text-box-tight watched-btn__label">{{ watched ? `Watched ${reactionEmoji}`.trim() : 'Watched?' }}</span>
     </button>
 
@@ -94,6 +100,8 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         role="dialog"
         :aria-label="`Did you like ${movie.title}?`"
         @click.stop
+        @pointerdown.stop
+        @pointerup.stop
     >
         <p class="px-1 pb-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400">Did you like it?</p>
         <div class="flex gap-1">
@@ -123,9 +131,18 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
 </template>
 
 <style scoped>
+.watched-btn__badge {
+    display: none;
+}
+
+/* Compact grids hide the label, so the reaction moves onto the icon. */
 @container style(--card-density: compact) {
     .watched-btn__label {
         display: none;
+    }
+
+    .watched-btn__badge {
+        display: block;
     }
 }
 
