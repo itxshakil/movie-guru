@@ -458,8 +458,82 @@ self.addEventListener('periodicsync', (event) => {
         event.waitUntil(weeklyTrendingNotification());
     } else if (event.tag === 'daily-notification') {
         event.waitUntil(dailyNotification());
+    } else if (event.tag === 'content-refresh') {
+        event.waitUntil(refreshContent());
     }
 });
+
+/**
+ * Keeps the home screen fresh offline and badges the app icon with the number of
+ * trending titles the user has not seen yet.
+ */
+async function refreshContent() {
+    const results = await Promise.allSettled([
+        prefetchIntoCache(DYNAMIC_CACHE, ['/', '/?utm_source=homescreen', '/hidden-gem']),
+        updateTrendingBadge(),
+    ]);
+
+    results
+        .filter((result) => result.status === 'rejected')
+        .forEach((result) => logError('Content refresh step failed', result.reason));
+}
+
+async function prefetchIntoCache(cacheName, urls) {
+    const cache = await caches.open(cacheName);
+
+    await Promise.all(urls.map(async (url) => {
+        const response = await fetch(url, {cache: 'no-cache'});
+        if (response.ok) {
+            await putTaggedResponse(cache, new Request(url), response, 0);
+        }
+    }));
+}
+
+async function updateTrendingBadge() {
+    const response = await fetch('/trending', {headers: {Accept: 'application/json'}, cache: 'no-cache'});
+    if (!response.ok) {
+        throw new Error(`Trending request failed with status ${response.status}`);
+    }
+
+    const {data} = await response.json();
+    const latestIds = data.map((movie) => movie.imdb_id);
+    await kvSet('trending-latest-ids', latestIds);
+
+    const seenIds = await kvGet('trending-seen-ids');
+    if (!seenIds) {
+        // First run: treat today's list as already seen instead of badging every title.
+        await kvSet('trending-seen-ids', latestIds);
+        return;
+    }
+
+    const newCount = latestIds.filter((imdbId) => !seenIds.includes(imdbId)).length;
+    await setBadge(newCount);
+}
+
+async function markTrendingSeen() {
+    const latestIds = await kvGet('trending-latest-ids');
+    if (latestIds) {
+        await kvSet('trending-seen-ids', latestIds);
+    }
+    await setBadge(0);
+}
+
+async function setBadge(count) {
+    if (!('setAppBadge' in self.navigator)) {
+        return;
+    }
+
+    try {
+        if (count > 0) {
+            await self.navigator.setAppBadge(count);
+        } else {
+            await self.navigator.clearAppBadge();
+        }
+    } catch (error) {
+        // Some platforms tie badging to notification permission and reject without it.
+        logError('Updating the app badge failed', error);
+    }
+}
 
 /**
  * Returns the most recent Saturday 18:00 (local time) that is not in the future.
@@ -620,6 +694,8 @@ self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting().then(r => log('Skip waiting')).catch(
             error => logError('Error skipping waiting', error));
+    } else if (event.data?.type === 'MARK_TRENDING_SEEN') {
+        event.waitUntil(markTrendingSeen().catch((error) => logError('Marking trending as seen failed', error)));
     } else if (event.data?.type === 'PROCESS_SEARCH_QUEUE') {
         event.waitUntil(processSearchQueue().catch((error) => logError('Search queue not drained', error)));
     }

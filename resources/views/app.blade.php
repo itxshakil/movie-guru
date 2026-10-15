@@ -140,6 +140,7 @@
                 await navigator.serviceWorker.ready;
                 registerPeriodicSyncs(registration);
                 processOfflineSearchQueue();
+                markTrendingSeen();
             } catch (error) {
                 console.error('Service Worker registration failed:', error);
             }
@@ -152,6 +153,7 @@
 
             registerPeriodicSync(registration, 'weekly-trending-notification', 24 * 60 * 60 * 1000);
             registerPeriodicSync(registration, 'daily-notification', (25 * 60 * 60 * 1000) + (1 * 60 * 60 * 1000) + (7 * 60 * 100));
+            registerPeriodicSync(registration, 'content-refresh', 12 * 60 * 60 * 1000);
         }
 
         async function registerPeriodicSync(registration, tag, minInterval) {
@@ -160,6 +162,13 @@
             } catch (error) {
                 console.error(`Periodic Sync registration failed for ${tag}:`, error);
             }
+        }
+
+        /**
+         * Visiting the app clears the "new trending titles" badge set by the content-refresh sync.
+         */
+        function markTrendingSeen() {
+            navigator.serviceWorker.controller?.postMessage({type: 'MARK_TRENDING_SEEN'});
         }
 
         /**

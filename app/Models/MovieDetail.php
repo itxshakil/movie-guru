@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * @property-read Carbon $source_last_fetched_at
+ * @property-read string $poster
  */
 final class MovieDetail extends Model
 {
