@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+/**
+ * Logs a console command's output to the application log as well as the terminal.
+ *
+ * @phpstan-require-extends Command
+ */
 trait LogCommands
 {
     /**
@@ -15,9 +21,7 @@ trait LogCommands
     public function log(string $message, array $context = []): void
     {
         Log::info($message, $context);
-        if (method_exists($this, 'info')) {
-            $this->info($message);
-        }
+        $this->info($message);
     }
 
     /**
@@ -26,9 +30,7 @@ trait LogCommands
     public function logError(string $message, array $context = []): void
     {
         Log::error($message, $context);
-        if (method_exists($this, 'error')) {
-            $this->error($message);
-        }
+        $this->error($message);
     }
 
     /**
@@ -37,9 +39,7 @@ trait LogCommands
     public function warning(string $message, array $context = []): void
     {
         Log::warning($message, $context);
-        if (method_exists($this, 'warn')) {
-            $this->warn($message);
-        }
+        $this->warn($message);
     }
 
     /**
@@ -55,8 +55,6 @@ trait LogCommands
             'trace' => $exception->getTrace(),
         ]));
 
-        if (method_exists($this, 'info')) {
-            $this->info($exception->getMessage());
-        }
+        $this->error($exception->getMessage());
     }
 }

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\MovieDetail;
-use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 
 use function Laravel\Prompts\search;
+
 use function Laravel\Prompts\text;
+
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'movie:affiliate', description: 'Set the movie booking affiliate link for a given IMDB ID')]
 final class SetMovieAffiliateLinkCommand extends Command
@@ -25,7 +27,7 @@ final class SetMovieAffiliateLinkCommand extends Command
         $title = $this->argument('title');
         $link = $this->argument('link');
 
-        if (!$imdbId) {
+        if (! $imdbId) {
             $imdbId = search(
                 label: 'Search for a movie by title',
                 options: function (string $query): array {
@@ -37,7 +39,7 @@ final class SetMovieAffiliateLinkCommand extends Command
                         ->where('title', 'like', '%' . $query . '%')
                         ->limit(10)
                         ->get()
-                        ->mapWithKeys(fn(MovieDetail $movie): array => [
+                        ->mapWithKeys(fn (MovieDetail $movie): array => [
                             $movie->imdb_id => sprintf('%s (%s) [%s]', $movie->title, $movie->year, $movie->type),
                         ])
                         ->all();
@@ -48,13 +50,13 @@ final class SetMovieAffiliateLinkCommand extends Command
 
         $movie = MovieDetail::where('imdb_id', $imdbId)->first();
 
-        if (!$movie) {
+        if (! $movie) {
             $this->error(sprintf('Movie with IMDB ID %s not found.', $imdbId));
 
             return 1;
         }
 
-        if (!$title) {
+        if (! $title) {
             $title = text(
                 label: 'Enter the affiliate title label',
                 default: $movie->title,
@@ -62,7 +64,7 @@ final class SetMovieAffiliateLinkCommand extends Command
             );
         }
 
-        if (!$link) {
+        if (! $link) {
             $link = text(
                 label: 'Enter the affiliate link',
                 required: true,

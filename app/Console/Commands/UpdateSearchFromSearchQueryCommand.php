@@ -7,9 +7,9 @@ namespace App\Console\Commands;
 use App\Models\Search;
 use App\Support\LogCommands;
 use Exception;
-use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'search:update-counts', description: 'Update the Search model with counts of search queries from the search_queries table')]
 final class UpdateSearchFromSearchQueryCommand extends Command
