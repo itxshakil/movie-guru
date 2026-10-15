@@ -48,7 +48,7 @@ final class DetailController extends Controller
         $shouldRefresh =
             $movie instanceof MovieDetail
             && (
-                empty($sources)
+                $sources === []
                 || $movie->source_last_fetched_at === null
                 || $movie->source_last_fetched_at->lt(now()->subMonth())
             );

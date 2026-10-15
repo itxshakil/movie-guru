@@ -37,3 +37,9 @@ test('search endpoint renders a full inertia page for a plain link visit with no
 
     expect($response->headers->get('content-type'))->toContain('text/html');
 });
+
+test('search page loads without a query before any trending searches exist', function (): void {
+    fakeOmdbSearchResponse();
+
+    $this->get(route('search'))->assertSuccessful();
+});
