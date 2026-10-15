@@ -6,8 +6,8 @@ namespace App\Support\RequestLogging;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
