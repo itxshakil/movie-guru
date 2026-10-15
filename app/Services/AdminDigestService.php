@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\DTOs\AdminDigestData;
-use App\Enums\LibraryStatus;
 use App\Models\Contact;
 use App\Models\LibraryItem;
 use App\Models\MovieDetail;
@@ -43,7 +42,7 @@ final class AdminDigestService
                 ->whereBetween('unsubscribed_at', [$start, $end])
                 ->count(),
             contactSubmissionsCount: Contact::query()->whereBetween('created_at', [$start, $end])->count(),
-            watchlistAddsCount: LibraryItem::query()->where('status', LibraryStatus::ToWatch)->whereBetween('created_at', [$start, $end])->count(),
+            watchlistAddsCount: LibraryItem::query()->whereBetween('created_at', [$start, $end])->count(),
             newMoviesCount: MovieDetail::query()->whereBetween('created_at', [$start, $end])->count(),
             errorLogCount: $this->countErrorLogLines($start, $end),
             topSearches: $type === 'monthly' ? $this->getTopSearches() : [],
@@ -91,7 +90,11 @@ final class AdminDigestService
 
             $timestamp = Date::createFromFormat('Y-m-d H:i:s', $matches[1], config('app.timezone'));
 
-            if ($timestamp instanceof Carbon && $timestamp->betweenIncluded($start, $end) && str_contains($line, '.ERROR:')) {
+            if (
+                $timestamp instanceof Carbon
+                && $timestamp->betweenIncluded($start, $end)
+                && str_contains($line, '.ERROR:')
+            ) {
                 $count++;
             }
         }
