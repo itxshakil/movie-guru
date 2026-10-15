@@ -139,18 +139,13 @@ function loadWatchlist(userId) {
         return loadingPromise;
     }
 
-    if (loadedForUserId && !userId) {
-        // Signed out: drop the offline copy of the account's watchlist from this device.
-        postToServiceWorker({type: 'FORGET_MEMBER_WATCHLIST'});
-    }
-
     loadedForUserId = userId;
     loadingPromise = (userId ? loadMemberWatchlist() : loadGuestWatchlist())
         .then((items) => {
             if (loadedForUserId === userId) {
                 watchlist.value = items;
                 isWatchlistLoaded.value = true;
-                cacheForOffline(items);
+                cacheForOffline(items, {reset: hasWatchlistOwnerChanged(userId)});
             }
         })
         .catch((error) => {
@@ -165,8 +160,33 @@ function postToServiceWorker(message) {
     navigator.serviceWorker?.controller?.postMessage(message);
 }
 
-function cacheForOffline(items) {
-    postToServiceWorker({type: 'CACHE_WATCHLIST', items: items.map(({imdb_id, poster}) => ({imdb_id, poster}))});
+const WATCHLIST_OWNER_KEY = 'movie-guru-watchlist-owner';
+
+/**
+ * Cached offline pages embed the signed-in user, so they are rebuilt when a different person
+ * (or a guest) uses the app on this device. Remembered across page loads.
+ */
+function hasWatchlistOwnerChanged(userId) {
+    const owner = userId ? `user:${userId}` : 'guest';
+    try {
+        const previousOwner = localStorage.getItem(WATCHLIST_OWNER_KEY);
+        localStorage.setItem(WATCHLIST_OWNER_KEY, owner);
+        return previousOwner !== null && previousOwner !== owner;
+    } catch {
+        return true;
+    }
+}
+
+function cacheForOffline(items, {reset = false} = {}) {
+    if (items.length === 0 && !reset) {
+        return;
+    }
+
+    postToServiceWorker({
+        type: 'CACHE_WATCHLIST',
+        items: items.map(({imdb_id, poster}) => ({imdb_id, poster})),
+        reset,
+    });
 }
 
 /**
