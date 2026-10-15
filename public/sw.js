@@ -790,6 +790,9 @@ async function handleFetch(event) {
     } else if (isInertiaRequest(request)) {
         // Partial reloads — always network
         return fetch(request);
+    } else if (isSameOrigin && ['/hidden-gem', '/trending'].includes(url.pathname) && request.method === 'GET') {
+        // Daily and shuffled picks must be fresh online; the cached copy is the offline fallback.
+        return networkFirst(DYNAMIC_CACHE, request);
     } else if (isSameOrigin && url.pathname === '/my-watchlist' && request.method === 'GET') {
         // A member's watchlist changes on every save, so always ask the network first.
         return networkFirst(WATCHLIST_CACHE, request);
