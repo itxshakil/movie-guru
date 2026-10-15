@@ -26,7 +26,7 @@ const viewDetail = (imdbID, title) => {
 </script>
 
 <template>
-    <section class="py-10 px-4">
+    <section id="hidden-gem" class="py-10 px-4 scroll-mt-20">
         <div class="mx-auto max-w-7xl">
             <div class="mb-5 flex items-center gap-2">
                 <span class="text-xl">💎</span>
