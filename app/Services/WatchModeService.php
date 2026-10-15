@@ -9,27 +9,16 @@ use App\DTOs\WatchModeSource;
 use App\DTOs\WatchModeSourceMeta;
 use App\Enums\WatchModeSearchField;
 use App\Enums\WatchModeType;
-use Exception;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 final class WatchModeService
 {
-    private string $baseUrl = 'https://api.watchmode.com/v1';
-
-    /**
-     * @var string[]
-     */
-    private array $apiKeys;
-
-    public function __construct()
-    {
-        $this->apiKeys = explode(',', (string) config('services.watchmode.key'));
-    }
+    public function __construct(
+        private readonly WatchModeClient $watchModeClient,
+    ) {}
 
     /**
      * Extract the 11-character YouTube video id from any common YouTube URL.
@@ -69,7 +58,7 @@ final class WatchModeService
             $params['types'] = implode(',', array_map(static fn ($t) => $t->value, $types));
         }
 
-        $raw = $this->request('/search/', $params);
+        $raw = $this->watchModeClient->get('/search/', $params);
         $results = [];
 
         foreach ($raw['title_results'] ?? [] as $title) {
@@ -97,7 +86,7 @@ final class WatchModeService
             $params['regions'] = implode(',', $regions);
         }
 
-        $raw = $this->request(sprintf('/title/%s/sources/', $titleId), $params);
+        $raw = $this->watchModeClient->get(sprintf('/title/%s/sources/', $titleId), $params);
 
         if (isset($raw['error'])) {
             Log::error('Error getting title sources', [
@@ -145,7 +134,7 @@ final class WatchModeService
     public function getSources(): Collection
     {
         return Cache::remember('watchmode.sources', now()->addDay(), function () {
-            $raw = $this->request('/sources/');
+            $raw = $this->watchModeClient->get('/sources/');
 
             return collect($raw)->values()->map(
                 static fn (array $item): WatchModeSourceMeta => WatchModeSourceMeta::fromArray($item),
@@ -165,7 +154,7 @@ final class WatchModeService
             'watchmode.trailer.' . $titleId,
             now()->addWeek(),
             function () use ($titleId): string {
-                $raw = $this->request(sprintf('/title/%s/details/', $titleId));
+                $raw = $this->watchModeClient->get(sprintf('/title/%s/details/', $titleId));
 
                 if (isset($raw['error'])) {
                     return '';
@@ -178,46 +167,5 @@ final class WatchModeService
         );
 
         return $value === '' ? null : $value;
-    }
-
-    /**
-     * Get a random API key from the configured keys.
-     *
-     * @throws Exception|Throwable
-     */
-    private function getRandomApiKey(): string
-    {
-        throw_if($this->apiKeys === [], Exception::class, 'No API keys are configured.');
-
-        return $this->apiKeys[array_rand($this->apiKeys)];
-    }
-
-    /**
-     * @param  array<string, mixed> $params
-     * @return array<string, mixed>
-     *
-     * @throws Throwable
-     */
-    private function request(string $endpoint, array $params = []): array
-    {
-        $params['apiKey'] = $this->getRandomApiKey();
-
-        try {
-            $response = Http::baseUrl($this->baseUrl)
-                ->timeout(15)
-                ->get($endpoint, $params)
-                ->throw();
-
-            return $response->json();
-        } catch (RequestException $requestException) {
-            $message = $requestException->getMessage();
-            if (str_contains($message, 'Title not found')) {
-                return ['error' => 'Title not found'];
-            }
-
-            report($requestException);
-
-            return ['error' => $requestException->getMessage()];
-        }
     }
 }
