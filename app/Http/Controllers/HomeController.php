@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovieDetail;
 use App\Models\ShowPageAnalytics;
+use App\Services\TrendingMovieService;
 use App\Services\TrendingQueryService;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -13,13 +14,15 @@ use Inertia\Response;
 
 final class HomeController extends Controller
 {
-    public function index(TrendingQueryService $trendingQueryService): Response
-    {
+    public function index(
+        TrendingQueryService $trendingQueryService,
+        TrendingMovieService $trendingMovieService,
+    ): Response {
         $trendingSearchQueries = $trendingQueryService->fetch();
         $popularMovies = Cache::remember(
             'popular-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::popular()->take(6)->get([
+            static fn () => MovieDetail::popular()->take(6)->get([
                 'imdb_id',
                 'title',
                 'year',
@@ -34,27 +37,12 @@ final class HomeController extends Controller
             ]),
         );
 
-        $trendingMovies = Cache::remember('trending-movies', now()->endOfDay(), static fn() => MovieDetail::trending()
-            ->inRandomOrder()
-            ->take(6)
-            ->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]));
+        $trendingMovies = $trendingMovieService->fetch();
 
         $hiddenGemsMovies = Cache::remember(
             'hidden-gems-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::hiddenGems()
+            static fn () => MovieDetail::hiddenGems()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -75,7 +63,7 @@ final class HomeController extends Controller
         $recentlyReleasedMovies = Cache::remember(
             'recently-released-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recentlyReleased()
+            static fn () => MovieDetail::recentlyReleased()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -96,7 +84,7 @@ final class HomeController extends Controller
         $recommendedMovies = Cache::remember(
             'recommended-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recommended()
+            static fn () => MovieDetail::recommended()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -114,7 +102,7 @@ final class HomeController extends Controller
                 ]),
         );
 
-        $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), static fn() => MovieDetail::topRated()
+        $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), static fn () => MovieDetail::topRated()
             ->inRandomOrder()
             ->take(6)
             ->get([
@@ -153,7 +141,7 @@ final class HomeController extends Controller
                     return MovieDetail::query()
                         ->whereIn('imdb_id', $topImdbIds)
                         ->get(['imdb_id', 'title', 'year', 'release_date', 'poster', 'type', 'imdb_rating', 'imdb_votes', 'director', 'writer', 'actors'])
-                        ->sortBy(fn($m) => $topImdbIds->search($m->imdb_id))
+                        ->sortBy(fn ($m) => $topImdbIds->search($m->imdb_id))
                         ->values();
                 }),
             ],

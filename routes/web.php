@@ -12,6 +12,7 @@ use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProtocolLinkController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TrendingMovieController;
 use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -54,6 +55,7 @@ Route::post('/movie-match/{token}/submit', [MovieMatchController::class, 'submit
 
 Route::get('/open', [ProtocolLinkController::class, 'show'])->name('protocol-link.show');
 
+Route::get('/trending', [TrendingMovieController::class, 'index'])->name('trending.index')->middleware('throttle:api');
 Route::get('/hidden-gem', [HiddenGemController::class, 'show'])->name('hidden-gem.show')->middleware('throttle:api');
 
 Route::middleware('auth')->group(function (): void {
