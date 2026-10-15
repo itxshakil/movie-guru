@@ -110,6 +110,10 @@
                 :movie="movie"
                 class="flex-none !bg-gray-100 dark:!bg-gray-800 hover:!bg-gray-200 dark:hover:!bg-gray-700 !text-gray-900 dark:!text-white !text-xs !font-bold !py-2.5 !px-3 !rounded-xl !transition-all !duration-200"
             />
+            <WatchedButton
+                :movie="movie"
+                class="flex-none !bg-gray-100 dark:!bg-gray-800 hover:!bg-gray-200 dark:hover:!bg-gray-700 !text-gray-900 dark:!text-white !text-xs !font-bold !py-2.5 !px-3 !rounded-xl !transition-all !duration-200"
+            />
             <button
                 class="flex-1 flex justify-center items-center gap-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold py-2.5 px-3 rounded-xl transition-colors duration-200 text-xs"
                 type="button"
@@ -142,6 +146,7 @@
 <script setup>
 import {computed, inject} from "vue";
 import WatchlistButton from "@/Components/WatchlistButton.vue";
+import WatchedButton from "@/Components/WatchedButton.vue";
 import {prefetchDetail} from '@/Composables/useDetailPrefetch.js';
 
 const props = defineProps({
