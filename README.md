@@ -1,7 +1,7 @@
 # [Movie Guru](https://movieguru.shakiltech.com)
 
 Movie Guru is your ultimate movie companion! It’s a super-fast and minimalistic Movie detail app where you can explore
-movies, series, and episodes. Find ratings from major platforms like Rotten Tomatoes and IMDB—all in one place! Built
+movies, series, and episodes. Find ratings from major platforms like Rotten Tomatoes and IMDB - all in one place! Built
 with Laravel and Vue, Movie Guru is designed to be efficient, reliable, and easy to use.
 
 ### Why is it awesome?
@@ -22,7 +22,7 @@ with Laravel and Vue, Movie Guru is designed to be efficient, reliable, and easy
 ## Features
 
 - **Unified Ratings:** Check ratings from all major sources in one place.
-- **Clean & Minimal Design:** Focus on what matters—the content.
+- **Clean & Minimal Design:** Focus on what matters - the content.
 - **IMDB Alternative:** A fresh perspective for movie lovers.
 - **Installable PWA:** Access it like a native app.
 - **Offline Search:** Remember your searches and notify you when back online.
