@@ -19,6 +19,8 @@ ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
 no-literal-password = { exclude = ["tests/"] }
+# DTOs and Mailables are data carriers built from promoted constructor properties.
+excessive-parameter-list = { exclude = ["app/DTOs/", "app/Mail/"] }
 
 [analyzer]
 plugins = []

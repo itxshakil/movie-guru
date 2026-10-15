@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\RecordTitleView;
 use App\Models\MovieDetail;
-use App\Models\ShowPageAnalytics;
 use App\Services\BotDetectorService;
 use App\Services\ImdbIdExtractor;
-use App\Services\OMDBApiService;
-use App\Services\WatchModeService;
-use Exception;
-use Illuminate\Http\Client\ConnectionException;
+use App\Services\MovieCollectionService;
+use App\Services\MovieDetailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,260 +20,49 @@ use Throwable;
 
 final class DetailController extends Controller
 {
+    public function __construct(
+        private readonly MovieDetailService $movieDetailService,
+        private readonly MovieCollectionService $movieCollectionService,
+    ) {}
+
     /**
      * @throws Throwable
      */
-    public function show(Request $request, string $imdbId): Response|JsonResponse
-    {
-        $cleanImdbId = resolve(ImdbIdExtractor::class)->extract($imdbId);
+    public function show(
+        Request $request,
+        string $imdbId,
+        ImdbIdExtractor $imdbIdExtractor,
+        BotDetectorService $botDetectorService,
+        RecordTitleView $recordTitleView,
+    ): Response|JsonResponse {
+        $cleanImdbId = $imdbIdExtractor->extract($imdbId);
 
         throw_unless($cleanImdbId, NotFoundHttpException::class, 'Invalid IMDb ID. Provided');
 
-        $cacheKey = 'detail.' . $imdbId;
-        $cacheTTl = [now()->addHours(18), now()->addHours(24)];
-        $movie = Cache::flexible($cacheKey, $cacheTTl, fn (): mixed => $this->fetchDetail($imdbId));
+        $movie = $this->movieDetailService->find($cleanImdbId, (string) $request->ip());
+        $movieDetail = $movie instanceof MovieDetail ? $movie : null;
 
-        $detail = $movie instanceof MovieDetail ? $movie->details : $movie;
-        $affiliateLink = $movie instanceof MovieDetail ? $movie->affiliate_link : null;
-
-        $sources = $movie->sources ?? [];
-
-        $cachedTrailer = Cache::get('watchmode.trailer.' . $cleanImdbId);
-        $trailerId = ($cachedTrailer === null || $cachedTrailer === '') ? null : $cachedTrailer;
-        $shouldWarmTrailer = $cachedTrailer === null;
-
-        $shouldRefresh =
-            $movie instanceof MovieDetail
-            && (
-                $sources === []
-                || $movie->source_last_fetched_at === null
-                || $movie->source_last_fetched_at->lt(now()->subMonth())
-            );
-
-        $botDetector = resolve(BotDetectorService::class);
-        if ($botDetector->isBot($request) === false && ! $this->isBackgroundPrefetch($request)) {
-            defer(static function () use ($shouldRefresh, $shouldWarmTrailer, $request, $imdbId, $cleanImdbId): void {
-                ShowPageAnalytics::create([
-                    'imdb_id' => $imdbId,
-                    'ip_address' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                ]);
-
-                if ($shouldWarmTrailer) {
-                    resolve(WatchModeService::class)->getTitleTrailer($cleanImdbId);
-                }
-
-                if ($shouldRefresh) {
-                    $watchMode = resolve(WatchModeService::class);
-                    $sources = $watchMode->getTitleSources($imdbId, ['IN']);
-
-                    if ($sources->isNotEmpty()) {
-                        $movie = MovieDetail::where('imdb_id', $imdbId)->first();
-                        if (! $movie) {
-                            return;
-                        }
-
-                        $movie->update([
-                            'sources' => $sources,
-                            'source_last_fetched_at' => now(),
-                        ]);
-                    }
-                }
-            });
+        if (! $botDetectorService->isBot($request) && ! $this->isBackgroundPrefetch($request)) {
+            $recordTitleView->handle($cleanImdbId, $request->ip(), $request->userAgent(), $movieDetail);
         }
+
+        $props = [
+            'detail' => $movieDetail instanceof MovieDetail ? $movieDetail->details : $movie,
+            'sources' => $movieDetail->sources ?? [],
+            'affiliateLink' => $movieDetail?->affiliate_link,
+            'trailerId' => Cache::get('watchmode.trailer.' . $cleanImdbId) ?: null,
+        ];
 
         if ($request->wantsJson()) {
-            return response()->json([
-                'detail' => $detail,
-                'sources' => $sources,
-                'affiliateLink' => $affiliateLink,
-                'trailerId' => $trailerId,
-            ]);
+            return response()->json($props);
         }
-
-        $recentlyReleasedMovies = Cache::remember(
-            'recently-released-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recentlyReleased()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
-
-        $recommendedMovies = Cache::remember(
-            'recommended-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recommended()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
-
-        $genre = $movie instanceof MovieDetail ? ($movie->genre ?? '') : '';
-        $firstGenre = mb_trim(explode(',', $genre)[0]);
 
         return Inertia::render('Show', [
-            'detail' => $detail,
-            'sources' => $sources,
-            'affiliateLink' => $affiliateLink,
-            'trailerId' => $trailerId,
-            'recentlyReleasedMovies' => $recentlyReleasedMovies,
-            'recommendedMovies' => $recommendedMovies,
-            'similarMovies' => $firstGenre
-                ? MovieDetail::query()
-                    ->where('genre', 'like', '%' . $firstGenre . '%')
-                    ->where('imdb_id', '!=', $cleanImdbId)
-                    ->orderByDesc('imdb_rating')
-                    ->take(6)
-                    ->get(['imdb_id', 'title', 'year', 'release_date', 'poster', 'type', 'imdb_rating', 'imdb_votes', 'director', 'writer', 'actors'])
-                : collect(),
+            ...$props,
+            'recentlyReleasedMovies' => $this->movieCollectionService->recentlyReleased(),
+            'recommendedMovies' => $this->movieCollectionService->recommended(),
+            'similarMovies' => $this->movieCollectionService->similarTo($movieDetail->genre ?? '', $cleanImdbId),
         ]);
-    }
-
-    /**
-     * @return array|mixed
-     *
-     * @throws ConnectionException
-     */
-    public function fetchDetail(string $imdbId): mixed
-    {
-        $movie = MovieDetail::where('imdb_id', $imdbId)->first();
-
-        if ($movie) {
-            return $this->handleDB($movie, $imdbId);
-        }
-
-        return $this->fetchFromAPI($imdbId);
-    }
-
-    public function handleDB(MovieDetail $movie, string $imdbId): MovieDetail
-    {
-        $ipAddress = request()->ip();
-        defer(static fn () => $movie->incrementViews($ipAddress));
-        $this->updateDetailInBG($imdbId);
-
-        return $movie;
-    }
-
-    /**
-     * @return array|mixed
-     *
-     * @throws ConnectionException
-     */
-    public function fetchFromAPI(string $imdbId): mixed
-    {
-        $imdbId = resolve(ImdbIdExtractor::class)->extract($imdbId);
-        if (! $imdbId) {
-            return [];
-        }
-
-        $OMDBApiService = resolve(OMDBApiService::class);
-        $detail = $OMDBApiService->getById($imdbId);
-        $ipAddress = request()->ip();
-
-        defer(static function () use ($ipAddress, $detail, $imdbId): void {
-            if ($detail === null || ! isset($detail['Title'])) {
-                $exception = new Exception('Failed to fetch details for IMDB ID: ' . $imdbId, 500);
-                report($exception);
-
-                Log::error('Failed to fetch details for IMDB ID: ' . $imdbId, [
-                    'response' => $detail,
-                ]);
-            }
-
-            $voted = $detail['imdbVotes'] && $detail['imdbVotes'] !== 'N/A'
-                ? str_replace(',', '', $detail['imdbVotes'])
-                : 0;
-
-            MovieDetail::updateOrCreate([
-                'imdb_id' => $imdbId,
-            ], [
-                'title' => $detail['Title'],
-                'year' => $detail['Year'],
-                'release_date' => $detail['Released'],
-                'poster' => $detail['Poster'],
-                'type' => $detail['Type'],
-                'imdb_rating' => $detail['imdbRating'] && $detail['imdbRating'] !== 'N/A' ? $detail['imdbRating'] : 0,
-                'imdb_votes' => $voted,
-                'details' => $detail,
-            ])->incrementViews($ipAddress);
-        });
-
-        return $detail; // Return fetched details
-    }
-
-    private function updateDetailInBG(string $imdbId): void
-    {
-        defer(
-            /**
-             * @throws ConnectionException
-             */
-            function () use ($imdbId): void {
-                $OMDBApiService = resolve(OMDBApiService::class);
-                $imdbId = resolve(ImdbIdExtractor::class)->extract($imdbId);
-                $updatedDetail = $OMDBApiService->getById($imdbId);
-
-                if ($updatedDetail === null || ! isset($updatedDetail['Title'])) {
-                    $response = $updatedDetail['Response'] ?? null;
-                    report(new Exception(
-                        'Failed to fetch updated details for IMDB ID: ' . $imdbId . ' Response: ' . $response,
-                        500,
-                    ));
-
-                    Log::error('Failed to fetch updated details for IMDB ID: ' . $imdbId, [
-                        'response' => $updatedDetail,
-                    ]);
-
-                    return;
-                }
-
-                MovieDetail::updateOrCreate([
-                    'imdb_id' => $imdbId,
-                ], [
-                    'title' => $updatedDetail['Title'],
-                    'year' => $updatedDetail['Year'],
-                    'release_date' => $updatedDetail['Released'],
-                    'poster' => $updatedDetail['Poster'],
-                    'type' => $updatedDetail['Type'],
-                    'imdb_rating' => $this->isValue($updatedDetail['imdbRating']) ? $updatedDetail['imdbRating'] : 0,
-                    'imdb_votes' => $this->isValue($updatedDetail['imdbVotes'] ?? null)
-                        ? str_replace(
-                            ',',
-                            '',
-                            $updatedDetail['imdbVotes'],
-                        ) : 0,
-                    'genre' => $updatedDetail['Genre'],
-                    'director' => mb_substr((string) $updatedDetail['Director'], 0, 255),
-                    'writer' => mb_substr((string) $updatedDetail['Writer'], 0, 255),
-                    'actors' => mb_substr((string) $updatedDetail['Actors'], 0, 255),
-                    'details' => $updatedDetail,
-                ]);
-            },
-        );
     }
 
     /**
@@ -286,10 +72,5 @@ final class DetailController extends Controller
     private function isBackgroundPrefetch(Request $request): bool
     {
         return $request->header('Purpose') === 'prefetch' && ! $request->hasHeader('X-Inertia');
-    }
-
-    private function isValue(mixed $value): bool
-    {
-        return $value && $value !== 'N/A';
     }
 }

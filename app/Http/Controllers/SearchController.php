@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\MovieDetail;
 use App\Models\Search;
 use App\Models\SearchQuery;
 use App\OMDB\MovieType;
 use App\Services\BotDetectorService;
+use App\Services\MovieCollectionService;
 use App\Services\OMDBApiService;
 use App\Services\SharedLinkResolver;
 use App\Services\TitleCleaner;
@@ -23,6 +23,10 @@ use Inertia\Response;
 
 final class SearchController extends Controller
 {
+    public function __construct(
+        private readonly MovieCollectionService $movieCollectionService,
+    ) {}
+
     public function index(Request $request, SharedLinkResolver $sharedLinkResolver): Response|JsonResponse|RedirectResponse
     {
         // Web Share Target payloads land here; shared IMDb, Letterboxd, RT or JustWatch links open the title.
@@ -38,163 +42,12 @@ final class SearchController extends Controller
             }
         }
 
-        $search = $request->get('s');
-        [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
-            $search,
-            $request,
-        );
-
-        $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
-
-        $recentlyReleasedMovies = Cache::remember(
-            'recently-released-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recentlyReleased()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
-
-        $recommendedMovies = Cache::remember(
-            'recommended-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recommended()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'searchResults' => $movies,
-                'search' => $search,
-                'page' => $page,
-                'movieType' => $movieType,
-                'year' => $year,
-                'movieTypes' => $movieTypes,
-                'nextUrl' => $nextUrl,
-                'trendingQueries' => $trendingQueries,
-            ]);
-        }
-
-        return Inertia::render('Search', [
-            'searchResults' => $movies,
-            'search' => $search,
-            'page' => $page,
-            'movieType' => $movieType,
-            'year' => $year,
-            'movieTypes' => $movieTypes,
-            'nextUrl' => $nextUrl,
-            'trendingQueries' => $trendingQueries,
-            'recentlyReleasedMovies' => $recentlyReleasedMovies,
-            'recommendedMovies' => $recommendedMovies,
-        ]);
+        return $this->respond($request, $request->string('s')->value(), includeMovieRowsInJson: false);
     }
 
-    public function show(
-        Request $request,
-        ?string $search,
-    ): Response|JsonResponse {
-        [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
-            $search,
-            $request,
-        );
-
-        $trendingQueries = $trendingQueries->random(min(5, $trendingQueries->count()));
-
-        $recentlyReleasedMovies = Cache::remember(
-            'recently-released-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recentlyReleased()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
-
-        $recommendedMovies = Cache::remember(
-            'recommended-movies',
-            now()->endOfDay(),
-            static fn () => MovieDetail::recommended()
-                ->inRandomOrder()
-                ->take(6)
-                ->get([
-                    'imdb_id',
-                    'title',
-                    'year',
-                    'release_date',
-                    'poster',
-                    'type',
-                    'imdb_rating',
-                    'imdb_votes',
-                    'director',
-                    'writer',
-                    'actors',
-                ]),
-        );
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'searchResults' => $movies,
-                'search' => $search,
-                'page' => $page,
-                'movieType' => $movieType,
-                'year' => $year,
-                'movieTypes' => $movieTypes,
-                'nextUrl' => $nextUrl,
-                'trendingQueries' => $trendingQueries,
-                'recentlyReleasedMovies' => $recentlyReleasedMovies,
-                'recommendedMovies' => $recommendedMovies,
-            ]);
-        }
-
-        return Inertia::render('Search', [
-            'searchResults' => $movies,
-            'search' => $search,
-            'page' => $page,
-            'movieType' => $movieType,
-            'year' => $year,
-            'movieTypes' => $movieTypes,
-            'nextUrl' => $nextUrl,
-            'trendingQueries' => $trendingQueries,
-            'recentlyReleasedMovies' => $recentlyReleasedMovies,
-            'recommendedMovies' => $recommendedMovies,
-        ]);
+    public function show(Request $request, ?string $search): Response|JsonResponse
+    {
+        return $this->respond($request, $search, includeMovieRowsInJson: true);
     }
 
     public function logSearchQuery(
@@ -286,5 +139,37 @@ final class SearchController extends Controller
         }
 
         return [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl];
+    }
+
+    private function respond(Request $request, ?string $search, bool $includeMovieRowsInJson): Response|JsonResponse
+    {
+        [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
+            $search,
+            $request,
+        );
+
+        $results = [
+            'searchResults' => $movies,
+            'search' => $search,
+            'page' => $page,
+            'movieType' => $movieType,
+            'year' => $year,
+            'movieTypes' => $movieTypes,
+            'nextUrl' => $nextUrl,
+            'trendingQueries' => $trendingQueries->random(min(5, $trendingQueries->count())),
+        ];
+
+        if ($request->wantsJson() && ! $includeMovieRowsInJson) {
+            return response()->json($results);
+        }
+
+        $results['recentlyReleasedMovies'] = $this->movieCollectionService->recentlyReleased();
+        $results['recommendedMovies'] = $this->movieCollectionService->recommended();
+
+        if ($request->wantsJson()) {
+            return response()->json($results);
+        }
+
+        return Inertia::render('Search', $results);
     }
 }
