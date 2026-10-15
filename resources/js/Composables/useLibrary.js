@@ -1,6 +1,14 @@
 import {computed, ref, watch} from 'vue';
 import {usePage} from '@inertiajs/vue3';
-import {applyLibraryChange, splitLibrary, STATUS, toLibraryItem, upgradeLegacyItem} from '@/Composables/libraryState.js';
+import {
+    applyLibraryChange,
+    chunk,
+    prepareGuestImport,
+    splitLibrary,
+    STATUS,
+    toLibraryItem,
+    upgradeLegacyItem,
+} from '@/Composables/libraryState.js';
 
 /**
  * One library per person: titles to watch and titles already watched (optionally liked or disliked).
@@ -17,6 +25,9 @@ const STORE_NAME = 'library';
 
 const library = ref([]);
 const isLibraryLoaded = ref(false);
+const loadError = ref(null);
+// The title most recently marked watched, so a page can ask for a reaction once its card is gone.
+const lastMarkedWatched = ref(null);
 const libraryTabs = computed(() => splitLibrary(library.value));
 
 let loadedForUserId;
@@ -122,19 +133,38 @@ async function requestJson(url, options = {}) {
     return response.status === 204 ? null : response.json();
 }
 
+/**
+ * Merges the guest library into the account in chunks the server accepts. Each response is the
+ * whole account library, so the last one is the result.
+ */
+async function importGuestItems(guestItems) {
+    let data = null;
+    for (const items of chunk(prepareGuestImport(guestItems))) {
+        ({data} = await requestJson(route('library.import.store'), {
+            method: 'POST',
+            body: JSON.stringify({items}),
+        }));
+    }
+    await clearGuestItems();
+    return data;
+}
+
 async function loadMemberLibrary() {
     const guestItems = await loadGuestLibrary();
 
-    if (guestItems.length === 0) {
-        const {data} = await requestJson(route('library.index'));
-        return data;
+    if (guestItems.length > 0) {
+        try {
+            const imported = await importGuestItems(guestItems);
+            if (imported) {
+                return imported;
+            }
+        } catch (error) {
+            // The guest library stays on the device and is retried on the next load.
+            console.error('Importing the guest library failed', error);
+        }
     }
 
-    const {data} = await requestJson(route('library.import.store'), {
-        method: 'POST',
-        body: JSON.stringify({items: guestItems.map(({saved_at, ...item}) => item)}),
-    });
-    await clearGuestItems();
+    const {data} = await requestJson(route('library.index'));
     return data;
 }
 
@@ -144,6 +174,7 @@ function loadLibrary(userId) {
     }
 
     loadedForUserId = userId;
+    loadError.value = null;
     loadingPromise = (userId ? loadMemberLibrary() : loadGuestLibrary())
         .then((items) => {
             if (loadedForUserId === userId) {
@@ -154,7 +185,10 @@ function loadLibrary(userId) {
         })
         .catch((error) => {
             console.error('Loading the library failed', error);
-            loadingPromise = null;
+            if (loadedForUserId === userId) {
+                loadingPromise = null;
+                loadError.value = error;
+            }
         });
 
     return loadingPromise;
@@ -204,8 +238,8 @@ export function requestPersistentStorage() {
         .catch((error) => console.error('Requesting persistent storage failed', error));
 }
 
-function showToast(message) {
-    new BroadcastChannel('toast-notifications').postMessage({message, level: 'danger'});
+function showToast(message, level = 'danger') {
+    new BroadcastChannel('toast-notifications').postMessage({message, level});
 }
 
 const findItem = (imdbId) => library.value.find((item) => item.imdb_id === imdbId) ?? null;
@@ -229,6 +263,7 @@ export function useLibrary() {
     );
 
     const isMemberSignedIn = () => Boolean(page.props.auth?.user);
+    const retryLoad = () => loadLibrary(page.props.auth?.user?.id ?? null);
 
     const persist = async (item) => {
         if (!isMemberSignedIn()) {
@@ -258,8 +293,9 @@ export function useLibrary() {
 
     /**
      * Applies a change optimistically, saves it, and restores only this title on failure.
+     * Announces the outcome through the toast live region and resolves to whether it was saved.
      */
-    const commit = async (nextItem, failureMessage) => {
+    const commit = async (nextItem, {success, failure}) => {
         const previousItem = findItem(nextItem.imdb_id);
         library.value = [nextItem, ...library.value.filter((item) => item.imdb_id !== nextItem.imdb_id)];
 
@@ -268,12 +304,14 @@ export function useLibrary() {
         } catch (error) {
             console.error('Saving the library failed', error);
             restoreItem(nextItem.imdb_id, previousItem);
-            showToast(navigator.onLine ? failureMessage : "Couldn't sync, try again when you're online.");
-            return;
+            showToast(navigator.onLine ? failure : "Couldn't sync, try again when you're online.");
+            return false;
         }
 
+        showToast(success, 'success');
         requestPersistentStorage();
         cacheForOffline([nextItem]);
+        return true;
     };
 
     const addToWatchlist = async (movie) => {
@@ -281,15 +319,22 @@ export function useLibrary() {
         const next = existing
             ? applyLibraryChange(existing, {type: 'add-to-watchlist'})
             : toLibraryItem(movie);
-        await commit(next, `Couldn't save "${next.title}" to your watchlist. Please try again.`);
+        await commit(next, {
+            success: `${next.title} added to your watchlist`,
+            failure: `Couldn't save "${next.title}" to your watchlist. Please try again.`,
+        });
     };
 
     const markWatched = async (movie, reaction = null) => {
         const existing = findItem(movie.imdb_id) ?? toLibraryItem(movie);
-        await commit(
-            applyLibraryChange(existing, {type: 'mark-watched', reaction}),
-            `Couldn't mark "${existing.title}" as watched. Please try again.`,
-        );
+        const next = applyLibraryChange(existing, {type: 'mark-watched', reaction});
+        const isSaved = await commit(next, {
+            success: `${next.title} marked as watched`,
+            failure: `Couldn't mark "${next.title}" as watched. Please try again.`,
+        });
+        if (isSaved) {
+            lastMarkedWatched.value = next;
+        }
     };
 
     const setReaction = async (imdbId, reaction) => {
@@ -297,10 +342,12 @@ export function useLibrary() {
         if (!existing || existing.status !== STATUS.WATCHED) {
             return;
         }
-        await commit(
-            applyLibraryChange(existing, {type: 'set-reaction', reaction}),
-            "Couldn't save your reaction. Please try again.",
-        );
+        const success = {liked: `You liked ${existing.title}`, disliked: `You disliked ${existing.title}`}[reaction]
+            ?? 'Reaction removed';
+        await commit(applyLibraryChange(existing, {type: 'set-reaction', reaction}), {
+            success,
+            failure: "Couldn't save your reaction. Please try again.",
+        });
     };
 
     const remove = async (imdbId) => {
@@ -318,6 +365,9 @@ export function useLibrary() {
             return;
         }
 
+        if (previousItem) {
+            showToast(`${previousItem.title} removed`, 'success');
+        }
         postToServiceWorker({type: 'UNCACHE_LIBRARY_TITLE', imdbId});
     };
 
@@ -326,6 +376,9 @@ export function useLibrary() {
         toWatch: computed(() => libraryTabs.value.toWatch),
         watched: computed(() => libraryTabs.value.watched),
         isLibraryLoaded,
+        loadError,
+        retryLoad,
+        lastMarkedWatched,
         isInWatchlist: (imdbId) => findItem(imdbId)?.status === STATUS.TO_WATCH,
         isWatched: (imdbId) => findItem(imdbId)?.status === STATUS.WATCHED,
         reactionFor: (imdbId) => findItem(imdbId)?.reaction ?? null,
