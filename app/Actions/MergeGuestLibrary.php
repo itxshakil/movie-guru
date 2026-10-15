@@ -18,7 +18,15 @@ use Illuminate\Support\Facades\DB;
 final class MergeGuestLibrary
 {
     /**
-     * @param array<int, array{imdb_id: string, title: string, poster?: string|null, year?: string|null, status: string, reaction?: string|null, watched_at?: string|null}> $items
+     * @param array<int, array{
+     *     imdb_id: string,
+     *     title: string,
+     *     poster?: string|null,
+     *     year?: string|null,
+     *     status: string,
+     *     reaction?: string|null,
+     *     watched_at?: string|null,
+     * }> $items
      */
     public function handle(User $user, array $items): void
     {
@@ -30,7 +38,15 @@ final class MergeGuestLibrary
     }
 
     /**
-     * @param array{imdb_id: string, title: string, poster?: string|null, year?: string|null, status: string, reaction?: string|null, watched_at?: string|null} $item
+     * @param array{
+     *     imdb_id: string,
+     *     title: string,
+     *     poster?: string|null,
+     *     year?: string|null,
+     *     status: string,
+     *     reaction?: string|null,
+     *     watched_at?: string|null,
+     * } $item
      */
     private function mergeItem(User $user, array $item): void
     {
@@ -60,7 +76,11 @@ final class MergeGuestLibrary
         }
 
         if ($existing->status === LibraryStatus::ToWatch) {
-            $existing->update(['status' => LibraryStatus::Watched, 'reaction' => $reaction, 'watched_at' => $watchedAt]);
+            $existing->update([
+                'status' => LibraryStatus::Watched,
+                'reaction' => $reaction,
+                'watched_at' => $watchedAt,
+            ]);
 
             return;
         }

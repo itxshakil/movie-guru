@@ -29,7 +29,11 @@ final class LibraryImportRequest extends FormRequest
             'items.*.poster' => ['nullable', 'string', 'max:500'],
             'items.*.year' => ['nullable', 'string', 'max:10'],
             'items.*.status' => ['required', Rule::enum(LibraryStatus::class)],
-            'items.*.reaction' => ['nullable', Rule::enum(LibraryReaction::class), 'prohibited_unless:items.*.status,watched'],
+            'items.*.reaction' => [
+                'nullable',
+                Rule::enum(LibraryReaction::class),
+                'prohibited_unless:items.*.status,watched',
+            ],
             'items.*.watched_at' => ['nullable', 'date'],
         ];
     }
