@@ -5,6 +5,7 @@ import {computed, inject, nextTick, ref} from 'vue';
 import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
 import TextInput from '@/Components/TextInput.vue';
+import VoiceSearchButton from '@/Components/VoiceSearchButton.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
 
@@ -80,6 +81,11 @@ const doSearch = () => {
     form.get(route('search'), {
         preserveScroll: true
     });
+};
+
+const searchByVoice = (transcript) => {
+    form.s = transcript;
+    doSearch();
 };
 
 const notifyError = (message) => {
@@ -263,8 +269,13 @@ const moviePoster = (movie) => {
                                     @focus="showSuggestions = true"
                                     @input="filterTrendingQueries"
                                 />
+                                <VoiceSearchButton
+                                    v-if="!form.s"
+                                    class="absolute right-3"
+                                    @result="searchByVoice"
+                                />
                                 <button
-                                    v-if="form.s"
+                                    v-else
                                     class="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                                     type="button"
                                     @click="clearSearch"

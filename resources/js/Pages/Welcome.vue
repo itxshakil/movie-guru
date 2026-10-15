@@ -3,6 +3,7 @@ import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import OurFeatures from '@/Components/OurFeatures.vue';
 import HiddenGem from '@/Components/HiddenGem.vue';
+import VoiceSearchButton from '@/Components/VoiceSearchButton.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import LoadingSpinnerIcon from '@/Components/Icons/LoadingSpinner.vue';
 import SearchCard from "@/Components/SearchCard.vue";
@@ -37,6 +38,11 @@ const doSearch = () => {
 
 const clearSearch = () => {
     form.s = '';
+};
+
+const searchByVoice = (transcript) => {
+    form.s = transcript;
+    doSearch();
 };
 
 // Randomize trending search queries
@@ -145,8 +151,13 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                                    required
                                    type="search"
                             />
+                            <VoiceSearchButton
+                                v-if="!form.s"
+                                class="absolute right-32 sm:right-44"
+                                @result="searchByVoice"
+                            />
                             <button
-                                v-if="form.s"
+                                v-else
                                 class="absolute right-32 sm:right-44 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                                 type="button"
                                 @click="clearSearch"
