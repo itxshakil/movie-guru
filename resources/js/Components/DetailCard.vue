@@ -18,6 +18,8 @@
                         <div class="flex flex-wrap gap-1 absolute top-0 p-2 justify-end w-full">
                             <WatchlistButton
                                 :movie="{ imdb_id: detail.imdbID, title: detail.Title, year: detail.Year, poster: detail.Poster, type: detail.Type, imdb_rating: detail.imdbRating }"/>
+                            <WatchedButton
+                                :movie="{ imdb_id: detail.imdbID, title: detail.Title, year: detail.Year, poster: detail.Poster }"/>
                             <button
                                 class="flex items-center gap-1 bg-white/20 hover:bg-white/40 active:scale-90 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all"
                                 title="Share"
@@ -427,6 +429,7 @@ import {computed, inject, ref} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
 import SourceCard from "@/Components/SourceCard.vue";
 import WatchlistButton from "@/Components/WatchlistButton.vue";
+import WatchedButton from "@/Components/WatchedButton.vue";
 import {createPosterCard} from '@/Composables/usePosterCard.js';
 import {createCalendarFile} from '@/Composables/useCalendarEvent.js';
 import {shareOrDownloadFile} from '@/Composables/useFileSharing.js';
