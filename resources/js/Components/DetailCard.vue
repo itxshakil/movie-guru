@@ -115,7 +115,7 @@
                                     <circle cx="8.5" cy="8.5" r="1.5"/>
                                     <path d="M21 15l-5-5L5 21" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                                {{ isCreatingPosterCard ? 'Creating card...' : 'Share as image' }}
+                                {{ posterCardLabel }}
                             </button>
                             <button
                                 v-if="upcomingReleaseDate"
@@ -617,17 +617,35 @@ const shareMovie = async () => {
 const detailUrl = computed(() => route('movie.detail.full', {imdbID: props.detail.imdbID}));
 
 const isCreatingPosterCard = ref(false);
+// Kept when rendering took longer than the tap's user activation, so the next tap shares instantly.
+const preparedPosterCard = ref(null);
+
+const posterCardLabel = computed(() => {
+    if (isCreatingPosterCard.value) {
+        return 'Creating card...';
+    }
+    return preparedPosterCard.value ? 'Card ready - tap to share' : 'Share as image';
+});
 
 const sharePosterCard = async () => {
-    isCreatingPosterCard.value = true;
+    const shareDetails = {
+        title: props.detail.Title,
+        text: `${props.detail.Title} via Movie Guru ${detailUrl.value}`,
+    };
+
     try {
-        const file = await createPosterCard(props.detail);
-        await shareOrDownloadFile(file, {
-            title: props.detail.Title,
-            text: `${props.detail.Title} via Movie Guru ${detailUrl.value}`,
-        });
+        let file = preparedPosterCard.value;
+        if (!file) {
+            isCreatingPosterCard.value = true;
+            file = await createPosterCard(props.detail);
+            isCreatingPosterCard.value = false;
+        }
+
+        const outcome = await shareOrDownloadFile(file, shareDetails);
+        preparedPosterCard.value = outcome === 'needs-activation' ? file : null;
     } catch (error) {
         console.error('Sharing the poster card failed', error);
+        preparedPosterCard.value = null;
     } finally {
         isCreatingPosterCard.value = false;
     }
