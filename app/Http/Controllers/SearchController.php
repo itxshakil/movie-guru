@@ -10,9 +10,11 @@ use App\Models\SearchQuery;
 use App\OMDB\MovieType;
 use App\Services\BotDetectorService;
 use App\Services\OMDBApiService;
+use App\Services\SharedLinkResolver;
 use App\Services\TitleCleaner;
 use App\Services\TrendingQueryService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -21,8 +23,21 @@ use Inertia\Response;
 
 final class SearchController extends Controller
 {
-    public function index(Request $request): Response|JsonResponse
+    public function index(Request $request, SharedLinkResolver $sharedLinkResolver): Response|JsonResponse|RedirectResponse
     {
+        // Web Share Target payloads land here; shared IMDb, Letterboxd, RT or JustWatch links open the title.
+        if (! $request->wantsJson()) {
+            $sharedLinkUrl = $sharedLinkResolver->resolve([
+                $request->string('s')->value(),
+                $request->string('link')->value(),
+                $request->string('name')->value(),
+            ]);
+
+            if ($sharedLinkUrl !== null) {
+                return redirect()->to($sharedLinkUrl);
+            }
+        }
+
         $search = $request->get('s');
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
             $search,
@@ -34,7 +49,7 @@ final class SearchController extends Controller
         $recentlyReleasedMovies = Cache::remember(
             'recently-released-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recentlyReleased()
+            static fn () => MovieDetail::recentlyReleased()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -55,7 +70,7 @@ final class SearchController extends Controller
         $recommendedMovies = Cache::remember(
             'recommended-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recommended()
+            static fn () => MovieDetail::recommended()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -103,8 +118,7 @@ final class SearchController extends Controller
     public function show(
         Request $request,
         ?string $search,
-    ): Response|JsonResponse
-    {
+    ): Response|JsonResponse {
         [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl] = $this->getSearchData(
             $search,
             $request,
@@ -115,7 +129,7 @@ final class SearchController extends Controller
         $recentlyReleasedMovies = Cache::remember(
             'recently-released-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recentlyReleased()
+            static fn () => MovieDetail::recentlyReleased()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -136,7 +150,7 @@ final class SearchController extends Controller
         $recommendedMovies = Cache::remember(
             'recommended-movies',
             now()->endOfDay(),
-            static fn() => MovieDetail::recommended()
+            static fn () => MovieDetail::recommended()
                 ->inRandomOrder()
                 ->take(6)
                 ->get([
@@ -230,7 +244,7 @@ final class SearchController extends Controller
         $movies = Cache::flexible(
             $cacheKey,
             [now()->addHours(16), now()->addHours(24)],
-            static fn() => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
+            static fn () => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
         );
 
         $botdetector = resolve(BotDetectorService::class);

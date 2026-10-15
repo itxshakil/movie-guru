@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\MovieDetail;
 use App\Models\ShowPageAnalytics;
 use App\Services\BotDetectorService;
+use App\Services\ImdbIdExtractor;
 use App\Services\OMDBApiService;
 use App\Services\WatchModeService;
 use Exception;
@@ -15,7 +16,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -28,7 +28,7 @@ final class DetailController extends Controller
      */
     public function show(Request $request, string $imdbId): Response|JsonResponse
     {
-        $cleanImdbId = $this->extractImdbId($imdbId);
+        $cleanImdbId = resolve(ImdbIdExtractor::class)->extract($imdbId);
 
         throw_unless($cleanImdbId, NotFoundHttpException::class, 'Invalid IMDb ID. Provided');
 
@@ -189,7 +189,7 @@ final class DetailController extends Controller
      */
     public function fetchFromAPI(string $imdbId): mixed
     {
-        $imdbId = $this->extractImdbId($imdbId);
+        $imdbId = resolve(ImdbIdExtractor::class)->extract($imdbId);
         if (! $imdbId) {
             return [];
         }
@@ -237,7 +237,7 @@ final class DetailController extends Controller
              */
             function () use ($imdbId): void {
                 $OMDBApiService = resolve(OMDBApiService::class);
-                $imdbId = $this->extractImdbId($imdbId);
+                $imdbId = resolve(ImdbIdExtractor::class)->extract($imdbId);
                 $updatedDetail = $OMDBApiService->getById($imdbId);
 
                 if ($updatedDetail === null || ! isset($updatedDetail['Title'])) {
@@ -282,34 +282,5 @@ final class DetailController extends Controller
     private function isValue(mixed $value): bool
     {
         return $value && $value !== 'N/A';
-    }
-
-    /**
-     * Extracts and returns a clean IMDb title ID (e.g., "tt6468322") from messy input.
-     *
-     * Handles:
-     * - Raw IDs ("tt6468322")
-     * - Full URLs ("https://www.imdb.com/title/tt6468322/?ref_=nv_sr_sr_1")
-     * - Query strings and trackers ("tt6468322&sa=U&ved=...")
-     * - HTML entities (&amp;)
-     *
-     * Returns: string|null
-     */
-    private function extractImdbId(string $input): ?string
-    {
-        $candidate = mb_trim($input);
-
-        $candidate = html_entity_decode($candidate, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-
-        // - Starts with "tt"
-        // - Followed by 7 or 8 digits (IMDb IDs are commonly 7–8 digits; allow 7+ to be safe)
-        // - Bounded to avoid partial matches inside larger tokens
-        $pattern = '/\btt\d{7,8}\b/i';
-
-        if (preg_match($pattern, $candidate, $matches)) {
-            return Str::lower($matches[0]);
-        }
-
-        return null;
     }
 }

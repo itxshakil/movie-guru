@@ -513,11 +513,77 @@
     ],
     "categories": ["Entertainment", "Movies", "Reference", "Media"],
     "scope": "/",
+    "launch_handler": {
+        "client_mode": ["navigate-existing", "auto"]
+    },
+    "handle_links": "preferred",
+    "protocol_handlers": [
+        {
+            "protocol": "web+movieguru",
+            "url": "/open?url=%s"
+        }
+    ],
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
     "shortcuts": [
         {
             "name": "Search Movies",
-            "short_name": "search_movies",
+            "short_name": "Search",
+            "description": "Search movies, shows and episodes",
             "url": "/search?utm_source=search_shortcut",
+            "icons": [
+                {
+                    "src": "/icons/ios/192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Watchlist",
+            "short_name": "Watchlist",
+            "description": "Movies you saved to watch later",
+            "url": "/watchlist?utm_source=watchlist_shortcut",
+            "icons": [
+                {
+                    "src": "/icons/ios/192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Mood Discovery",
+            "short_name": "Mood",
+            "description": "Find a movie that matches your mood",
+            "url": "/mood?utm_source=mood_shortcut",
+            "icons": [
+                {
+                    "src": "/icons/ios/192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Movie Match",
+            "short_name": "Match",
+            "description": "Find movies you and a friend both want to watch",
+            "url": "/movie-match?utm_source=movie_match_shortcut",
+            "icons": [
+                {
+                    "src": "/icons/ios/192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Hidden Gem",
+            "short_name": "Hidden Gem",
+            "description": "Today's under-the-radar pick",
+            "url": "/?utm_source=hidden_gem_shortcut#hidden-gem",
             "icons": [
                 {
                     "src": "/icons/ios/192.png",

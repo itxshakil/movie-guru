@@ -10,6 +10,7 @@ use App\Http\Controllers\MoodDiscoveryController;
 use App\Http\Controllers\MovieMatchController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProtocolLinkController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +42,7 @@ Route::get('/movie/{imdbID}', [DetailController::class, 'show'])->name('movie.de
 Route::post('/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('subscribe')->middleware('throttle:api');
 Route::get('/unsubscribe', [NewsletterSubscriptionController::class, 'unsubscribe'])->name('unsubscribe')->middleware(['signed', 'throttle:api']);
 
-Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/mood', [MoodDiscoveryController::class, 'index'])->name('mood.index');
 Route::get('/mood/{mood}', [MoodDiscoveryController::class, 'show'])->name('mood.show');
@@ -50,6 +51,8 @@ Route::get('/movie-match', [MovieMatchController::class, 'create'])->name('movie
 Route::post('/movie-match', [MovieMatchController::class, 'store'])->name('movie-match.store');
 Route::get('/movie-match/{token}', [MovieMatchController::class, 'show'])->name('movie-match.show');
 Route::post('/movie-match/{token}/submit', [MovieMatchController::class, 'submit'])->name('movie-match.submit');
+
+Route::get('/open', [ProtocolLinkController::class, 'show'])->name('protocol-link.show');
 
 Route::get('/hidden-gem', [HiddenGemController::class, 'show'])->name('hidden-gem.show')->middleware('throttle:api');
 
