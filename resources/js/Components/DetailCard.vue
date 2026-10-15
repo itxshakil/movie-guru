@@ -103,6 +103,34 @@
                                   itemprop="contentRating" v-text="detail.Rated"/>
                         </div>
 
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button
+                                :disabled="isCreatingPosterCard"
+                                class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-60 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                type="button"
+                                @click="sharePosterCard"
+                            >
+                                <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect height="18" rx="2" width="18" x="3" y="3"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <path d="M21 15l-5-5L5 21" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                {{ isCreatingPosterCard ? 'Creating card...' : 'Share as image' }}
+                            </button>
+                            <button
+                                v-if="upcomingReleaseDate"
+                                class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                type="button"
+                                @click="addReleaseToCalendar"
+                            >
+                                <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect height="18" rx="2" width="18" x="3" y="4"/>
+                                    <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/>
+                                </svg>
+                                Add release to calendar
+                            </button>
+                        </div>
+
                         <section aria-labelledby="information-heading" class="mt-4">
                             <h3 id="information-heading" class="sr-only">Product information</h3>
                             <div class="mb-3" itemprop="aggregateRating" itemscope
@@ -395,10 +423,13 @@
 </template>
 <script setup>
 import DetailSkeletonCard from '@/Components/DetailSkeletonCard.vue';
-import {computed, inject} from 'vue';
+import {computed, inject, ref} from 'vue';
 import SnippetText from '@/Components/SnippetText.vue';
 import SourceCard from "@/Components/SourceCard.vue";
 import WatchlistButton from "@/Components/WatchlistButton.vue";
+import {createPosterCard} from '@/Composables/usePosterCard.js';
+import {createCalendarFile} from '@/Composables/useCalendarEvent.js';
+import {shareOrDownloadFile} from '@/Composables/useFileSharing.js';
 
 const gtag = inject('gtag');
 
@@ -581,6 +612,60 @@ function sendAnalytics(platform, link) {
 
 const shareMovie = async () => {
     emit('share');
+};
+
+const detailUrl = computed(() => route('movie.detail.full', {imdbID: props.detail.imdbID}));
+
+const isCreatingPosterCard = ref(false);
+
+const sharePosterCard = async () => {
+    isCreatingPosterCard.value = true;
+    try {
+        const file = await createPosterCard(props.detail);
+        await shareOrDownloadFile(file, {
+            title: props.detail.Title,
+            text: `${props.detail.Title} via Movie Guru ${detailUrl.value}`,
+        });
+    } catch (error) {
+        console.error('Sharing the poster card failed', error);
+    } finally {
+        isCreatingPosterCard.value = false;
+    }
+};
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * OMDb release dates look like "17 Oct 2026"; parsed by hand because Date parsing of that format is not portable.
+ */
+const upcomingReleaseDate = computed(() => {
+    const match = /^(\d{1,2}) ([A-Za-z]{3}) (\d{4})$/.exec(props.detail?.Released ?? '');
+    const monthIndex = match ? MONTHS.indexOf(match[2]) : -1;
+    if (monthIndex === -1) {
+        return null;
+    }
+
+    const releaseDate = new Date(Number(match[3]), monthIndex, Number(match[1]));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return releaseDate >= today ? releaseDate : null;
+});
+
+const addReleaseToCalendar = async () => {
+    const file = createCalendarFile({
+        title: `🎬 ${props.detail.Title} releases`,
+        description: `${props.detail.Title} is out today. Details and where to watch: ${detailUrl.value}`,
+        url: detailUrl.value,
+        start: upcomingReleaseDate.value,
+        allDay: true,
+    });
+
+    try {
+        await shareOrDownloadFile(file, {title: `${props.detail.Title} release`});
+    } catch (error) {
+        console.error('Adding the release to the calendar failed', error);
+    }
 };
 
 </script>

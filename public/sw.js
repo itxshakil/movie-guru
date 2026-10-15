@@ -807,7 +807,8 @@ async function handleFetch(event) {
         } else {
             return cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60);
         }
-    } else if (url.hostname === 'm.media-amazon.com' && url.pathname.startsWith('/images/')) {
+    } else if (url.hostname === 'm.media-amazon.com' && url.pathname.startsWith('/images/') && request.mode !== 'cors') {
+        // CORS requests (the poster card canvas) skip this cache: it holds opaque <img> responses.
         return cacheRequest(POSTER_CACHE, request, 15, 7 * 24 * 60 * 60);
     } else {
         return fetch(request);
