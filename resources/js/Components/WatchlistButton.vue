@@ -57,10 +57,7 @@ const toggleWatchlist = () => {
 }
 
 .watchlist-btn--saved {
-    /* Fallback first, then the @function-consolidated version — see
-       --tint() in resources/css/app.css. */
     background-color: color-mix(in srgb, var(--color-primary-500) 80%, transparent);
-    background-color: --tint(var(--color-primary-500), 80%);
 }
 
 /* Experimental, decorative only: picks a readable text color for the

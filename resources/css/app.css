@@ -214,17 +214,7 @@ input[type='password']:focus,
 input[type='search']:focus,
 textarea:focus,
 select:focus {
-    /* Fallback first (Firefox/Safari), then the @function-consolidated
-       version — invalid-at-compute-time in unsupporting browsers, so the
-       fallback above wins there. See --tint() below. */
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 20%, transparent);
-    box-shadow: 0 0 0 3px --tint(var(--color-primary-500), 20%);
-}
-
-/* Consolidates the repeated color-mix()-based tint pattern used for focus
-   rings and "active"/"saved" state backgrounds across components. */
-@function --tint(--color <color>, --percent <percentage>) returns <color> {
-    result: color-mix(in srgb, var(--color) var(--percent), transparent);
 }
 
 /* Brand spring easing for tactile press/hover feedback */
