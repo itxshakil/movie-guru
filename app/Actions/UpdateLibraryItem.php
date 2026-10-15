@@ -8,6 +8,7 @@ use App\Enums\LibraryReaction;
 use App\Enums\LibraryStatus;
 use App\Models\LibraryItem;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 /**
  * Saves a title in a member's library and applies the library state rules:
@@ -17,11 +18,45 @@ use App\Models\User;
 final class UpdateLibraryItem
 {
     /**
-     * @param array{title: string, poster?: string|null, year?: string|null, status: string, reaction?: string|null} $attributes
+     * @param array{
+     *     title: string,
+     *     poster?: string|null,
+     *     year?: string|null,
+     *     status: string,
+     *     reaction?: string|null,
+     * } $attributes
      */
     public function handle(User $user, string $imdbId, array $attributes): LibraryItem
     {
-        $item = LibraryItem::query()->firstOrNew(['user_id' => $user->id, 'imdb_id' => $imdbId]);
+        $item = $this->findOrNew($user, $imdbId);
+
+        try {
+            $this->applyAndSave($item, $attributes);
+        } catch (UniqueConstraintViolationException) {
+            // A concurrent request inserted the same title first: apply the change to that row instead.
+            $item = $this->findOrNew($user, $imdbId);
+            $this->applyAndSave($item, $attributes);
+        }
+
+        return $item;
+    }
+
+    private function findOrNew(User $user, string $imdbId): LibraryItem
+    {
+        return LibraryItem::query()->firstOrNew(['user_id' => $user->id, 'imdb_id' => $imdbId]);
+    }
+
+    /**
+     * @param array{
+     *     title: string,
+     *     poster?: string|null,
+     *     year?: string|null,
+     *     status: string,
+     *     reaction?: string|null,
+     * } $attributes
+     */
+    private function applyAndSave(LibraryItem $item, array $attributes): void
+    {
         $status = LibraryStatus::from($attributes['status']);
         $wasWatched = $item->exists && $item->status === LibraryStatus::Watched;
 
@@ -41,7 +76,5 @@ final class UpdateLibraryItem
         }
 
         $item->save();
-
-        return $item;
     }
 }
