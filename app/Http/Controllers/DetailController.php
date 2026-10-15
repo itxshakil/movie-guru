@@ -54,7 +54,7 @@ final class DetailController extends Controller
             );
 
         $botDetector = resolve(BotDetectorService::class);
-        if ($botDetector->isBot($request) === false) {
+        if ($botDetector->isBot($request) === false && ! $this->isBackgroundPrefetch($request)) {
             defer(static function () use ($shouldRefresh, $shouldWarmTrailer, $request, $imdbId, $cleanImdbId): void {
                 ShowPageAnalytics::create([
                     'imdb_id' => $imdbId,
@@ -277,6 +277,15 @@ final class DetailController extends Controller
                 ]);
             },
         );
+    }
+
+    /**
+     * The service worker caches saved titles for offline use with "Purpose: prefetch"; those
+     * are not page views and must not trigger analytics or third-party lookups.
+     */
+    private function isBackgroundPrefetch(Request $request): bool
+    {
+        return $request->header('Purpose') === 'prefetch' && ! $request->hasHeader('X-Inertia');
     }
 
     private function isValue(mixed $value): bool
