@@ -5,8 +5,8 @@
                transition-colors duration-200 cursor-pointer overflow-hidden"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"
         @click="openDetail(movie.imdb_id, movie.title)"
-        @pointercancel="cancelWarmDetail"
         @pointerdown="warmDetail($event, movie.imdb_id)"
+        @pointerup="warmDetailOnTap($event, movie.imdb_id)"
     >
         <div>
             <!-- Poster -->
@@ -159,28 +159,24 @@ const viewDetail = (imdbID) => {
     emit('selected');
 };
 
-// Below 1024px a click opens the quick-view modal, so its data can start loading on press.
-// Touch presses wait a moment first: a scroll also starts with pointerdown, then cancels it,
-// and a prefetch for a card that is never opened would be recorded as a view.
-const TOUCH_PREFETCH_DELAY_MS = 60;
-let warmDetailTimer = null;
-
-const warmDetail = (event, imdbID) => {
-    if (window.innerWidth >= 1024 || !imdbID || event.target.closest('button, a')) {
-        return;
-    }
-
-    if (event.pointerType !== 'touch') {
-        prefetchDetail(imdbID);
-        return;
-    }
-
-    clearTimeout(warmDetailTimer);
-    warmDetailTimer = setTimeout(() => prefetchDetail(imdbID), TOUCH_PREFETCH_DELAY_MS);
+// Below 1024px a click opens the quick-view modal, so its data can start loading before the
+// click event. Every prefetch is recorded as a view, so it must only start when a click is
+// certain: on press for a mouse or pen, and on release for touch, because a scroll also starts
+// with a touch press but ends in pointercancel instead of pointerup.
+const shouldWarmDetail = (event, imdbID) => {
+    return window.innerWidth < 1024 && imdbID && !event.target.closest('button, a');
 };
 
-const cancelWarmDetail = () => {
-    clearTimeout(warmDetailTimer);
+const warmDetail = (event, imdbID) => {
+    if (event.pointerType !== 'touch' && shouldWarmDetail(event, imdbID)) {
+        prefetchDetail(imdbID);
+    }
+};
+
+const warmDetailOnTap = (event, imdbID) => {
+    if (event.pointerType === 'touch' && shouldWarmDetail(event, imdbID)) {
+        prefetchDetail(imdbID);
+    }
 };
 
 const openDetail = (imdbID, title) => {
