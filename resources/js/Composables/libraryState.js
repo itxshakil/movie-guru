@@ -79,3 +79,53 @@ export function splitLibrary(items) {
         watched: items.filter((item) => item.status === STATUS.WATCHED).sort(newestFirst('watched_at')),
     };
 }
+
+export const IMPORT_CHUNK_SIZE = 500;
+
+const IMDB_ID_PATTERN = /^tt\d{7,8}$/;
+const TITLE_MAX = 255;
+const YEAR_MAX = 10;
+const POSTER_MAX = 500;
+
+const truncate = (text, max) => Array.from(text).slice(0, max).join('');
+const withinLimit = (value, max) => (value != null && String(value).length <= max ? String(value) : null);
+
+/**
+ * Shapes the guest library for POST /library/import so one bad row cannot fail the whole import:
+ * rows the server would reject are dropped or trimmed to fit its rules, and duplicates are removed.
+ */
+export function prepareGuestImport(items) {
+    const seen = new Set();
+
+    return items.flatMap((item) => {
+        const imdbId = String(item?.imdb_id ?? '').toLowerCase();
+        const title = typeof item?.title === 'string' ? truncate(item.title.trim(), TITLE_MAX) : '';
+        if (!IMDB_ID_PATTERN.test(imdbId) || title === '' || seen.has(imdbId)) {
+            return [];
+        }
+        seen.add(imdbId);
+
+        const isWatched = item.status === STATUS.WATCHED;
+        const watchedAt = isWatched && item.watched_at && !Number.isNaN(Date.parse(item.watched_at))
+            ? item.watched_at
+            : null;
+
+        return [{
+            imdb_id: imdbId,
+            title,
+            poster: withinLimit(item.poster, POSTER_MAX),
+            year: withinLimit(item.year, YEAR_MAX),
+            status: isWatched ? STATUS.WATCHED : STATUS.TO_WATCH,
+            reaction: isWatched && REACTIONS.includes(item.reaction) ? item.reaction : null,
+            watched_at: watchedAt,
+        }];
+    });
+}
+
+export function chunk(items, size = IMPORT_CHUNK_SIZE) {
+    const chunks = [];
+    for (let index = 0; index < items.length; index += size) {
+        chunks.push(items.slice(index, index + size));
+    }
+    return chunks;
+}

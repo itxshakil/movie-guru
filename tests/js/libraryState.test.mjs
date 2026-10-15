@@ -2,6 +2,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {
     applyLibraryChange,
+    chunk,
+    prepareGuestImport,
     splitLibrary,
     toLibraryItem,
     upgradeLegacyItem,
@@ -84,4 +86,58 @@ test('the library splits into tabs, newest first', () => {
     const {toWatch, watched} = splitLibrary([a, c, b, d]);
     assert.deepEqual(toWatch.map((item) => item.imdb_id), ['tt2', 'tt1']);
     assert.deepEqual(watched.map((item) => item.imdb_id), ['tt4', 'tt3']);
+});
+
+test('the guest import keeps valid rows and drops what the server would reject', () => {
+    const watched = applyLibraryChange(toLibraryItem(movie, now), {type: 'mark-watched', reaction: 'liked'}, now);
+    const rows = prepareGuestImport([
+        {...watched, saved_at: 'x'},
+        {...toLibraryItem({...movie, imdb_id: 'TT0816692', title: 'Interstellar'}, now)},
+        {...toLibraryItem({...movie, imdb_id: 'tt0816692', title: 'Duplicate'}, now)},
+        {...toLibraryItem({...movie, imdb_id: 'not-an-id'}, now)},
+        {...toLibraryItem({...movie, imdb_id: 'tt0068646', title: '   '}, now)},
+    ]);
+
+    assert.deepEqual(rows, [
+        {
+            imdb_id: 'tt1375666',
+            title: 'Inception',
+            poster: 'p.jpg',
+            year: '2010',
+            status: 'watched',
+            reaction: 'liked',
+            watched_at: now.toISOString(),
+        },
+        {
+            imdb_id: 'tt0816692',
+            title: 'Interstellar',
+            poster: 'p.jpg',
+            year: '2010',
+            status: 'to_watch',
+            reaction: null,
+            watched_at: null,
+        },
+    ]);
+});
+
+test('the guest import trims fields to the server limits', () => {
+    const [row] = prepareGuestImport([{
+        ...toLibraryItem(movie, now),
+        title: `${'a'.repeat(254)}😀😀`,
+        year: '2010-2011-2012',
+        poster: `https://example.com/${'p'.repeat(500)}`,
+        reaction: 'liked',
+    }]);
+
+    assert.equal(Array.from(row.title).length, 255);
+    assert.ok(row.title.endsWith('😀'));
+    assert.equal(row.year, null);
+    assert.equal(row.poster, null);
+    assert.equal(row.reaction, null);
+});
+
+test('large imports are split into chunks of 500', () => {
+    const items = Array.from({length: 1001}, (_, index) => index);
+    assert.deepEqual(chunk(items).map((part) => part.length), [500, 500, 1]);
+    assert.deepEqual(chunk([]), []);
 });
