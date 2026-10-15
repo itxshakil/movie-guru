@@ -18,6 +18,8 @@ const props = defineProps({
 const CACHE_PREFIX = 'mood-prompt:';
 
 const isAvailable = ref(false);
+// 'available' (ready), 'downloadable' or 'downloading' (multi-GB download, only on explicit submit).
+const modelAvailability = ref('unavailable');
 const description = ref('');
 const status = ref('');
 const isMatching = ref(false);
@@ -30,7 +32,8 @@ onMounted(async () => {
     }
 
     try {
-        isAvailable.value = (await LanguageModel.availability()) !== 'unavailable';
+        modelAvailability.value = await LanguageModel.availability();
+        isAvailable.value = modelAvailability.value !== 'unavailable';
     } catch (error) {
         console.error('Checking on-device AI availability failed', error);
     }
@@ -44,8 +47,7 @@ const systemPrompt = () => [
 ].join('\n');
 
 /**
- * Creates the base session once, as soon as the user shows intent (focusing the field), so the
- * model is warm by the time they submit. Each match runs in a clone of it.
+ * Creates the base session once. Each match runs in a clone of it.
  */
 const prepareSession = () => {
     if (!isAvailable.value || baseSessionPromise) {
@@ -132,6 +134,18 @@ const matchMood = async () => {
     }
 };
 
+/**
+ * Warms the model up as soon as the user shows intent, but only when it is already on the device:
+ * focusing a field must never start the multi-gigabyte model download.
+ */
+const warmUpSession = () => {
+    if (modelAvailability.value !== 'available') {
+        return;
+    }
+
+    prepareSession()?.catch((error) => console.error('Preparing on-device AI failed', error));
+};
+
 onBeforeUnmount(() => baseSession?.destroy());
 </script>
 
@@ -151,7 +165,7 @@ onBeforeUnmount(() => baseSession?.destroy());
                 maxlength="200"
                 placeholder="Something cosy after a long day"
                 type="text"
-                @focus="prepareSession()?.catch((error) => console.error('Preparing on-device AI failed', error))"
+                @focus="warmUpSession"
             />
             <button
                 :disabled="isMatching || !description.trim()"
