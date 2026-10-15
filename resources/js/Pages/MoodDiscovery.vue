@@ -50,6 +50,7 @@ const moviePoster = (movie) => {
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
                         : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 text-gray-700 dark:text-gray-300'"
                     :href="route('mood.show', mood.slug)"
+                    prefetch
                     class="flex flex-col items-center gap-2 p-4 rounded-2xl border bg-white dark:bg-gray-900 transition-colors text-center"
                 >
                     <span class="text-3xl">{{ mood.emoji }}</span>
@@ -68,6 +69,7 @@ const moviePoster = (movie) => {
                         v-for="movie in movies"
                         :key="movie.imdb_id"
                         :href="route('movie.detail.full', { imdbID: movie.imdb_id })"
+                        prefetch="click"
                         class="group rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow"
                     >
                         <div class="aspect-[2/3] overflow-hidden">

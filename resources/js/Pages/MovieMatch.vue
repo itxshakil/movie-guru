@@ -179,6 +179,7 @@ const addMovieNightToCalendar = async () => {
                         <li v-for="movie in matchedMovies" :key="movie.imdb_id">
                             <Link
                                 :href="route('movie.detail.full', { imdbID: movie.imdb_id })"
+                                prefetch="click"
                                 class="flex items-center gap-3 rounded-xl p-2 -m-2 hover:bg-white dark:hover:bg-gray-800 transition-colors"
                             >
                                 <img

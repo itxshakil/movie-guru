@@ -65,7 +65,7 @@ const moviePoster = (movie) => {
                     :key="movie.imdb_id"
                     class="group relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cv-card-compact"
                 >
-                    <Link :href="route('movie.detail.full', {imdbID: movie.imdb_id})">
+                    <Link :href="route('movie.detail.full', {imdbID: movie.imdb_id})" prefetch="click">
                         <div class="aspect-2/3 overflow-hidden">
                             <img
                                 :alt="movie.title + ' Poster'"

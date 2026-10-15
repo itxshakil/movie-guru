@@ -2,6 +2,7 @@
 import {onMounted, ref} from 'vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import DetailCard from '@/Components/DetailCard.vue';
+import {fetchDetail, takePrefetchedDetail} from '@/Composables/useDetailPrefetch.js';
 
 const props = defineProps({
   imdbID: String,
@@ -32,13 +33,7 @@ const loadDetail = async () => {
         return;
     }
     try {
-        const response = await fetch(`/i/${props.imdbID}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-        });
+        const response = await (takePrefetchedDetail(props.imdbID) ?? fetchDetail(props.imdbID));
 
         if (response.status === 429 && maxRetry.value) {
             const retryAfter = response.headers.get('retry-after');
