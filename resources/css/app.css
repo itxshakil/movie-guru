@@ -222,7 +222,7 @@ select:focus {
     --ease-spring: linear(0, 0.42 6.4%, 0.706 12.6%, 0.914 18.2%, 1.005 22.9%, 1.037 27.4%, 1.021 34.3%, 0.99 41.7%, 0.976 51%, 1);
     /* Required for any block-size/inline-size transition to/from an
        intrinsic keyword (auto, max-content, etc.) to animate smoothly
-       instead of jumping instantly — see .snippet-text in SnippetText.vue. */
+       instead of jumping instantly - see .snippet-text in SnippetText.vue. */
     interpolate-size: allow-keywords;
 }
 
@@ -287,7 +287,7 @@ select:focus {
 }
 
 /* Highlights a field's label once its input has been interacted with and
-   is invalid — applies everywhere InputLabel + a native/TextInput input
+   is invalid - applies everywhere InputLabel + a native/TextInput input
    share an immediate wrapper (Auth forms, Profile forms), with no changes
    needed per-page since InputLabel is a shared component. Purely additive;
    no existing JS-driven validation-class-toggling is being replaced. */

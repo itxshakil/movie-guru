@@ -34,7 +34,7 @@ const subscribe = () => {
                 style="font-feature-settings: 'kern' 1, 'liga' 1;">
                 Never miss a great film.
             </h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Weekly picks, hidden gems, and cinematic news —
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Weekly picks, hidden gems, and cinematic news -
                 straight to your inbox.</p>
         </div>
 

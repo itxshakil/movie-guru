@@ -55,7 +55,7 @@ const posters = [
                 <div class="max-w-md">
                     <blockquote class="text-white/90 text-2xl font-semibold leading-snug mb-4"
                                 style="font-feature-settings: 'kern' 1, 'liga' 1;">
-                        "Discover your next favourite film — curated, personalised, and always fresh."
+                        "Discover your next favourite film - curated, personalised, and always fresh."
                     </blockquote>
                     <p class="text-white/50 text-sm font-medium">Trusted by thousands of movie lovers worldwide.</p>
                 </div>
