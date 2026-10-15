@@ -5,7 +5,9 @@ declare(strict_types=1);
 use App\Models\MovieDetail;
 use Illuminate\Support\Facades\Cache;
 
-beforeEach(fn () => Cache::flush());
+beforeEach(function (): void {
+    Cache::flush();
+});
 
 test('trending endpoint lists todays trending movies for the badge refresh', function (): void {
     MovieDetail::factory()->create([

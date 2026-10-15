@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\MovieDetail;
 use App\Models\MovieMatchSession;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
 
 test('the creator sees the share view for their own match', function (): void {
@@ -21,7 +22,7 @@ test('the creator sees the share view for their own match', function (): void {
 
 test('a friend opening the shared link sees the pick form, not the creator view', function (): void {
     $session = MovieMatchSession::create([
-        'token' => 'shared-token-123',
+        'token' => Str::random(32),
         'creator_picks' => ['tt0111161'],
         'expires_at' => now()->addDay(),
     ]);
@@ -36,7 +37,7 @@ test('a friend opening the shared link sees the pick form, not the creator view'
 test('submitting picks shows the matched titles with their details', function (): void {
     MovieDetail::factory()->create(['imdb_id' => 'tt0111161', 'title' => 'The Shawshank Redemption', 'year' => '1994']);
     $session = MovieMatchSession::create([
-        'token' => 'shared-token-456',
+        'token' => Str::random(32),
         'creator_picks' => ['tt0111161', 'tt0000001'],
         'expires_at' => now()->addDay(),
     ]);
@@ -59,7 +60,7 @@ test('picks are validated', function (): void {
 
 test('expired matches are gone', function (): void {
     $session = MovieMatchSession::create([
-        'token' => 'expired-token',
+        'token' => Str::random(32),
         'creator_picks' => ['tt0111161'],
         'expires_at' => now()->subMinute(),
     ]);
