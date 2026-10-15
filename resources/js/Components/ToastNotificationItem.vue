@@ -29,32 +29,22 @@ onMounted(() => {
     setTimeout(() => emit('remove'), props.duration);
 });
 
-let iconClasses = computed(() => {
-    return {
-        'text-red-600 dark:text-red-400 ':
-            props.level === 'danger',
-        'text-green-600  dark:text-green-400 ':
-            props.level === 'success',
-        'text-yellow-600  dark:text-yellow-400 ':
-            props.level === 'warning',
-        'text-primary-600  dark:text-primary-400 ': ![
-            'danger',
-            'success',
-            'warning',
-        ].includes(props.level),
-    };
-});
+const iconClasses = computed(() => ({
+    danger: 'text-red-600 dark:text-red-400',
+    success: 'text-green-600 dark:text-green-400',
+    warning: 'text-yellow-600 dark:text-yellow-400',
+}[props.level] ?? 'text-primary-600 dark:text-primary-400'));
 
 const emit = defineEmits(['remove']);
 </script>
 
 <template>
     <div
-        :class="iconClasses"
-        class="animate-shake flex items-start px-3 py-2 space-x-2 backdrop-blur-xl backdrop-saturate-150 rtl:space-x-reverse text-xs shadow-sm ring-1 rounded-xl"
+        class="animate-shake flex items-start gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white/95 text-xs text-gray-900 shadow-lg backdrop-blur-md backdrop-saturate-150 dark:border-gray-700 dark:bg-gray-800/95 dark:text-white"
     >
         <TimesCircle
             v-if="level === 'danger'"
+            :class="iconClasses"
             class="shrink-0 w-6 h-6 mt-1"
             fill="none"
             stroke="currentColor"
@@ -62,6 +52,7 @@ const emit = defineEmits(['remove']);
         />
         <TickCircle
             v-else-if="level === 'success'"
+            :class="iconClasses"
             class="shrink-0 w-6 h-6 mt-1"
             fill="none"
             stroke="currentColor"
@@ -69,6 +60,7 @@ const emit = defineEmits(['remove']);
         />
         <WarningTriangle
             v-else-if="level === 'warning'"
+            :class="iconClasses"
             class="shrink-0 w-6 h-6 mt-1"
             fill="none"
             stroke="currentColor"
@@ -76,6 +68,7 @@ const emit = defineEmits(['remove']);
         />
         <InfoCircle
             v-else
+            :class="iconClasses"
             class="shrink-0 w-6 h-6 mt-1"
             fill="none"
             stroke="currentColor"
@@ -93,7 +86,7 @@ const emit = defineEmits(['remove']);
                     @click="emit('remove')"
                 >
                     <Times
-                        class="w-4 h-4 text-gray-900"
+                        class="w-4 h-4 text-gray-900 dark:text-gray-200"
                         fill="currentColor"
                         stroke="2"
                         viewBox="0 0 20 20"
