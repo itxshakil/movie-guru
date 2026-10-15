@@ -589,6 +589,8 @@ async function activate() {
             }
         });
         await Promise.all(promises);
+        // Cached watchlist pages reference this build's hashed assets, which were just deleted.
+        await purgeWatchlistPages();
 
         channel.postMessage({
             type: 'APP_UPDATED',
@@ -727,10 +729,32 @@ async function matchWatchlistCopy(request) {
 }
 
 /**
- * Caches the full detail page and poster of each saved title, plus the watchlist page,
- * so the whole watchlist works offline. Titles that are already cached are skipped.
+ * Removes the cached same-origin pages (and the member watchlist JSON) but keeps posters.
+ * Pages embed the build's asset URLs and the signed-in user, so they are dropped after an
+ * app update or when a different person uses the app; the next load caches them again.
  */
-async function cacheWatchlistTitles(items) {
+async function purgeWatchlistPages() {
+    const cache = await caches.open(WATCHLIST_CACHE);
+    const requests = await cache.keys();
+
+    await Promise.all(requests
+        .filter((request) => new URL(request.url).origin === self.location.origin)
+        .map((request) => cache.delete(request)));
+}
+
+/**
+ * Caches the full detail page and poster of each saved title, plus the watchlist page,
+ * so the whole watchlist works offline. Anything already cached is skipped.
+ */
+async function cacheWatchlistTitles(items, {reset = false} = {}) {
+    if (reset) {
+        await purgeWatchlistPages();
+    }
+
+    if (items.length === 0) {
+        return;
+    }
+
     const cache = await caches.open(WATCHLIST_CACHE);
 
     const jobs = items.flatMap(({imdb_id: imdbId, poster}) => {
@@ -743,11 +767,7 @@ async function cacheWatchlistTitles(items) {
         return titleJobs;
     });
 
-    jobs.push(fetch('/watchlist', {headers: {Accept: 'text/html'}}).then(async (response) => {
-        if (response.ok) {
-            await cache.put('/watchlist', response);
-        }
-    }));
+    jobs.push(cacheIfMissing(cache, '/watchlist', {headers: {Accept: 'text/html'}}));
 
     const results = await Promise.allSettled(jobs);
     results
@@ -824,9 +844,8 @@ self.addEventListener('message', event => {
         self.skipWaiting().then(r => log('Skip waiting')).catch(
             error => logError('Error skipping waiting', error));
     } else if (event.data?.type === 'CACHE_WATCHLIST') {
-        event.waitUntil(cacheWatchlistTitles(event.data.items ?? []));
-    } else if (event.data?.type === 'FORGET_MEMBER_WATCHLIST') {
-        event.waitUntil(caches.open(WATCHLIST_CACHE).then((cache) => cache.delete('/my-watchlist')));
+        event.waitUntil(cacheWatchlistTitles(event.data.items ?? [], {reset: event.data.reset === true})
+            .catch((error) => logError('Caching the watchlist failed', error)));
     } else if (event.data?.type === 'UNCACHE_WATCHLIST_TITLE') {
         event.waitUntil(uncacheWatchlistTitle(event.data.imdbId).catch((error) => logError('Uncaching a watchlist title failed', error)));
     } else if (event.data?.type === 'MARK_TRENDING_SEEN') {
