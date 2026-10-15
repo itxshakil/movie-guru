@@ -20,6 +20,7 @@ const popoverId = `watched-${useId()}`;
 const anchorName = `--watched-${useId()}`;
 const button = ref(null);
 const popover = ref(null);
+const isPopoverOpen = ref(false);
 let hidePromptTimer = null;
 
 const watched = computed(() => isWatched(props.movie.imdb_id));
@@ -63,6 +64,13 @@ const markNotWatched = async () => {
     await unmarkWatched(props.movie.imdb_id);
 };
 
+const onPopoverToggle = (event) => {
+    isPopoverOpen.value = event.newState === 'open';
+    if (!isPopoverOpen.value) {
+        clearTimeout(hidePromptTimer);
+    }
+};
+
 onBeforeUnmount(() => clearTimeout(hidePromptTimer));
 </script>
 
@@ -72,6 +80,8 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         v-bind="$attrs"
         :aria-label="watched ? `${movie.title}: watched${reaction ? `, ${reaction}` : ''}. Change` : `Mark ${movie.title} as watched`"
         :aria-pressed="watched"
+        :aria-haspopup="watched ? 'dialog' : undefined"
+        :aria-expanded="watched ? isPopoverOpen : undefined"
         :class="watched ? 'bg-emerald-600/85 hover:bg-emerald-600' : 'bg-white/20 hover:bg-white/40'"
         :style="{anchorName}"
         class="watched-btn squircle flex items-center gap-1 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all active:scale-90"
@@ -99,6 +109,7 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         popover="auto"
         role="dialog"
         :aria-label="`Did you like ${movie.title}?`"
+        @toggle="onPopoverToggle"
         @click.stop
         @pointerdown.stop
         @pointerup.stop
