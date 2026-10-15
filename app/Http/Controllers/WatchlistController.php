@@ -5,24 +5,28 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\WatchlistStoreRequest;
+use App\Http\Resources\WatchlistItemResource;
 use App\Models\Watchlist;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 final class WatchlistController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): AnonymousResourceCollection|RedirectResponse
     {
+        // The watchlist page itself lives at /watchlist for guests and members alike.
+        if (! $request->wantsJson()) {
+            return redirect()->route('watchlist');
+        }
+
         $watchlist = Watchlist::query()
             ->where('user_id', $request->user()->id)
             ->orderByDesc('created_at')
-            ->get(['id', 'imdb_id', 'title', 'poster', 'year']);
+            ->get(['imdb_id', 'title', 'poster', 'year']);
 
-        return Inertia::render('WatchlistPage', [
-            'watchlist' => $watchlist,
-        ]);
+        return WatchlistItemResource::collection($watchlist);
     }
 
     public function store(WatchlistStoreRequest $request): JsonResponse

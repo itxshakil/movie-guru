@@ -8,9 +8,11 @@ const INFO_CACHE = 'info-cache-v-4.17.0';
 const DYNAMIC_CACHE = 'dynamic-cache-v-4.17.0';
 const POSTER_CACHE = 'poster-cache-v-4.17.0';
 const INERTIA_CACHE = 'inertia-cache-v-4.17.0';
+// Not versioned: saved titles must survive app updates. Entries are only removed when unsaved.
+const WATCHLIST_CACHE = 'watchlist-cache-v1';
 
 // All current caches — used in activate to preserve them all
-const ALL_CACHES = [APP_CACHE, SEARCH_CACHE, INFO_CACHE, DYNAMIC_CACHE, POSTER_CACHE, INERTIA_CACHE];
+const ALL_CACHES = [APP_CACHE, SEARCH_CACHE, INFO_CACHE, DYNAMIC_CACHE, POSTER_CACHE, INERTIA_CACHE, WATCHLIST_CACHE];
 
 const STATIC_ASSETS = [
     '/app.webmanifest',
@@ -610,6 +612,24 @@ async function activate() {
     }
 }
 
+async function networkFirst(cacheName, request) {
+    const cache = await caches.open(cacheName);
+
+    try {
+        const response = await fetch(request);
+        if (response.ok) {
+            await cache.put(request, response.clone());
+        }
+        return response;
+    } catch (error) {
+        const cachedResponse = await cache.match(request);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
+        throw error;
+    }
+}
+
 async function handleAssetRequest(request) {
     let cache;
     try {
@@ -646,8 +666,110 @@ async function handleAssetRequest(request) {
 
 // Event listener for fetching requests
 self.addEventListener('fetch', event => {
-    event.respondWith(handleFetch(event));
+    event.respondWith(handleFetchWithOfflineFallback(event));
 });
+
+async function handleFetchWithOfflineFallback(event) {
+    try {
+        const response = await handleFetch(event);
+        if (response.type !== 'error') {
+            return response;
+        }
+    } catch (error) {
+        logError('Fetch failed, looking for an offline copy', event.request.url, error);
+    }
+
+    return (await matchWatchlistCopy(event.request)) ?? Response.error();
+}
+
+const WATCHLIST_TITLE_PATH = /^\/(?:movie|i)\/(tt\d{7,8})\/?$/i;
+
+function watchlistCacheKey(url) {
+    const {origin, pathname} = new URL(url);
+    if (origin !== self.location.origin) {
+        return url;
+    }
+
+    if (pathname === '/watchlist') {
+        return '/watchlist';
+    }
+
+    const match = pathname.match(WATCHLIST_TITLE_PATH);
+    return match ? `/movie/${match[1].toLowerCase()}` : null;
+}
+
+/**
+ * Serves saved titles, the watchlist page and their posters from WATCHLIST_CACHE when offline.
+ * Inertia visits get a 409 with X-Inertia-Location, which makes Inertia do a full page load
+ * that this cache can then answer.
+ */
+async function matchWatchlistCopy(request) {
+    if (request.method !== 'GET' || request.headers.get('Accept')?.includes('application/json')) {
+        return null;
+    }
+
+    const cacheKey = watchlistCacheKey(request.url);
+    if (!cacheKey) {
+        return null;
+    }
+
+    const cache = await caches.open(WATCHLIST_CACHE);
+    const cachedResponse = await cache.match(cacheKey, {ignoreVary: true});
+    if (!cachedResponse) {
+        return null;
+    }
+
+    if (isInertiaRequest(request)) {
+        return new Response('', {status: 409, headers: {'X-Inertia-Location': request.url}});
+    }
+
+    return cachedResponse;
+}
+
+/**
+ * Caches the full detail page and poster of each saved title, plus the watchlist page,
+ * so the whole watchlist works offline. Titles that are already cached are skipped.
+ */
+async function cacheWatchlistTitles(items) {
+    const cache = await caches.open(WATCHLIST_CACHE);
+
+    const jobs = items.flatMap(({imdb_id: imdbId, poster}) => {
+        const titleJobs = [cacheIfMissing(cache, `/movie/${imdbId.toLowerCase()}`, {
+            headers: {Accept: 'text/html', Purpose: 'prefetch'},
+        })];
+        if (poster && /^https?:\/\//.test(poster)) {
+            titleJobs.push(cacheIfMissing(cache, poster, {mode: 'no-cors'}));
+        }
+        return titleJobs;
+    });
+
+    jobs.push(fetch('/watchlist', {headers: {Accept: 'text/html'}}).then(async (response) => {
+        if (response.ok) {
+            await cache.put('/watchlist', response);
+        }
+    }));
+
+    const results = await Promise.allSettled(jobs);
+    results
+        .filter((result) => result.status === 'rejected')
+        .forEach((result) => logError('Caching a watchlist title failed', result.reason));
+}
+
+async function cacheIfMissing(cache, url, fetchOptions) {
+    if (await cache.match(url, {ignoreVary: true})) {
+        return;
+    }
+
+    const response = await fetch(url, fetchOptions);
+    if (response.ok || response.type === 'opaque') {
+        await cache.put(url, response);
+    }
+}
+
+async function uncacheWatchlistTitle(imdbId) {
+    const cache = await caches.open(WATCHLIST_CACHE);
+    await cache.delete(`/movie/${imdbId.toLowerCase()}`);
+}
 
 async function handleFetch(event) {
     const request = event.request;
@@ -668,6 +790,9 @@ async function handleFetch(event) {
     } else if (isInertiaRequest(request)) {
         // Partial reloads — always network
         return fetch(request);
+    } else if (isSameOrigin && url.pathname === '/my-watchlist' && request.method === 'GET') {
+        // A member's watchlist changes on every save, so always ask the network first.
+        return networkFirst(WATCHLIST_CACHE, request);
     } else if (isSameOrigin) {
         // Item 3: stale-while-revalidate for /search and /i/ routes
         if (url.pathname.includes('/search')) {
@@ -694,6 +819,12 @@ self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting().then(r => log('Skip waiting')).catch(
             error => logError('Error skipping waiting', error));
+    } else if (event.data?.type === 'CACHE_WATCHLIST') {
+        event.waitUntil(cacheWatchlistTitles(event.data.items ?? []));
+    } else if (event.data?.type === 'FORGET_MEMBER_WATCHLIST') {
+        event.waitUntil(caches.open(WATCHLIST_CACHE).then((cache) => cache.delete('/my-watchlist')));
+    } else if (event.data?.type === 'UNCACHE_WATCHLIST_TITLE') {
+        event.waitUntil(uncacheWatchlistTitle(event.data.imdbId).catch((error) => logError('Uncaching a watchlist title failed', error)));
     } else if (event.data?.type === 'MARK_TRENDING_SEEN') {
         event.waitUntil(markTrendingSeen().catch((error) => logError('Marking trending as seen failed', error)));
     } else if (event.data?.type === 'PROCESS_SEARCH_QUEUE') {

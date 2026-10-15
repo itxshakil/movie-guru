@@ -14,6 +14,7 @@ use App\Http\Controllers\ProtocolLinkController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TrendingMovieController;
 use App\Http\Controllers\WatchlistController;
+use App\Http\Controllers\WatchlistImportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -66,6 +67,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/my-watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/my-watchlist', [WatchlistController::class, 'store'])->name('watchlist.store');
     Route::delete('/my-watchlist/{imdbId}', [WatchlistController::class, 'destroy'])->name('watchlist.destroy');
+    Route::post('/my-watchlist/import', [WatchlistImportController::class, 'store'])->name('watchlist.import.store');
 });
 
 require __DIR__ . '/auth.php';

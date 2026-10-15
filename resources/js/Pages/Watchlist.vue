@@ -1,11 +1,17 @@
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
+import {computed} from 'vue';
+import {Head, Link, usePage} from '@inertiajs/vue3';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import {useWatchlist} from '@/Composables/useWatchlist.js';
 
 defineOptions({layout: BaseLayout});
 
-const {watchlist, removeMovie} = useWatchlist();
+const {watchlist, isWatchlistLoaded, removeMovie} = useWatchlist();
+
+const page = usePage();
+const storageDescription = computed(() => page.props.auth?.user
+    ? "Movies you've saved to watch later. Synced to your account and available offline."
+    : "Movies you've saved to watch later. Saved on this device and available offline. Sign in to keep them in your account.");
 
 const moviePoster = (movie) => {
     return movie.poster && movie.poster !== 'N/A' ? movie.poster : '/assets/images/no-poster.jpg';
@@ -14,19 +20,30 @@ const moviePoster = (movie) => {
 
 <template>
     <Head>
-        <title>My Watchlist — Movie Guru</title>
-        <meta content="Your personal movie watchlist saved locally." head-key="description" name="description"/>
+        <title>My Watchlist - Movie Guru</title>
+        <meta content="Your personal movie watchlist, available offline." head-key="description" name="description"/>
     </Head>
 
     <div class="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">
         <div class="mx-auto max-w-7xl">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🎬 My Watchlist</h1>
-                <p class="mt-1 text-gray-500 dark:text-gray-400">Movies you've saved to watch later. Stored locally in
-                    your browser.</p>
+                <p class="mt-1 text-gray-500 dark:text-gray-400">{{ storageDescription }}</p>
             </div>
 
-            <div v-if="watchlist.length === 0" class="text-center py-24">
+            <div v-if="!isWatchlistLoaded" aria-busy="true" aria-label="Loading your watchlist"
+                 class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                <div v-for="placeholder in 6" :key="placeholder"
+                     class="animate-pulse rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700"/>
+                    <div class="p-2 space-y-2">
+                        <div class="h-3 rounded bg-gray-200 dark:bg-gray-700 w-3/4"/>
+                        <div class="h-2.5 rounded bg-gray-200 dark:bg-gray-700 w-1/3"/>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="watchlist.length === 0" class="text-center py-24">
                 <svg class="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor"
                      viewBox="0 0 24 24">
                     <path
@@ -64,7 +81,8 @@ const moviePoster = (movie) => {
                         </div>
                     </Link>
                     <button
-                        class="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all active:scale-90"
+                        :aria-label="`Remove ${movie.title} from Watchlist`"
+                        class="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-all active:scale-90 focus-visible:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
                         title="Remove from Watchlist"
                         @click.prevent="removeMovie(movie.imdb_id)"
                     >
