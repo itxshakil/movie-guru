@@ -6,6 +6,8 @@ use App\Enums\LibraryReaction;
 use App\Enums\LibraryStatus;
 use App\Models\LibraryItem;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 
 function libraryPayload(array $overrides = []): array
 {
@@ -29,7 +31,9 @@ test('members get their whole library as json', function (): void {
         ->getJson(route('library.index'))
         ->assertSuccessful()
         ->assertJsonCount(2, 'data')
-        ->assertJsonStructure(['data' => [['imdb_id', 'title', 'poster', 'year', 'status', 'reaction', 'watched_at', 'saved_at']]])
+        ->assertJsonStructure(['data' => [
+            ['imdb_id', 'title', 'poster', 'year', 'status', 'reaction', 'watched_at', 'saved_at'],
+        ]])
         ->assertJsonFragment(['imdb_id' => 'tt0816692', 'status' => 'watched', 'reaction' => 'liked']);
 });
 
@@ -52,7 +56,11 @@ test('saving a title adds it to the watchlist', function (): void {
         ->assertJsonPath('data.status', 'to_watch')
         ->assertJsonPath('data.watched_at', null);
 
-    $this->assertDatabaseHas('library_items', ['user_id' => $user->id, 'imdb_id' => 'tt1375666', 'status' => 'to_watch']);
+    $this->assertDatabaseHas('library_items', [
+        'user_id' => $user->id,
+        'imdb_id' => 'tt1375666',
+        'status' => 'to_watch',
+    ]);
 });
 
 test('marking a watchlist title watched moves it in place and stamps watched_at', function (): void {
@@ -60,7 +68,10 @@ test('marking a watchlist title watched moves it in place and stamps watched_at'
     LibraryItem::factory()->for($user)->create(['imdb_id' => 'tt1375666']);
 
     $this->actingAs($user)
-        ->putJson(route('library.update', ['imdbId' => 'tt1375666']), libraryPayload(['status' => 'watched', 'reaction' => 'liked']))
+        ->putJson(
+            route('library.update', ['imdbId' => 'tt1375666']),
+            libraryPayload(['status' => 'watched', 'reaction' => 'liked']),
+        )
         ->assertSuccessful()
         ->assertJsonPath('data.status', 'watched')
         ->assertJsonPath('data.reaction', 'liked');
@@ -73,10 +84,16 @@ test('marking a watchlist title watched moves it in place and stamps watched_at'
 
 test('changing the reaction keeps the original watched date', function (): void {
     $user = User::factory()->create();
-    $item = LibraryItem::factory()->for($user)->watched()->create(['imdb_id' => 'tt1375666', 'watched_at' => '2026-01-02 03:04:05']);
+    $item = LibraryItem::factory()->for($user)->watched()->create([
+        'imdb_id' => 'tt1375666',
+        'watched_at' => '2026-01-02 03:04:05',
+    ]);
 
     $this->actingAs($user)
-        ->putJson(route('library.update', ['imdbId' => 'tt1375666']), libraryPayload(['status' => 'watched', 'reaction' => 'disliked']))
+        ->putJson(
+            route('library.update', ['imdbId' => 'tt1375666']),
+            libraryPayload(['status' => 'watched', 'reaction' => 'disliked']),
+        )
         ->assertSuccessful();
 
     expect($item->refresh()->watched_at->toDateTimeString())->toBe('2026-01-02 03:04:05')
@@ -100,15 +117,53 @@ test('moving a watched title back to the watchlist clears its reaction and watch
 test('saving the same title twice keeps one row', function (): void {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->putJson(route('library.update', ['imdbId' => 'tt1375666']), libraryPayload(['status' => 'watched']));
-    $this->actingAs($user)->putJson(route('library.update', ['imdbId' => 'tt1375666']), libraryPayload(['status' => 'watched']));
+    $url = route('library.update', ['imdbId' => 'tt1375666']);
+    $this->actingAs($user)->putJson($url, libraryPayload(['status' => 'watched']));
+    $this->actingAs($user)->putJson($url, libraryPayload(['status' => 'watched']));
 
     expect(LibraryItem::query()->forUser($user)->count())->toBe(1);
 });
 
+test('a title saved by a concurrent request is updated instead of failing', function (): void {
+    $user = User::factory()->create();
+    $hasInsertedConcurrently = false;
+    Event::listen('eloquent.creating: ' . LibraryItem::class, function () use ($user, &$hasInsertedConcurrently): void {
+        if ($hasInsertedConcurrently) {
+            return;
+        }
+        $hasInsertedConcurrently = true;
+        DB::table('library_items')->insert([
+            'user_id' => $user->id,
+            'imdb_id' => 'tt1375666',
+            'title' => 'Inception',
+            'status' => 'watched',
+            'reaction' => 'liked',
+            'watched_at' => '2026-01-02 03:04:05',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    });
+
+    $this->actingAs($user)
+        ->putJson(
+            route('library.update', ['imdbId' => 'tt1375666']),
+            libraryPayload(['status' => 'watched', 'reaction' => 'disliked']),
+        )
+        ->assertSuccessful()
+        ->assertJsonPath('data.reaction', 'disliked');
+
+    $item = LibraryItem::query()->forUser($user)->sole();
+    expect($hasInsertedConcurrently)->toBeTrue()
+        ->and($item->reaction)->toBe(LibraryReaction::Disliked)
+        ->and($item->watched_at->toDateTimeString())->toBe('2026-01-02 03:04:05');
+});
+
 test('a reaction needs the title to be watched', function (): void {
     $this->actingAs(User::factory()->create())
-        ->putJson(route('library.update', ['imdbId' => 'tt1375666']), libraryPayload(['status' => 'to_watch', 'reaction' => 'liked']))
+        ->putJson(
+            route('library.update', ['imdbId' => 'tt1375666']),
+            libraryPayload(['status' => 'to_watch', 'reaction' => 'liked']),
+        )
         ->assertUnprocessable()
         ->assertJsonValidationErrors('reaction');
 });
