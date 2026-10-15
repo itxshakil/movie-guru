@@ -32,13 +32,13 @@
                             Hi {{ $firstName }}, great to have you. 🎬</h1>
                         <p style="margin:0 0 28px;font-size:16px;color:#515154;line-height:1.6;">You've joined a
                             community of movie lovers who never run out of great things to watch. Every week we'll bring
-                            you curated picks, hidden gems, and fresh releases — straight to your inbox.</p>
+                            you curated picks, hidden gems, and fresh releases - straight to your inbox.</p>
 
                         <!-- Features -->
                         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                             <tr>
                                 <td style="padding:12px 16px;background:#f5f5f7;border-radius:12px;margin-bottom:8px;display:block;">
-                                    <span style="font-size:15px;color:#1d1d1f;">🎥 <strong>Curated picks</strong> — hidden gems, classics, and new releases</span>
+                                    <span style="font-size:15px;color:#1d1d1f;">🎥 <strong>Curated picks</strong> - hidden gems, classics, and new releases</span>
                                 </td>
                             </tr>
                             <tr>
@@ -46,7 +46,7 @@
                             </tr>
                             <tr>
                                 <td style="padding:12px 16px;background:#f5f5f7;border-radius:12px;">
-                                    <span style="font-size:15px;color:#1d1d1f;">⭐ <strong>Trending now</strong> — what everyone's watching this week</span>
+                                    <span style="font-size:15px;color:#1d1d1f;">⭐ <strong>Trending now</strong> - what everyone's watching this week</span>
                                 </td>
                             </tr>
                             <tr>
@@ -54,7 +54,7 @@
                             </tr>
                             <tr>
                                 <td style="padding:12px 16px;background:#f5f5f7;border-radius:12px;">
-                                    <span style="font-size:15px;color:#1d1d1f;">💎 <strong>Hidden gems</strong> — underrated films you'll love</span>
+                                    <span style="font-size:15px;color:#1d1d1f;">💎 <strong>Hidden gems</strong> - underrated films you'll love</span>
                                 </td>
                             </tr>
                         </table>

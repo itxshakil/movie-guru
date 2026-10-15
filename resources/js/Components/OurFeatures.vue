@@ -22,7 +22,7 @@
                 >
                     Movie Guru is your ultimate cinematic guide. <strong>Explore movies, series, and episodes</strong>
                     with ease. Find ratings
-                    from major platforms like <strong>Rotten Tomatoes and IMDB</strong>—all in one elegant interface.
+                    from major platforms like <strong>Rotten Tomatoes and IMDB</strong> - all in one elegant interface.
                 </p>
             </div>
             <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">

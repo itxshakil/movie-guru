@@ -24,7 +24,7 @@ final class WelcomeSubscriberMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🎬 Welcome to Movie Guru — Your Cinematic Journey Begins!',
+            subject: '🎬 Welcome to Movie Guru - Your Cinematic Journey Begins!',
         );
     }
 

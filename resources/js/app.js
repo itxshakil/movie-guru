@@ -27,7 +27,7 @@ window.addEventListener('appinstalled', requestPersistentStorage);
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     // Wraps every Inertia page swap in the View Transitions API (native
-    // support and fallback are handled by Inertia itself — it no-ops when
+    // support and fallback are handled by Inertia itself - it no-ops when
     // document.startViewTransition is unavailable).
     defaults: {
         visitOptions: (href, options) => ({...options, viewTransition: true}),

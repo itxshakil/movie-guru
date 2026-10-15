@@ -366,7 +366,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
 /* Native CSS Carousel controls (scroll markers + prev/next buttons) as a
    pure progressive enhancement. Feature-detected via selector() so
    unsupporting browsers skip the whole block cleanly rather than getting a
-   partial/broken result — the plain scroll-snap carousel above already
+   partial/broken result - the plain scroll-snap carousel above already
    works fully via touch/trackpad/scrollbar without this. */
 @supports selector(::scroll-marker) {
     .trending-carousel {
