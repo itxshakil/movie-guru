@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.16.0';
-const SEARCH_CACHE = 'search-cache-v-4.16.0';
-const INFO_CACHE = 'info-cache-v-4.16.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.16.0';
-const POSTER_CACHE = 'poster-cache-v-4.16.0';
-const INERTIA_CACHE = 'inertia-cache-v-4.16.0';
+const APP_CACHE = 'v-4.17.0';
+const SEARCH_CACHE = 'search-cache-v-4.17.0';
+const INFO_CACHE = 'info-cache-v-4.17.0';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.17.0';
+const POSTER_CACHE = 'poster-cache-v-4.17.0';
+const INERTIA_CACHE = 'inertia-cache-v-4.17.0';
 
 // All current caches — used in activate to preserve them all
 const ALL_CACHES = [APP_CACHE, SEARCH_CACHE, INFO_CACHE, DYNAMIC_CACHE, POSTER_CACHE, INERTIA_CACHE];
@@ -23,6 +23,51 @@ const STATIC_ASSETS = [
     '/assets/images/screenshots/MOVIE_GURU_FEAURES_WIDE_SCREENSHOT.png',
     '/assets/images/no-poster.jpg',
 ];
+
+const DB_NAME = 'movie-guru-sw';
+const DB_VERSION = 1;
+const KV_STORE = 'kv';
+const SEARCH_QUEUE_STORE = 'search-queue';
+const OFFLINE_SEARCH_SYNC_TAG = 'offline-search-sync';
+
+/**
+ * The service worker owns this database. Pages never open it directly;
+ * they talk to the worker with postMessage instead.
+ */
+function openDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(KV_STORE)) {
+                db.createObjectStore(KV_STORE);
+            }
+            if (!db.objectStoreNames.contains(SEARCH_QUEUE_STORE)) {
+                db.createObjectStore(SEARCH_QUEUE_STORE, {keyPath: 'url'});
+            }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function runTransaction(storeName, mode, operation) {
+    const db = await openDatabase();
+    try {
+        return await new Promise((resolve, reject) => {
+            const transaction = db.transaction(storeName, mode);
+            const request = operation(transaction.objectStore(storeName));
+            transaction.oncomplete = () => resolve(request?.result);
+            transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () => reject(transaction.error);
+        });
+    } finally {
+        db.close();
+    }
+}
+
+const kvGet = (key) => runTransaction(KV_STORE, 'readonly', (store) => store.get(key));
+const kvSet = (key, value) => runTransaction(KV_STORE, 'readwrite', (store) => store.put(value, key));
 
 function log(message, ...optionalParams) {
     if (DEBUG) {
@@ -96,7 +141,15 @@ const cacheInertiaRequest = async (request, maxEntries, maxAge) => {
             await cache.delete(request);
         }
 
-        const response = await fetch(request);
+        let response;
+        try {
+            response = await fetch(request);
+        } catch (networkError) {
+            if (isSearchUrl(request.url)) {
+                await queueOfflineSearch(request.url);
+            }
+            throw networkError;
+        }
 
         if (response.ok) {
             const headers = new Headers(response.headers);
@@ -120,7 +173,7 @@ const cacheInertiaRequest = async (request, maxEntries, maxAge) => {
         return response;
     } catch (error) {
         logError('Error in cacheInertiaRequest', error);
-        return fetch(request);
+        return Response.error();
     }
 };
 
@@ -178,37 +231,23 @@ const cacheRequest = async (cacheName, request, maxEntries, maxAge) => {
 
         return response;
     } catch (error) {
-        // if it get /search and network is not available, then we will prompt the user to check their network and notify when it is back
-        if (request.url.includes('/search') && navigator.onLine === false) {
-            // send message to the client
-            self.clients.matchAll()
-                .then((clients) => {
-                    clients.forEach((client) => {
-                        client.postMessage({
-                            type: 'OFFLINE_SEARCH_DETECTED',
-                            status: 'offline',
-                            message: 'You appear to be offline. Your search request will be processed once you\'re back online.',
-                            url: request.url,
-                        });
-                    });
-                });
-        }
-
         logError('Error fetching and caching new data', error);
         throw error; // re-throw the error to be handled by the caller
     }
 };
 
 /**
- * Item 3: Stale-while-revalidate — return cached immediately, revalidate in background.
+ * Item 3: Stale-while-revalidate: return cached immediately, revalidate in background.
+ * When the network is unavailable, a stale copy is still better than nothing, and a
+ * search with no copy at all is queued for Background Sync.
  */
-const staleWhileRevalidate = async (cacheName, request, maxEntries, maxAge) => {
+const staleWhileRevalidate = async (event, cacheName, request, maxEntries, maxAge) => {
     if (!('caches' in self) || request.method !== 'GET') {
         return fetch(request);
     }
 
     if (isInertiaRequest(request)) {
-        log('Inertia request — bypassing SWR cache', request.url);
+        log('Inertia request - bypassing SWR cache', request.url);
         return fetch(request);
     }
 
@@ -217,23 +256,14 @@ const staleWhileRevalidate = async (cacheName, request, maxEntries, maxAge) => {
 
     const networkFetch = fetch(request).then(async (response) => {
         if (response.ok) {
-            const taggedHeaders = new Headers(response.headers);
-            taggedHeaders.set('X-SW-Request-Type', 'full');
-            const taggedResponse = new Response(await response.clone().arrayBuffer(), {
-                status: response.status,
-                statusText: response.statusText,
-                headers: taggedHeaders,
-            });
-            await cache.put(request, taggedResponse);
-            const keys = await cache.keys();
-            if (maxEntries && keys.length >= maxEntries) {
-                await cache.delete(keys[0]);
-            }
+            await putTaggedResponse(cache, request, response, maxEntries);
         }
         return response;
-    }).catch((err) => {
-        logError('SWR background fetch failed', err);
+    }).catch((error) => {
+        logError('SWR network fetch failed', error);
+        return null;
     });
+    event.waitUntil(networkFetch);
 
     if (cachedResponse) {
         const cachedTime = new Date(cachedResponse.headers.get('date')).getTime();
@@ -242,11 +272,148 @@ const staleWhileRevalidate = async (cacheName, request, maxEntries, maxAge) => {
             log('SWR: returning cached, revalidating in background', request.url);
             return cachedResponse;
         }
-        await cache.delete(request);
     }
 
-    return networkFetch;
+    const networkResponse = await networkFetch;
+    if (networkResponse) {
+        return networkResponse;
+    }
+
+    if (cachedResponse) {
+        return cachedResponse;
+    }
+
+    if (isSearchUrl(request.url)) {
+        await queueOfflineSearch(request.url);
+        if (request.mode === 'navigate') {
+            return offlineSearchPage(request.url);
+        }
+    }
+
+    return Response.error();
 };
+
+async function putTaggedResponse(cache, request, response, maxEntries) {
+    const taggedHeaders = new Headers(response.headers);
+    taggedHeaders.set('X-SW-Request-Type', 'full');
+    const taggedResponse = new Response(await response.clone().arrayBuffer(), {
+        status: response.status,
+        statusText: response.statusText,
+        headers: taggedHeaders,
+    });
+    await cache.put(request, taggedResponse);
+
+    const keys = await cache.keys();
+    if (maxEntries && keys.length > maxEntries) {
+        await cache.delete(keys[0]);
+    }
+}
+
+function isSearchUrl(url) {
+    const {origin, pathname} = new URL(url);
+    return origin === self.location.origin && (pathname === '/search' || pathname.startsWith('/search/'));
+}
+
+/**
+ * Stores the search in IndexedDB so it survives the tab being closed, then asks the
+ * browser for a one-off Background Sync. Browsers without Background Sync rely on the
+ * page posting PROCESS_SEARCH_QUEUE when it comes back online.
+ */
+async function queueOfflineSearch(url) {
+    try {
+        await runTransaction(SEARCH_QUEUE_STORE, 'readwrite', (store) => store.put({url, queuedAt: Date.now()}));
+    } catch (error) {
+        logError('Error queueing offline search', error);
+        return;
+    }
+
+    if ('sync' in self.registration) {
+        try {
+            await self.registration.sync.register(OFFLINE_SEARCH_SYNC_TAG);
+        } catch (error) {
+            logError('Background Sync registration failed', error);
+        }
+    }
+
+    const windowClients = await self.clients.matchAll({type: 'window'});
+    windowClients.forEach((client) => {
+        client.postMessage({
+            type: 'OFFLINE_SEARCH_DETECTED',
+            status: 'offline',
+            message: 'You appear to be offline. Your search request will be processed once you\'re back online.',
+            url,
+        });
+    });
+}
+
+function searchQueryFromUrl(url) {
+    return new URL(url).searchParams.get('s') || 'search';
+}
+
+function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        '\'': '&#39;',
+    })[character]);
+}
+
+/**
+ * Minimal page for a search navigation made while offline with nothing cached.
+ */
+function offlineSearchPage(url) {
+    const query = escapeHtml(searchQueryFromUrl(url));
+    const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#030712">
+<title>You're offline - Movie Guru</title>
+<style>
+    :root { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 1.5rem; box-sizing: border-box;
+        background: #030712; color: #f9fafb; font-family: system-ui, sans-serif; text-align: center; }
+    main { max-width: 26rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.75rem; }
+    p { color: #9ca3af; line-height: 1.5; margin: 0 0 1.5rem; }
+    .actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    button { font: inherit; font-weight: 600; border: 0; border-radius: 0.75rem; padding: 0.75rem 1.25rem; cursor: pointer; }
+    .primary { background: #1d34ff; color: #fff; }
+    .secondary { background: #1f2937; color: #f9fafb; }
+    [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+    <h1>You're offline</h1>
+    <p>We saved your search for "${query}" and will fetch it as soon as you're back online.</p>
+    <div class="actions">
+        <button class="primary" id="notify" type="button" hidden>Notify me when it's ready</button>
+        <button class="secondary" type="button" onclick="location.reload()">Try again</button>
+    </div>
+</main>
+<script>
+    const notifyButton = document.getElementById('notify');
+    if ('Notification' in window && Notification.permission === 'default') {
+        notifyButton.hidden = false;
+        notifyButton.addEventListener('click', async () => {
+            await Notification.requestPermission();
+            notifyButton.hidden = true;
+        });
+    }
+    window.addEventListener('online', () => location.reload());
+</script>
+</body>
+</html>`;
+
+    return new Response(html, {
+        status: 503,
+        headers: {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store'},
+    });
+}
 
 self.addEventListener('install', event => {
     event.waitUntil(precacheAssets());
@@ -285,47 +452,57 @@ async function precacheAssets() {
     });
 }
 
-self.addEventListener('periodicsync', async (event) => {
-    log('Periodic sync', event);
+self.addEventListener('periodicsync', (event) => {
+    log('Periodic sync', event.tag);
     if (event.tag === 'weekly-trending-notification') {
-        const now = new Date();
-        const isSaturday = now.getDay() === 6; // Saturday is day 6
-        const isNotificationTime = now.getHours() > 18; // 6 PM is hour 18
-
-        if (isSaturday && isNotificationTime) {
-            // Check if notification permission is granted before showing
-            if (Notification.permission === 'granted') {
-                sendTrendingNotification();
-            } else {
-                try {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                        sendTrendingNotification();
-                    } else {
-                        channel.postMessage({
-                            type: 'NOTIFICATION_PERMISSION_DENIED',
-                            message: 'You need to allow push notifications.',
-                            level: 'danger',
-                        });
-                    }
-                } catch (error) {
-                    channel.postMessage({
-                        type: 'NOTIFICATION_PERMISSION_DENIED',
-                        message: 'Error while requesting and/or showing notification.',
-                        level: 'danger',
-                    });
-
-                    log("Error while requesting and/or showing notification.", error);
-                }
-            }
-        }
+        event.waitUntil(weeklyTrendingNotification());
     } else if (event.tag === 'daily-notification') {
-        dailyNotification();
+        event.waitUntil(dailyNotification());
     }
 });
 
-// Item 4: Fixed activate — preserve ALL current caches, not just APP_CACHE
-self.addEventListener('activate', async (e) => {
+/**
+ * Returns the most recent Saturday 18:00 (local time) that is not in the future.
+ */
+function mostRecentSaturdayEvening(now) {
+    const boundary = new Date(now);
+    boundary.setHours(18, 0, 0, 0);
+    const daysSinceSaturday = (now.getDay() + 1) % 7;
+    boundary.setDate(boundary.getDate() - daysSinceSaturday);
+    if (boundary > now) {
+        boundary.setDate(boundary.getDate() - 7);
+    }
+    return boundary;
+}
+
+/**
+ * The browser decides when periodic sync runs (roughly daily at most), so instead of
+ * requiring a sync to land exactly on Saturday evening, send on the first sync on or
+ * after the most recent Saturday 18:00 that has not been covered yet.
+ */
+async function weeklyTrendingNotification() {
+    // Permission can only be requested from a page, never from the worker.
+    if (Notification.permission !== 'granted') {
+        return;
+    }
+
+    const now = new Date();
+    const boundary = mostRecentSaturdayEvening(now);
+    const lastSentAt = await kvGet('weekly-trending-sent-at');
+
+    if (lastSentAt && new Date(lastSentAt) >= boundary) {
+        return;
+    }
+
+    await sendTrendingNotification();
+    await kvSet('weekly-trending-sent-at', now.toISOString());
+}
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(activate());
+});
+
+async function activate() {
     log('Activated');
     try {
         const keyList = await caches.keys();
@@ -357,7 +534,7 @@ self.addEventListener('activate', async (e) => {
     } catch (error) {
         logError('Error claiming clients', error);
     }
-});
+}
 
 async function handleAssetRequest(request) {
     let cache;
@@ -420,14 +597,14 @@ async function handleFetch(event) {
     } else if (isSameOrigin) {
         // Item 3: stale-while-revalidate for /search and /i/ routes
         if (url.pathname.includes('/search')) {
-            return staleWhileRevalidate(SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60);
+            return staleWhileRevalidate(event, SEARCH_CACHE, request, 15, 5 * 24 * 60 * 60);
         } else if (url.pathname.includes('/i/')) {
             if (request.headers.get('Accept')?.includes('application/json')) {
                 // AJAX detail fetch (quick-view modal) - never mixed into the full-page HTML cache,
                 // since email links to the same URL cache the full Inertia page under the same key.
                 return fetch(request);
             }
-            return staleWhileRevalidate(INFO_CACHE, request, 10, 24 * 60 * 60);
+            return staleWhileRevalidate(event, INFO_CACHE, request, 10, 24 * 60 * 60);
         } else {
             return cacheRequest(DYNAMIC_CACHE, request, 15, 2 * 24 * 60 * 60);
         }
@@ -443,6 +620,8 @@ self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting().then(r => log('Skip waiting')).catch(
             error => logError('Error skipping waiting', error));
+    } else if (event.data?.type === 'PROCESS_SEARCH_QUEUE') {
+        event.waitUntil(processSearchQueue().catch((error) => logError('Search queue not drained', error)));
     }
 });
 
@@ -525,86 +704,99 @@ function handleNotificationClick(event) {
     }
 }
 
-self.addEventListener('sync', async (event) => {
-    if (event.tag === 'offline-search-sync') {
-        channel.postMessage({type: 'OFFLINE_SYNC_EVENT'});
+self.addEventListener('sync', (event) => {
+    if (event.tag === OFFLINE_SEARCH_SYNC_TAG) {
+        event.waitUntil(processSearchQueue());
     }
 });
 
-// Item 4: Single channel handles both tracking and offline sync messages
-channel.onmessage = (event) => {
-    if (event.data.type === 'OFFLINE_SYNC_REQUEST') {
-        const offlineRequestUrl = event.data.url;
-        offlineSyncRequest(offlineRequestUrl);
-    }
-};
+/**
+ * Fetches every queued search, caches the full page so it opens offline, and notifies.
+ * Throws when any search still fails so Background Sync retries it later.
+ */
+async function processSearchQueue() {
+    const queuedSearches = await runTransaction(SEARCH_QUEUE_STORE, 'readonly', (store) => store.getAll());
+    let hasFailures = false;
 
-async function offlineSyncRequest(offlineRequestUrl) {
-    if (!offlineRequestUrl) {
+    for (const {url} of queuedSearches) {
+        try {
+            const response = await fetch(new Request(url, {headers: {Accept: 'text/html'}}));
+            if (!response.ok) {
+                throw new Error(`Search request failed with status ${response.status}`);
+            }
+
+            const cache = await caches.open(SEARCH_CACHE);
+            await putTaggedResponse(cache, new Request(url), response, 15);
+            await runTransaction(SEARCH_QUEUE_STORE, 'readwrite', (store) => store.delete(url));
+            await notifySearchReady(url);
+        } catch (error) {
+            hasFailures = true;
+            logError('Error processing queued search', url, error);
+        }
+    }
+
+    if (hasFailures) {
+        throw new Error('Some queued searches could not be fetched yet');
+    }
+}
+
+async function notifySearchReady(url) {
+    const searchQuery = searchQueryFromUrl(url);
+
+    channel.postMessage({
+        type: 'OFFLINE_SYNC_FETCHED',
+        message: `Your request for ${searchQuery} is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
+        level: 'success',
+    });
+
+    broadcastTrackingEvent('OFFLINE_SYNCED_SUCCESS', {
+        event_category: 'OFFLINE_SYNCED_SUCCESS',
+        event_label: searchQuery,
+    });
+
+    broadcastTrackingEvent(`${searchQuery}offline`, {
+        event_category: 'OFFLINE_SYNCED_SUCCESS',
+        event_label: searchQuery,
+    });
+
+    if (Notification.permission !== 'granted') {
         return;
     }
 
-    try {
-        await cacheRequest(DYNAMIC_CACHE, new Request(offlineRequestUrl), 15, 2 * 24 * 60 * 60);
-
-        const url = new URL(offlineRequestUrl);
-        const searchParams = new URLSearchParams(url.search);
-        const searchQuery = searchParams.get('s') || 'search';
-        channel.postMessage({
-            type: 'OFFLINE_SYNC_FETCHED',
-            message: `Your request for ${searchQuery} request is ready and waiting for you. Check notification to view and explore the results. 🚀👀`,
-            level: 'success',
-        });
-
-        // Item 5: Enriched offline-sync notification with image, badge, structured actions, vibrate
-        self.registration.showNotification('🎬 Content is Ready!', {
-            body: `Your search for "${searchQuery}" is ready. Tap to explore the results! 🚀👀`,
-            badge: '/icons/android/android-launchericon-96-96.png',
-            icon: '/icons/ios/72.png',
-            image: '/assets/images/screenshots/MOVIE_GURU_SEARCH_SCREENSHOT.png',
-            actions: [
-                {
-                    action: 'close',
-                    title: 'Not Now',
-                },
-                {
-                    action: 'open',
-                    title: '🔍 View Results',
-                },
-            ],
-            data: {
-                url: offlineRequestUrl,
+    // Item 5: Enriched offline-sync notification with image, badge, structured actions, vibrate
+    await self.registration.showNotification('🎬 Content is Ready!', {
+        body: `Your search for "${searchQuery}" is ready. Tap to explore the results! 🚀👀`,
+        badge: '/icons/android/android-launchericon-96-96.png',
+        icon: '/icons/ios/72.png',
+        image: '/assets/images/screenshots/MOVIE_GURU_SEARCH_SCREENSHOT.png',
+        actions: [
+            {
+                action: 'close',
+                title: 'Not Now',
             },
-            requireInteraction: true,
-            vibrate: [100, 50, 100, 50, 200],
-            tag: `offline-sync-${searchQuery}`,
-            renotify: true,
-        });
-
-        broadcastTrackingEvent(`OFFLINE_SYNCED_SUCCESS`, {
-            event_category: 'OFFLINE_SYNCED_SUCCESS',
-            event_label: searchQuery,
-        });
-
-        broadcastTrackingEvent(`${searchQuery}offline`, {
-            event_category: 'OFFLINE_SYNCED_SUCCESS',
-            event_label: searchQuery,
-        });
-    } catch (error) {
-        logError('Error occurred while fetching offline request', error);
-    }
-
+            {
+                action: 'open',
+                title: '🔍 View Results',
+            },
+        ],
+        data: {
+            url,
+        },
+        requireInteraction: true,
+        vibrate: [100, 50, 100, 50, 200],
+        tag: `offline-sync-${searchQuery}`,
+        renotify: true,
+    });
 }
 
 async function dailyNotification() {
     if (Notification.permission !== 'granted') return;
 
-    const cache = await caches.open(DYNAMIC_CACHE);
-    const lastNotif = await cache.match('last-notification-time');
+    const lastNotifiedAt = await kvGet('daily-notification-sent-at');
     const now = new Date();
 
-    if (lastNotif) {
-        const lastTime = new Date(await lastNotif.text());
+    if (lastNotifiedAt) {
+        const lastTime = new Date(lastNotifiedAt);
         const hoursSinceLast = (now - lastTime) / (1000 * 60 * 60);
         if (hoursSinceLast < 20) return; // Max once per day
     }
@@ -947,7 +1139,7 @@ async function dailyNotification() {
     const randomMessage = pool[Math.floor(Math.random() * pool.length)];
 
     // Item 5: Enriched daily notification with image, contextual badge, structured actions
-    self.registration.showNotification('🎬 Your Movie Awaits!', {
+    await self.registration.showNotification('🎬 Your Movie Awaits!', {
         tag: 'daily-alert',
         body: randomMessage,
         badge: '/icons/android/android-launchericon-96-96.png',
@@ -994,7 +1186,7 @@ async function dailyNotification() {
         event_label: timeOfDayLabel,
     });
 
-    await cache.put('last-notification-time', new Response(now.toISOString()));
+    await kvSet('daily-notification-sent-at', now.toISOString());
 }
 
 
@@ -1029,13 +1221,13 @@ self.addEventListener('notificationclose', (event) => {
     });
 });
 
-function sendTrendingNotification() {
+async function sendTrendingNotification() {
     const notificationTitle = "🔥 What's Trending This Weekend?";
     const notificationBody = "Don't miss out on the latest trends! 🍿 Tap to discover your next favorite binge-worthy experience.";
     const notificationData = {url: '/'};
 
     // Item 5: Enriched trending notification with image, badge, vibrate pattern
-    self.registration.showNotification(notificationTitle, {
+    await self.registration.showNotification(notificationTitle, {
         body: notificationBody,
         icon: '/icons/ios/72.png',
         badge: '/icons/android/android-launchericon-96-96.png',

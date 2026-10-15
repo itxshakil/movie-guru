@@ -130,66 +130,45 @@
     </noscript>
     <script type="text/javascript">
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                registerServiceWorker();
-            });
+            window.addEventListener('load', registerServiceWorker);
+            window.addEventListener('online', processOfflineSearchQueue);
         }
 
-        // Modular function for registering the Service Worker
         async function registerServiceWorker() {
             try {
                 const registration = await navigator.serviceWorker.register('/sw.js');
-                handleServiceWorkerState(registration);
+                await navigator.serviceWorker.ready;
+                registerPeriodicSyncs(registration);
+                processOfflineSearchQueue();
             } catch (error) {
                 console.error('Service Worker registration failed:', error);
             }
         }
 
-        function handleServiceWorkerState(registration) {
-            let serviceWorker = registration.installing || registration.waiting || registration.active;
-
-            if (serviceWorker) {
-                console.log('Service Worker state:', serviceWorker.state);
-                serviceWorker.addEventListener('statechange', (e) => {
-                    console.log('Service Worker state:', e.target.state);
-
-                    if (e.target.state === 'activated') {
-                        console.log('Service Worker activated');
-                        setupSyncAndPeriodicSync(registration);
-                    }
-                });
+        function registerPeriodicSyncs(registration) {
+            if (!('periodicSync' in registration)) {
+                return;
             }
 
-            // Listen for updates to the Service Worker
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker.addEventListener('statechange', () => {
-                    console.log('Service Worker update state:', newWorker.state);
-                });
-            });
-        }
-
-        function setupSyncAndPeriodicSync(registration) {
-            // Sync Manager
-            if ('SyncManager' in window) {
-                registration.sync.register('offline-search-sync').catch(error => {
-                    console.error('Offline sync registration failed:', error);
-                });
-            }
-
-            // Periodic Sync
-            if ('periodicSync' in registration) {
-                registerPeriodicSync(registration, 'weekly-trending-notification', 24 * 60 * 60 * 1000); // Once a day
-                registerPeriodicSync(registration, 'daily-notification', ((25 * 60 * 60 * 1000) + (1 * 60 * 60 * 1000) + (7 * 60 * 100))); // Random
-            }
+            registerPeriodicSync(registration, 'weekly-trending-notification', 24 * 60 * 60 * 1000);
+            registerPeriodicSync(registration, 'daily-notification', (25 * 60 * 60 * 1000) + (1 * 60 * 60 * 1000) + (7 * 60 * 100));
         }
 
         async function registerPeriodicSync(registration, tag, minInterval) {
             try {
                 await registration.periodicSync.register(tag, {minInterval});
-                console.log(`Periodic Sync registered for ${tag}`);
             } catch (error) {
                 console.error(`Periodic Sync registration failed for ${tag}:`, error);
+            }
+        }
+
+        /**
+         * Fallback for browsers without Background Sync: ask the worker to drain the
+         * offline search queue whenever the page is (back) online.
+         */
+        function processOfflineSearchQueue() {
+            if (navigator.onLine && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({type: 'PROCESS_SEARCH_QUEUE'});
             }
         }
 
@@ -214,12 +193,7 @@
         function showInstallPrompt() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
+                deferredPrompt.userChoice.then(() => {
                     deferredPrompt = null;
                 });
             }
@@ -230,38 +204,6 @@
                 ('standalone' in navigator && navigator.standalone) ||
                 window.matchMedia('(display-mode: standalone)').matches
             );
-        }
-
-        // Broadcast Channel for Offline Sync
-        const broadcast = new BroadcastChannel('service-worker-channel');
-        broadcast.addEventListener('message', (event) => {
-            if (event.data?.type === 'OFFLINE_SYNC_EVENT') {
-                const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
-                if (offlineRequestUrl) {
-                    broadcast.postMessage({type: 'OFFLINE_SYNC_REQUEST', url: offlineRequestUrl});
-                }
-            } else if (event.data?.type === 'OFFLINE_SYNC_FETCHED') {
-                localStorage.removeItem('offlineRequestUrl');
-            } else if (event.data?.type === 'EVENT_TRACKING') {
-                if (window.gtag) {
-                    const title = event.data.title;
-                    const details = event.data.details ?? {};
-                    window.gtag('event', title, details);
-                }
-            }
-        });
-
-        window.addEventListener('online', () => {
-            const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
-            if (offlineRequestUrl && navigator.onLine) {
-                broadcast.postMessage({type: 'OFFLINE_SYNC_REQUEST', url: offlineRequestUrl});
-            }
-        });
-
-        // Handle stored offline requests
-        const offlineRequestUrl = localStorage.getItem('offlineRequestUrl');
-        if (offlineRequestUrl && navigator.onLine) {
-            broadcast.postMessage({type: 'OFFLINE_SYNC_REQUEST', url: offlineRequestUrl});
         }
     </script>
 
