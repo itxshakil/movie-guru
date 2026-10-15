@@ -1,13 +1,14 @@
 <script setup>
-import {computed} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {Head, Link, usePage} from '@inertiajs/vue3';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import WatchedButton from '@/Components/WatchedButton.vue';
+import ReactionPrompt from '@/Components/ReactionPrompt.vue';
 import {useLibrary} from '@/Composables/useLibrary.js';
 
 defineOptions({layout: BaseLayout});
 
-const {toWatch, watched, isLibraryLoaded, remove} = useLibrary();
+const {toWatch, watched, isLibraryLoaded, loadError, retryLoad, lastMarkedWatched, remove} = useLibrary();
 
 const page = usePage();
 
@@ -31,13 +32,33 @@ const emptyState = computed(() => (activeTab.value === 'watched'
     ? {title: 'Nothing watched yet', body: 'Mark titles as watched from any movie card.'}
     : {title: 'Your watchlist is empty', body: 'Browse movies and click the Watchlist button to save them here.'}));
 
+// A title marked watched on the To watch tab leaves the grid (and its button) at once, so the page asks for the
+// reaction instead. Anything marked before this page opened is ignored.
+lastMarkedWatched.value = null;
+const promptMovie = ref(null);
+const tabLinks = ref([]);
+
+watch(lastMarkedWatched, (movie) => {
+    if (movie && !items.value.some((item) => item.imdb_id === movie.imdb_id)) {
+        promptMovie.value = movie;
+    }
+});
+
+const closeReactionPrompt = ({hadFocus}) => {
+    promptMovie.value = null;
+    lastMarkedWatched.value = null;
+    if (hadFocus) {
+        tabLinks.value.find((link) => link.$el.getAttribute('aria-current') === 'page')?.$el.focus();
+    }
+};
+
 const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.poster : '/assets/images/no-poster.jpg');
 </script>
 
 <template>
     <Head>
-        <title>{{ activeTab === 'watched' ? 'Watched' : 'My Watchlist' }} - Movie Guru</title>
-        <meta content="Movies you want to watch and movies you've watched, available offline." head-key="description" name="description"/>
+        <title>{{ activeTab === 'watched' ? 'Watched and To watch' : 'To watch and Watched' }} - My Watchlist - Movie Guru</title>
+        <meta content="Your watchlist in two tabs: To watch for movies you want to see, and Watched for movies you've seen, liked or disliked. Available offline." head-key="description" name="description"/>
     </Head>
 
     <div class="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">
@@ -51,6 +72,7 @@ const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.p
                 <Link
                     v-for="tab in tabs"
                     :key="tab.key"
+                    ref="tabLinks"
                     :aria-current="activeTab === tab.key ? 'page' : undefined"
                     :class="activeTab === tab.key
                         ? 'border-primary-600 text-primary-700 dark:border-primary-400 dark:text-primary-300'
@@ -64,7 +86,19 @@ const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.p
                 </Link>
             </nav>
 
-            <div v-if="!isLibraryLoaded" aria-busy="true" aria-label="Loading your watchlist"
+            <div v-if="!isLibraryLoaded && loadError" class="text-center py-24" role="alert">
+                <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">We couldn't load your watchlist</h2>
+                <p class="mt-2 text-gray-500 dark:text-gray-400">Check your connection and try again.</p>
+                <button
+                    class="mt-6 inline-block px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-colors"
+                    type="button"
+                    @click="retryLoad"
+                >
+                    Try again
+                </button>
+            </div>
+
+            <div v-else-if="!isLibraryLoaded" aria-busy="true" aria-label="Loading your watchlist"
                  class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 <div v-for="placeholder in 6" :key="placeholder"
                      class="animate-pulse rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -121,5 +155,7 @@ const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.p
                 </div>
             </div>
         </div>
+
+        <ReactionPrompt v-if="promptMovie" :key="promptMovie.imdb_id" :movie="promptMovie" @close="closeReactionPrompt"/>
     </div>
 </template>
