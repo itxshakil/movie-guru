@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Mail\AdminDigestMail;
 use App\Models\Contact;
+use App\Models\LibraryItem;
 use App\Models\MovieDetail;
 use App\Models\NewsletterSubscription;
 use App\Models\Search;
 use App\Models\User;
-use App\Models\Watchlist;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -42,7 +42,7 @@ it('sends weekly admin digest with counts and no top searches', function (): voi
 
     NewsletterSubscription::factory()->create(['created_at' => now()->subDays(2)]);
     Contact::factory()->create(['created_at' => now()->subDays(2)]);
-    Watchlist::factory()->create(['user_id' => $user->id, 'created_at' => now()->subDays(2)]);
+    LibraryItem::factory()->create(['user_id' => $user->id, 'created_at' => now()->subDays(2)]);
     MovieDetail::factory()->create(['created_at' => now()->subDays(2)]);
 
     $this->artisan('admin:digest', ['type' => 'weekly'])
