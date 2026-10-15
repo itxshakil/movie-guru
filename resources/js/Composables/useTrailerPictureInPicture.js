@@ -15,17 +15,15 @@ let pictureInPictureWindow = null;
 export const isDocumentPictureInPictureSupported = typeof window !== 'undefined'
     && 'documentPictureInPicture' in window;
 
-export function buildTrailerEmbedUrl(videoId, {startSeconds = 0, origin = window.location.origin} = {}) {
+export function buildTrailerEmbedUrl(videoId) {
     const params = new URLSearchParams({
         autoplay: '1',
         rel: '0',
         modestbranding: '1',
+        // The YouTube iframe API reports the playback position, so PiP can resume from it.
         enablejsapi: '1',
-        origin,
+        origin: window.location.origin,
     });
-    if (startSeconds > 0) {
-        params.set('start', String(Math.floor(startSeconds)));
-    }
 
     return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?${params}`;
 }
@@ -50,8 +48,11 @@ async function openTrailerPictureInPicture({videoId, title, startSeconds}) {
         + 'iframe { display: block; width: 100%; height: 100%; border: 0; }';
     pipWindow.document.head.append(style);
 
+    // The window's document is about:blank, and YouTube rejects referrer-less embeds (Error 153),
+    // so it loads a same-origin page that embeds the player with this site as referrer.
     const iframe = pipWindow.document.createElement('iframe');
-    iframe.src = buildTrailerEmbedUrl(videoId, {startSeconds});
+    const startAt = Math.floor(startSeconds ?? 0);
+    iframe.src = route('trailer-embed.show', startAt > 0 ? {videoId, start: startAt} : {videoId});
     iframe.title = `${title} trailer`;
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     iframe.referrerPolicy = 'strict-origin-when-cross-origin';
