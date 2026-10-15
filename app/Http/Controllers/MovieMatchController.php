@@ -50,8 +50,7 @@ final class MovieMatchController extends Controller
             -self::MAX_REMEMBERED_MATCHES,
         );
 
-        return redirect()
-            ->route('movie-match.show', $session->token)
+        return to_route('movie-match.show', $session->token)
             ->withCookie(cookie(
                 self::CREATED_TOKENS_COOKIE,
                 (string) json_encode($createdTokens),
@@ -63,14 +62,12 @@ final class MovieMatchController extends Controller
     {
         $session = MovieMatchSession::query()->where('token', $token)->firstOrFail();
 
-        if ($session->isExpired()) {
-            abort(410, 'This Movie Match session has expired.');
-        }
+        abort_if($session->isExpired(), 410, 'This Movie Match session has expired.');
 
         return Inertia::render('MovieMatch', [
             'session' => [
                 'token' => $session->token,
-                'is_creator' => in_array($session->token, $this->createdTokens($request), true),
+                'is_creator' => in_array($session->token, $this->createdTokens($request), strict: true),
                 'creator_picks' => $session->creator_picks,
                 'partner_picks' => $session->partner_picks,
                 'matched' => $session->matched,
@@ -84,9 +81,7 @@ final class MovieMatchController extends Controller
     {
         $session = MovieMatchSession::query()->where('token', $token)->firstOrFail();
 
-        if ($session->isExpired()) {
-            abort(410, 'This Movie Match session has expired.');
-        }
+        abort_if($session->isExpired(), 410, 'This Movie Match session has expired.');
 
         /** @var array{picks: array<int, string>} $validated */
         $validated = $request->validated();
@@ -99,7 +94,7 @@ final class MovieMatchController extends Controller
             'matched' => $matched,
         ]);
 
-        return redirect()->route('movie-match.show', $token);
+        return to_route('movie-match.show', $token);
     }
 
     /**
@@ -107,7 +102,7 @@ final class MovieMatchController extends Controller
      */
     private function createdTokens(Request $request): array
     {
-        $decoded = json_decode((string) $request->cookie(self::CREATED_TOKENS_COOKIE, '[]'), true);
+        $decoded = json_decode((string) $request->cookie(self::CREATED_TOKENS_COOKIE, '[]'), associative: true);
 
         return is_array($decoded) ? array_values(array_filter($decoded, is_string(...))) : [];
     }

@@ -32,7 +32,7 @@ final class ErrorReporter
             return; // Skip sending email (rate-limited)
         }
 
-        Cache::put($key, true, now()->addMinutes((int) config('error_mail.rate_limit_minutes')));
+        Cache::put($key, value: true, ttl: now()->addMinutes((int) config('error_mail.rate_limit_minutes')));
 
         $data = self::buildPayload($e);
 
@@ -47,7 +47,7 @@ final class ErrorReporter
     {
         return array_values(array_filter(
             array_map(trim(...), config('error_mail.recipients')),
-            static fn (string $email) => filter_var($email, FILTER_VALIDATE_EMAIL),
+            static fn (string $email): string|false => filter_var($email, FILTER_VALIDATE_EMAIL),
         ));
     }
 
@@ -95,7 +95,7 @@ final class ErrorReporter
         $fields = config('error_mail.sensitive_fields', []);
 
         foreach ($payload as $key => $value) {
-            if (in_array($key, $fields, true)) {
+            if (in_array($key, $fields, strict: true)) {
                 $payload[$key] = '****';
             } elseif (is_array($value)) {
                 $payload[$key] = self::sanitizePayload($value);

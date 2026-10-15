@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Watchlist;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Date;
 use SplFileObject;
 
 final class AdminDigestService
@@ -65,7 +66,7 @@ final class AdminDigestService
 
     private function countErrorLogLines(CarbonImmutable $start, CarbonImmutable $end): int
     {
-        $path = config('logging.channels.single.path') ?? storage_path('logs/app.log');
+        $path = config('logging.channels.single.path', storage_path('logs/app.log'));
 
         if (! is_string($path) || ! is_readable($path)) {
             return 0;
@@ -87,9 +88,9 @@ final class AdminDigestService
                 continue;
             }
 
-            $timestamp = Carbon::createFromFormat('Y-m-d H:i:s', $matches[1], config('app.timezone'));
+            $timestamp = Date::createFromFormat('Y-m-d H:i:s', $matches[1], config('app.timezone'));
 
-            if ($timestamp !== null && $timestamp->betweenIncluded($start, $end) && str_contains($line, '.ERROR:')) {
+            if ($timestamp instanceof Carbon && $timestamp->betweenIncluded($start, $end) && str_contains($line, '.ERROR:')) {
                 $count++;
             }
         }

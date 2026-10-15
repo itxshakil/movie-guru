@@ -46,7 +46,7 @@ final class MovieDetail extends Model
 
         if (! Cache::has($cacheKey)) {
             $this->increment('views');
-            Cache::put($cacheKey, true, now()->addHour());
+            Cache::put($cacheKey, value: true, ttl: now()->addHour());
         }
     }
 

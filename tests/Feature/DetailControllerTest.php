@@ -32,6 +32,7 @@ test('detail endpoint renders a full inertia page for a plain link visit with no
     $response = $this->get('/i/' . $movie->imdb_id);
 
     $response->assertSuccessful();
+
     expect($response->headers->get('content-type'))->toContain('text/html');
 });
 

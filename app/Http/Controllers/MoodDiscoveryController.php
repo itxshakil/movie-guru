@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\MovieDetail;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -12,7 +13,7 @@ use Inertia\Response;
 final class MoodDiscoveryController extends Controller
 {
     /** @var array<string, array<string, mixed>> */
-    private const MOODS = [
+    private const array MOODS = [
         'cozy' => [
             'label' => 'Cozy',
             'emoji' => '🛋️',
@@ -48,7 +49,7 @@ final class MoodDiscoveryController extends Controller
     public function index(): Response
     {
         return Inertia::render('MoodDiscovery', [
-            'moods' => array_map(fn ($key, $mood) => ['slug' => $key, ...$mood], array_keys(self::MOODS), self::MOODS),
+            'moods' => array_map(fn ($key, $mood): array => ['slug' => $key, ...$mood], array_keys(self::MOODS), self::MOODS),
             'selectedMood' => null,
             'movies' => [],
         ]);
@@ -61,7 +62,7 @@ final class MoodDiscoveryController extends Controller
         $config = self::MOODS[$mood];
 
         $movies = MovieDetail::query()
-            ->where(function ($q) use ($config): void {
+            ->where(function (Builder $q) use ($config): void {
                 foreach ($config['genres'] as $genre) {
                     $q->orWhere('genre', 'like', "%{$genre}%");
                 }
@@ -72,7 +73,7 @@ final class MoodDiscoveryController extends Controller
             ->get(['imdb_id', 'title', 'year', 'poster', 'imdb_rating', 'genre']);
 
         return Inertia::render('MoodDiscovery', [
-            'moods' => array_map(fn ($key, $m) => ['slug' => $key, ...$m], array_keys(self::MOODS), self::MOODS),
+            'moods' => array_map(fn ($key, $m): array => ['slug' => $key, ...$m], array_keys(self::MOODS), self::MOODS),
             'selectedMood' => ['slug' => $mood, ...$config],
             'movies' => $movies,
         ]);

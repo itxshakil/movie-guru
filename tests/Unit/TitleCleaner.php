@@ -85,7 +85,7 @@ it('removes seasons and episodes correctly', function (): void {
 it('handles edge cases and preserves original title when needed', function (): void {
     $cleaner = new TitleCleaner();
 
-    expect($cleaner->clean(null))
+    expect($cleaner->clean(title: null))
         ->toBeEmpty();
     expect($cleaner->clean('A'))
         ->toBe('A');

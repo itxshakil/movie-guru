@@ -32,7 +32,7 @@ final readonly class SharedLinkResolver
      */
     public function resolve(array $sharedValues): ?string
     {
-        $sharedText = implode(' ', array_filter($sharedValues, static fn (?string $value): bool => filled($value)));
+        $sharedText = implode(' ', array_filter($sharedValues, filled(...)));
 
         if ($sharedText === '') {
             return null;

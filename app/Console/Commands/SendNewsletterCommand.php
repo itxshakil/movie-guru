@@ -25,7 +25,7 @@ final class SendNewsletterCommand extends Command
     {
         $type = (string) $this->argument('type');
 
-        if (! in_array($type, ['weekly', 'monthly'])) {
+        if (! in_array($type, ['weekly', 'monthly'], strict: true)) {
             $this->logError('Invalid newsletter type. Use "weekly" or "monthly".');
 
             return;

@@ -43,5 +43,5 @@ test('spam keyword rule logs detected spam keywords', function (): void {
     $rule = new SpamKeywordRule();
     $rule->passes('message', 'How to make money fast');
 
-    expect(true)->toBeTrue();
+    expect(value: true)->toBeTrue();
 });

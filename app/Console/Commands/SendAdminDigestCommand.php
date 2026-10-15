@@ -19,7 +19,7 @@ final class SendAdminDigestCommand extends Command
 
     protected $signature = 'admin:digest {type=weekly : The digest period (weekly or monthly)}';
 
-    public function __construct(private readonly AdminDigestService $service)
+    public function __construct(private readonly AdminDigestService $adminDigestService)
     {
         parent::__construct();
     }
@@ -28,7 +28,7 @@ final class SendAdminDigestCommand extends Command
     {
         $type = (string) $this->argument('type');
 
-        if (! in_array($type, ['weekly', 'monthly'], true)) {
+        if (! in_array($type, ['weekly', 'monthly'], strict: true)) {
             $this->logError('Invalid digest type. Use "weekly" or "monthly".');
 
             return self::INVALID;
@@ -45,7 +45,7 @@ final class SendAdminDigestCommand extends Command
         $end = CarbonImmutable::now();
         $start = $type === 'weekly' ? $end->subWeek() : $end->subMonth();
 
-        $data = $this->service->generate($start, $end, $type);
+        $data = $this->adminDigestService->generate($start, $end, $type);
 
         Mail::to($adminAddress, config('mail.admin.name'))->queue(new AdminDigestMail($data));
 

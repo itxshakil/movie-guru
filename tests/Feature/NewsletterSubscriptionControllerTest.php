@@ -19,9 +19,7 @@ it('subscribes a new user and sends welcome email', function (): void {
 
     expect(NewsletterSubscription::where('email', 'newuser@example.com')->exists())->toBeTrue();
 
-    Mail::assertQueued(WelcomeSubscriberMail::class, function (WelcomeSubscriberMail $mail): bool {
-        return $mail->email === 'newuser@example.com' && $mail->firstName === 'Alice';
-    });
+    Mail::assertQueued(WelcomeSubscriberMail::class, fn (WelcomeSubscriberMail $mail): bool => $mail->email === 'newuser@example.com' && $mail->firstName === 'Alice');
 });
 
 it('subscribes without first name and uses default in welcome email', function (): void {
@@ -31,9 +29,7 @@ it('subscribes without first name and uses default in welcome email', function (
         'email' => 'noname@example.com',
     ])->assertRedirect();
 
-    Mail::assertQueued(WelcomeSubscriberMail::class, function (WelcomeSubscriberMail $mail): bool {
-        return $mail->firstName === 'Movie Fan';
-    });
+    Mail::assertQueued(WelcomeSubscriberMail::class, fn (WelcomeSubscriberMail $mail): bool => $mail->firstName === 'Movie Fan');
 });
 
 it('does not send welcome email when re-subscribing', function (): void {

@@ -15,7 +15,7 @@ test('it renders slow query details in the mail', function (): void {
         $connection,
     );
 
-    $html = (new SlowQueryDetected($connection, $event))->toMail(null)->render();
+    $html = new SlowQueryDetected($connection, $event)->toMail(notifiable: null)->render();
 
     expect($html)
         ->toContain($connection->getName())
@@ -30,7 +30,7 @@ test('it labels fast-but-slow queries differently from critical ones', function 
     $connection = DB::connection();
     $event = new QueryExecuted('select 1', [], 150.0, $connection);
 
-    $html = (new SlowQueryDetected($connection, $event))->toMail(null)->render();
+    $html = new SlowQueryDetected($connection, $event)->toMail(notifiable: null)->render();
 
     expect($html)->toContain('SLOW')->not->toContain('CRITICAL');
 });

@@ -21,8 +21,7 @@ final class WatchlistImportController extends Controller
 
         return WatchlistItemResource::collection(
             Watchlist::query()
-                ->where('user_id', $request->user()->id)
-                ->orderByDesc('created_at')
+                ->where('user_id', $request->user()->id)->latest()
                 ->get(['imdb_id', 'title', 'poster', 'year']),
         );
     }
