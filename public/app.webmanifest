@@ -8,7 +8,7 @@
     "background_color": "#030712",
     "theme_color": "#030712",
     "orientation": "portrait",
-    "display_override": ["window-controls-overlay", "fullscreen", "minimal-ui"],
+    "display_override": ["window-controls-overlay", "standalone"],
           "icons": [
             {
               "src": "/icons/windows11/SmallTile.scale-100.png",
@@ -511,13 +511,8 @@
             "label" : "Features Section Wide"
         }
     ],
-    "features": ["Ratings from All Major Sources", "Simple UI", "Alternative to IMDb", "Lightweight"],
     "categories": ["Entertainment", "Movies", "Reference", "Media"],
     "scope": "/",
-    "serviceworker": {
-        "src": "/sw.js",
-        "scope": "/"
-    },
     "shortcuts": [
         {
             "name": "Search Movies",

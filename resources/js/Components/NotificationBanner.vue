@@ -2,8 +2,9 @@
 import Snackbar from "@/Components/SnackBar.vue";
 import {onMounted, ref} from "vue";
 
+const isNotificationSupported = typeof Notification !== "undefined";
 const promptForNotification = ref(false);
-const hasNotificationPermission = ref(Notification.permission === "granted");
+const hasNotificationPermission = ref(isNotificationSupported && Notification.permission === "granted");
 
 // Notification prompt content
 const notificationPromptTitle = "Enable Notifications";
@@ -15,7 +16,7 @@ const notificationPromptSecondaryAction = "Maybe Later";
 onMounted(() => {
   // Check if we should prompt for notifications
   if (
-      typeof Notification !== 'undefined' &&
+      isNotificationSupported &&
       Notification.permission === "default" &&
       !hasNotificationPermission.value
   ) {
@@ -30,6 +31,9 @@ const requestNotificationPermission = () => {
     if (permission === "granted") {
       hasNotificationPermission.value = true;
     }
+    promptForNotification.value = false;
+  }).catch((error) => {
+    console.error("Error requesting notification permission", error);
     promptForNotification.value = false;
   });
 };

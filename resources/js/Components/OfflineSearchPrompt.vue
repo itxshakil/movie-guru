@@ -1,9 +1,8 @@
 <script setup>
-import Snackbar from "@/Components/Snackbar.vue";
-import { ref } from "vue";
+import Snackbar from "@/Components/SnackBar.vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
 
 const promptNotify = ref(false);
-const requestUrl = ref(null);
 const installAppPromptDescription = ref(
     "Offline? No problem, Movie Guru will remember your search and send you a notification when results are ready."
 );
@@ -11,16 +10,20 @@ const primaryAction = ref("Notify Me");
 const secondaryAction = ref("Not Now");
 const promptTitle = ref("Network Unavailable");
 
-// Add code to handle OFFLINE_SEARCH_DETECTED message
-navigator.serviceWorker?.addEventListener("message", (event) => {
-    if (
-        event.data.type === "OFFLINE_SEARCH_DETECTED" &&
-        event.data.status === "offline"
-    ) {
-        requestUrl.value = event.data.url;
+// The service worker queues the search in IndexedDB itself; this prompt only asks
+// for notification permission so the worker can tell the user when it is ready.
+const handleServiceWorkerMessage = (event) => {
+    if (event.data?.type === "OFFLINE_SEARCH_DETECTED" && event.data.status === "offline") {
         promptNotify.value = true;
-        localStorage.setItem("offlineRequestUrl", event.data.url);
     }
+};
+
+onMounted(() => {
+    navigator.serviceWorker?.addEventListener("message", handleServiceWorkerMessage);
+});
+
+onBeforeUnmount(() => {
+    navigator.serviceWorker?.removeEventListener("message", handleServiceWorkerMessage);
 });
 
 const cancelPrompt = () => {
@@ -33,23 +36,13 @@ const handlePostNoticationConfirm = () => {
 };
 
 const handleNotificationConfirm = () => {
-    // Check for Notification API support
     if (!("Notification" in window)) {
         installAppPromptDescription.value =
-            "This browser does not support notifications, please use a modern browser.";
+            "This browser does not support notifications. Your search will still load once you're back online.";
         handlePostNoticationConfirm();
         return;
     }
 
-    // Check for localStorage support
-    if (!window.localStorage) {
-        installAppPromptDescription.value =
-            "This browser does not support localStorage, please use a modern browser.";
-        handlePostNoticationConfirm();
-        return;
-    }
-
-    // Check current notification permission status
     if (Notification.permission === "granted") {
         installAppPromptDescription.value =
             "You will be notified when the network is available.";
@@ -62,9 +55,6 @@ const handleNotificationConfirm = () => {
         Notification.requestPermission()
             .then((permission) => {
                 if (permission === "granted") {
-                    // save the requestUrl in localStorage
-                    localStorage.setItem("offlineRequestUrl", requestUrl.value);
-                    // Update the text to inform the user that they will be notified
                     installAppPromptDescription.value =
                         "You will be notified when the network is available.";
                 } else {
