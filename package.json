@@ -4,7 +4,8 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "postbuild": "node scripts/generate-sw-precache.mjs"
+        "postbuild": "node scripts/generate-sw-precache.mjs",
+        "test:js": "node --test 'tests/js/**/*.test.mjs'"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^2.0",
