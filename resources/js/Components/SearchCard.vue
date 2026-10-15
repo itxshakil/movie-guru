@@ -5,6 +5,8 @@
                transition-colors duration-200 cursor-pointer overflow-hidden"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"
         @click="openDetail(movie.imdb_id, movie.title)"
+        @pointercancel="cancelWarmDetail"
+        @pointerdown="warmDetail($event, movie.imdb_id)"
     >
         <div>
             <!-- Poster -->
@@ -140,6 +142,7 @@
 <script setup>
 import {computed, inject} from "vue";
 import WatchlistButton from "@/Components/WatchlistButton.vue";
+import {prefetchDetail} from '@/Composables/useDetailPrefetch.js';
 
 const props = defineProps({
     movie: Object
@@ -154,6 +157,30 @@ const viewDetail = (imdbID) => {
         navigator.vibrate(10);
     }
     emit('selected');
+};
+
+// Below 1024px a click opens the quick-view modal, so its data can start loading on press.
+// Touch presses wait a moment first: a scroll also starts with pointerdown, then cancels it,
+// and a prefetch for a card that is never opened would be recorded as a view.
+const TOUCH_PREFETCH_DELAY_MS = 60;
+let warmDetailTimer = null;
+
+const warmDetail = (event, imdbID) => {
+    if (window.innerWidth >= 1024 || !imdbID || event.target.closest('button, a')) {
+        return;
+    }
+
+    if (event.pointerType !== 'touch') {
+        prefetchDetail(imdbID);
+        return;
+    }
+
+    clearTimeout(warmDetailTimer);
+    warmDetailTimer = setTimeout(() => prefetchDetail(imdbID), TOUCH_PREFETCH_DELAY_MS);
+};
+
+const cancelWarmDetail = () => {
+    clearTimeout(warmDetailTimer);
 };
 
 const openDetail = (imdbID, title) => {
