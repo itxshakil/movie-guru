@@ -6,11 +6,11 @@ namespace App\Console\Commands;
 
 use App\Models\MovieDetail;
 use App\Models\Search;
-use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\LazyCollection;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'sitemap:generate', description: 'Generate the sitemap.')]
 final class SitemapGenerator extends Command
@@ -27,7 +27,7 @@ final class SitemapGenerator extends Command
             ->add(Url::create('/terms'))
             ->add(Url::create('/contact'));
 
-        $limit = (int)$this->option('limit');
+        $limit = (int) $this->option('limit');
 
         $this->getTopSearches($limit)->each(static function (Search $topQuery) use ($sitemap): void {
             $sitemap->add(Url::create('/search/' . $topQuery->query));

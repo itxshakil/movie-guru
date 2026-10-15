@@ -8,11 +8,11 @@ use App\Mail\NewsletterMail;
 use App\Models\MovieDetail;
 use App\Models\NewsletterSubscription;
 use App\Support\LogCommands;
-use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'newsletter:send', description: 'Send weekly or monthly newsletters to subscribers')]
 final class SendNewsletterCommand extends Command
@@ -23,9 +23,9 @@ final class SendNewsletterCommand extends Command
 
     public function handle(): void
     {
-        $type = (string)$this->argument('type');
+        $type = (string) $this->argument('type');
 
-        if (!in_array($type, ['weekly', 'monthly'])) {
+        if (! in_array($type, ['weekly', 'monthly'])) {
             $this->logError('Invalid newsletter type. Use "weekly" or "monthly".');
 
             return;

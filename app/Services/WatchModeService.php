@@ -28,28 +28,45 @@ final class WatchModeService
 
     public function __construct()
     {
-        $this->apiKeys = explode(',', (string)config('services.watchmode.key'));
+        $this->apiKeys = explode(',', (string) config('services.watchmode.key'));
+    }
+
+    /**
+     * Extract the 11-character YouTube video id from any common YouTube URL.
+     */
+    public static function extractYoutubeId(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return null;
+        }
+
+        $pattern = '#(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|v/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})#';
+
+        if (preg_match($pattern, $url, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
     /**
      * Search titles or people.
      *
-     * @param WatchModeType[] $types
+     * @param  WatchModeType[]         $types
      * @return WatchModeSearchResult[]
      */
     public function search(
         WatchModeSearchField $searchField,
         string $searchValue,
         array $types = [],
-    ): array
-    {
+    ): array {
         $params = [
             'search_field' => $searchField->value,
             'search_value' => $searchValue,
         ];
 
         if ($types !== []) {
-            $params['types'] = implode(',', array_map(static fn($t) => $t->value, $types));
+            $params['types'] = implode(',', array_map(static fn ($t) => $t->value, $types));
         }
 
         $raw = $this->request('/search/', $params);
@@ -69,7 +86,7 @@ final class WatchModeService
     /**
      * Get streaming availability for a title, enriched with source metadata.
      *
-     * @param array<string> $regions
+     * @param  array<string>                                                                    $regions
      * @return Collection<array{availability: WatchModeSource, meta: WatchModeSourceMeta|null}>
      */
     public function getTitleSources(string|int $titleId, array $regions = []): Collection
@@ -95,7 +112,7 @@ final class WatchModeService
 
         try {
             $availability = collect($raw)->map(
-                static fn(array $item): WatchModeSource => WatchModeSource::fromArray($item),
+                static fn (array $item): WatchModeSource => WatchModeSource::fromArray($item),
             );
         } catch (Throwable $throwable) {
             Log::error('Error getting title sources', [
@@ -113,7 +130,7 @@ final class WatchModeService
         // Attach cached metadata
         $meta = $this->getSources()->keyBy('id');
 
-        return $availability->map(static fn(WatchModeSource $source): array => [
+        return $availability->map(static fn (WatchModeSource $source): array => [
             'availability' => $source,
             'meta' => $meta->get($source->sourceId),
         ])->values();
@@ -130,8 +147,8 @@ final class WatchModeService
         return Cache::remember('watchmode.sources', now()->addDay(), function () {
             $raw = $this->request('/sources/');
 
-            return collect($raw)->map(
-                static fn(array $item): WatchModeSourceMeta => WatchModeSourceMeta::fromArray($item),
+            return collect($raw)->values()->map(
+                static fn (array $item): WatchModeSourceMeta => WatchModeSourceMeta::fromArray($item),
             );
         });
     }
@@ -164,24 +181,6 @@ final class WatchModeService
     }
 
     /**
-     * Extract the 11-character YouTube video id from any common YouTube URL.
-     */
-    public static function extractYoutubeId(?string $url): ?string
-    {
-        if ($url === null || $url === '') {
-            return null;
-        }
-
-        $pattern = '#(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|v/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})#';
-
-        if (preg_match($pattern, $url, $matches) === 1) {
-            return $matches[1];
-        }
-
-        return null;
-    }
-
-    /**
      * Get a random API key from the configured keys.
      *
      * @throws Exception|Throwable
@@ -194,7 +193,7 @@ final class WatchModeService
     }
 
     /**
-     * @param array<string, mixed> $params
+     * @param  array<string, mixed> $params
      * @return array<string, mixed>
      *
      * @throws Throwable

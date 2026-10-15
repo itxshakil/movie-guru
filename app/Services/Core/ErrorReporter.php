@@ -15,7 +15,7 @@ final class ErrorReporter
 {
     public static function report(Throwable $e): void
     {
-        if (!config('error_mail.enabled')) {
+        if (! config('error_mail.enabled')) {
             return;
         }
 
@@ -32,7 +32,7 @@ final class ErrorReporter
             return; // Skip sending email (rate-limited)
         }
 
-        Cache::put($key, true, now()->addMinutes((int)config('error_mail.rate_limit_minutes')));
+        Cache::put($key, true, now()->addMinutes((int) config('error_mail.rate_limit_minutes')));
 
         $data = self::buildPayload($e);
 
@@ -47,7 +47,7 @@ final class ErrorReporter
     {
         return array_values(array_filter(
             array_map(trim(...), config('error_mail.recipients')),
-            static fn(string $email) => filter_var($email, FILTER_VALIDATE_EMAIL),
+            static fn (string $email) => filter_var($email, FILTER_VALIDATE_EMAIL),
         ));
     }
 
@@ -70,7 +70,7 @@ final class ErrorReporter
         return [
             'message_short' => class_basename($e),
             'message' => $e->getMessage(),
-            'file' => basename($e->getFile() ?? ''),
+            'file' => basename($e->getFile()),
             'line' => $e->getLine(),
             'trace' => $e->getTraceAsString(),
             'timestamp' => now()->toDateTimeString(),

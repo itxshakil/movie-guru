@@ -8,9 +8,9 @@ use App\Mail\AdminDigestMail;
 use App\Services\AdminDigestService;
 use App\Support\LogCommands;
 use Carbon\CarbonImmutable;
-use Illuminate\Console\Attribute\AsCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'admin:digest', description: 'Send the weekly or monthly admin activity digest')]
 final class SendAdminDigestCommand extends Command
