@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\DTOs\AdminDigestData;
+use App\Enums\LibraryStatus;
 use App\Models\Contact;
+use App\Models\LibraryItem;
 use App\Models\MovieDetail;
 use App\Models\NewsletterSubscription;
 use App\Models\Search;
 use App\Models\User;
-use App\Models\Watchlist;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -42,7 +43,7 @@ final class AdminDigestService
                 ->whereBetween('unsubscribed_at', [$start, $end])
                 ->count(),
             contactSubmissionsCount: Contact::query()->whereBetween('created_at', [$start, $end])->count(),
-            watchlistAddsCount: Watchlist::query()->whereBetween('created_at', [$start, $end])->count(),
+            watchlistAddsCount: LibraryItem::query()->where('status', LibraryStatus::ToWatch)->whereBetween('created_at', [$start, $end])->count(),
             newMoviesCount: MovieDetail::query()->whereBetween('created_at', [$start, $end])->count(),
             errorLogCount: $this->countErrorLogLines($start, $end),
             topSearches: $type === 'monthly' ? $this->getTopSearches() : [],
