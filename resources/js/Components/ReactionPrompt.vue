@@ -25,17 +25,18 @@ const dialog = ref(null);
 const reaction = computed(() => reactionFor(props.movie.imdb_id));
 let hideTimer = null;
 let isHovered = false;
-let isUsingKeys = false;
+let isUsingControls = false;
 
 const close = () => {
     clearTimeout(hideTimer);
     emit('close', {hadFocus: Boolean(dialog.value?.contains(document.activeElement))});
 };
 
-// Focus is moved here on purpose, so only real use (hovering or pressing keys) holds the prompt open.
+// Focus is moved to the dialog itself on purpose, so only real use holds the prompt open: hovering it,
+// focusing one of its buttons, or pressing keys inside it.
 const updateTimer = () => {
     clearTimeout(hideTimer);
-    if (!isHovered && !isUsingKeys) {
+    if (!isHovered && !isUsingControls) {
         hideTimer = setTimeout(close, AUTO_HIDE_MS);
     }
 };
@@ -51,13 +52,20 @@ const onKeydown = (event) => {
         close();
         return;
     }
-    isUsingKeys = true;
+    isUsingControls = true;
     updateTimer();
+};
+
+const onFocusin = (event) => {
+    if (event.target !== dialog.value) {
+        isUsingControls = true;
+        updateTimer();
+    }
 };
 
 const onFocusout = (event) => {
     if (!dialog.value?.contains(event.relatedTarget)) {
-        isUsingKeys = false;
+        isUsingControls = false;
         updateTimer();
     }
 };
@@ -79,9 +87,10 @@ onBeforeUnmount(() => clearTimeout(hideTimer));
     <div
         ref="dialog"
         :aria-labelledby="headingId"
-        class="reaction-prompt fixed inset-x-4 bottom-24 z-50 mx-auto flex max-w-sm items-center gap-2 rounded-2xl border border-gray-200 bg-white/95 py-2 pl-4 pr-2 text-gray-900 shadow-lg outline-none backdrop-blur-md focus-visible:ring-2 focus-visible:ring-primary-500 lg:bottom-6 dark:border-gray-700 dark:bg-gray-800/95 dark:text-white"
+        class="reaction-prompt fixed inset-x-4 bottom-24 z-60 mx-auto flex max-w-sm items-center gap-2 rounded-2xl border border-gray-200 bg-white/95 py-2 pl-4 pr-2 text-gray-900 shadow-lg outline-none backdrop-blur-md focus-visible:ring-2 focus-visible:ring-primary-500 lg:bottom-6 dark:border-gray-700 dark:bg-gray-800/95 dark:text-white"
         role="dialog"
         tabindex="-1"
+        @focusin="onFocusin"
         @focusout="onFocusout"
         @keydown="onKeydown"
         @pointerenter="setHovered(true)"
