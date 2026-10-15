@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property-read Carbon $expires_at
+ */
 final class MovieMatchSession extends Model
 {
     protected $fillable = [
