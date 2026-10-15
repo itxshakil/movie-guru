@@ -1,6 +1,7 @@
 <script setup>
 import {Head, Link} from '@inertiajs/vue3';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
+import MoodPrompt from '@/Components/MoodPrompt.vue';
 
 defineOptions({layout: BaseLayout});
 
@@ -26,7 +27,7 @@ const moviePoster = (movie) => {
 
 <template>
     <Head>
-        <title>Mood Discovery — Movie Guru</title>
+        <title>Mood Discovery - Movie Guru</title>
         <meta content="Find movies that match your mood." head-key="description" name="description"/>
     </Head>
 
@@ -58,6 +59,8 @@ const moviePoster = (movie) => {
                     <span class="text-xs text-gray-500 dark:text-gray-400 leading-snug">{{ mood.description }}</span>
                 </Link>
             </div>
+
+            <MoodPrompt :moods="moods"/>
 
             <!-- Results -->
             <div v-if="selectedMood && movies.length" class="space-y-6">
