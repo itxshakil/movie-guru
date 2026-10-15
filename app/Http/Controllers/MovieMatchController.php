@@ -17,10 +17,15 @@ use SensitiveParameter;
 final class MovieMatchController extends Controller
 {
     /**
-     * Session key holding the tokens of matches created in this browser, so the creator sees the
-     * "share this link" view while the friend opening the same link sees the pick form.
+     * Cookie holding the tokens of matches created in this browser, so the creator sees the
+     * "share this link" view while the friend opening the same link sees the pick form. A cookie
+     * (encrypted by Laravel) rather than the session, because matches outlive the session.
      */
-    private const string CREATED_TOKENS_SESSION_KEY = 'movie_match.created_tokens';
+    private const string CREATED_TOKENS_COOKIE = 'movie_match_created';
+
+    private const int MATCH_LIFETIME_HOURS = 24;
+
+    private const int MAX_REMEMBERED_MATCHES = 20;
 
     public function create(): Response
     {
@@ -37,12 +42,21 @@ final class MovieMatchController extends Controller
         $session = MovieMatchSession::create([
             'token' => Str::random(32),
             'creator_picks' => $validated['picks'],
-            'expires_at' => now()->addHours(24),
+            'expires_at' => now()->addHours(self::MATCH_LIFETIME_HOURS),
         ]);
 
-        $request->session()->push(self::CREATED_TOKENS_SESSION_KEY, $session->token);
+        $createdTokens = array_slice(
+            [...$this->createdTokens($request), $session->token],
+            -self::MAX_REMEMBERED_MATCHES,
+        );
 
-        return redirect()->route('movie-match.show', $session->token);
+        return redirect()
+            ->route('movie-match.show', $session->token)
+            ->withCookie(cookie(
+                self::CREATED_TOKENS_COOKIE,
+                (string) json_encode($createdTokens),
+                self::MATCH_LIFETIME_HOURS * 60,
+            ));
     }
 
     public function show(Request $request, #[SensitiveParameter] string $token): Response
@@ -53,13 +67,10 @@ final class MovieMatchController extends Controller
             abort(410, 'This Movie Match session has expired.');
         }
 
-        /** @var array<int, string> $createdTokens */
-        $createdTokens = $request->session()->get(self::CREATED_TOKENS_SESSION_KEY, []);
-
         return Inertia::render('MovieMatch', [
             'session' => [
                 'token' => $session->token,
-                'is_creator' => in_array($session->token, $createdTokens, true),
+                'is_creator' => in_array($session->token, $this->createdTokens($request), true),
                 'creator_picks' => $session->creator_picks,
                 'partner_picks' => $session->partner_picks,
                 'matched' => $session->matched,
@@ -89,6 +100,16 @@ final class MovieMatchController extends Controller
         ]);
 
         return redirect()->route('movie-match.show', $token);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function createdTokens(Request $request): array
+    {
+        $decoded = json_decode((string) $request->cookie(self::CREATED_TOKENS_COOKIE, '[]'), true);
+
+        return is_array($decoded) ? array_values(array_filter($decoded, is_string(...))) : [];
     }
 
     /**

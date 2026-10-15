@@ -7,13 +7,18 @@ use App\Models\MovieMatchSession;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
 
-test('the creator sees the share view for their own match', function (): void {
+test('the creator sees the share view for their own match, even after their session ends', function (): void {
     $response = $this->post(route('movie-match.store'), ['picks' => ['tt0111161', 'tt0068646']]);
 
     $session = MovieMatchSession::query()->sole();
     $response->assertRedirect(route('movie-match.show', $session->token));
+    $createdCookie = $response->getCookie('movie_match_created');
+    expect($createdCookie->getExpiresTime())->toBeGreaterThan(now()->addHours(23)->getTimestamp());
 
-    $this->get(route('movie-match.show', $session->token))
+    $this->flushSession();
+
+    $this->withCookie('movie_match_created', $createdCookie->getValue())
+        ->get(route('movie-match.show', $session->token))
         ->assertSuccessful()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('MovieMatch')
@@ -65,5 +70,5 @@ test('expired matches are gone', function (): void {
         'expires_at' => now()->subMinute(),
     ]);
 
-    $this->get(route('movie-match.show', $session->token))->assertStatus(410);
+    $this->get(route('movie-match.show', $session->token))->assertGone();
 });
