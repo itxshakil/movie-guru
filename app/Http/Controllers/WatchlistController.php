@@ -18,12 +18,11 @@ final class WatchlistController extends Controller
     {
         // The watchlist page itself lives at /watchlist for guests and members alike.
         if (! $request->wantsJson()) {
-            return redirect()->route('watchlist');
+            return to_route('watchlist');
         }
 
         $watchlist = Watchlist::query()
-            ->where('user_id', $request->user()->id)
-            ->orderByDesc('created_at')
+            ->where('user_id', $request->user()->id)->latest()
             ->get(['imdb_id', 'title', 'poster', 'year']);
 
         return WatchlistItemResource::collection($watchlist);

@@ -160,7 +160,7 @@ final class BotDetectorService
                 continue;
             }
 
-            $this->logBotDetection($ipAddress, '', null, 'IP in known bot range: ' . $knownBotIpRange);
+            $this->logBotDetection($ipAddress, '', request: null, reason: 'IP in known bot range: ' . $knownBotIpRange);
 
             return true;
         }

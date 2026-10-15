@@ -20,6 +20,9 @@ final class Watchlist extends Model
         'year',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

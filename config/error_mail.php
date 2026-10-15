@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 return [
-    'enabled' => env('ERROR_MAIL_ENABLED', true),
+    'enabled' => env('ERROR_MAIL_ENABLED', default: true),
 
     'recipients' => explode(',', (string) env('ERROR_MAIL_RECIPIENTS', '')),
 
     'rate_limit_minutes' => env('ERROR_MAIL_RATE_LIMIT', 5),
 
-    'group_errors' => env('ERROR_MAIL_GROUP', true),
+    'group_errors' => env('ERROR_MAIL_GROUP', default: true),
 
     'sensitive_fields' => [
         'password',

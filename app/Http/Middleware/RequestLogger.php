@@ -93,7 +93,7 @@ final class RequestLogger
     {
         $fileExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif'];
 
-        return in_array(pathinfo($request->getPathInfo(), PATHINFO_EXTENSION), $fileExtensions, true);
+        return in_array(pathinfo($request->getPathInfo(), PATHINFO_EXTENSION), $fileExtensions, strict: true);
     }
 
     /**
@@ -206,7 +206,7 @@ final class RequestLogger
     private function sanitizeArray(array &$data, array $fields): void
     {
         foreach ($data as $key => &$value) {
-            if (in_array($key, $fields, true)) {
+            if (in_array($key, $fields, strict: true)) {
                 $value = '****';
             } elseif (is_array($value)) {
                 $this->sanitizeArray($value, $fields);
@@ -271,7 +271,7 @@ final class RequestLogger
         $authenticatableId = $authenticatable ? $authenticatable->id : 'Guest';
 
         $sensitiveFields = config('error_mail.sensitive_fields', ['password', 'password_confirmation']);
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode((string) $response->getContent(), associative: true);
 
         if (is_array($responseData)) {
             $this->sanitizeArray($responseData, $sensitiveFields);

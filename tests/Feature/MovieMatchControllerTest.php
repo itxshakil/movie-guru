@@ -20,9 +20,9 @@ test('the creator sees the share view for their own match, even after their sess
     $this->withCookie('movie_match_created', $createdCookie->getValue())
         ->get(route('movie-match.show', $session->token))
         ->assertSuccessful()
-        ->assertInertia(fn (AssertableInertia $page) => $page
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->component('MovieMatch')
-            ->where('session.is_creator', true));
+            ->where('session.is_creator', expected: true));
 });
 
 test('a friend opening the shared link sees the pick form, not the creator view', function (): void {
@@ -34,9 +34,9 @@ test('a friend opening the shared link sees the pick form, not the creator view'
 
     $this->get(route('movie-match.show', $session->token))
         ->assertSuccessful()
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('session.is_creator', false)
-            ->where('session.partner_picks', null));
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('session.is_creator', expected: false)
+            ->where('session.partner_picks', expected: null));
 });
 
 test('submitting picks shows the matched titles with their details', function (): void {
@@ -51,11 +51,11 @@ test('submitting picks shows the matched titles with their details', function ()
         ->assertRedirect(route('movie-match.show', $session->token));
 
     $this->get(route('movie-match.show', $session->token))
-        ->assertInertia(fn (AssertableInertia $page) => $page
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->where('session.matched', ['tt0111161', 'tt0000001'])
             ->where('session.matched_movies.0.title', 'The Shawshank Redemption')
             ->where('session.matched_movies.1.imdb_id', 'tt0000001')
-            ->where('session.matched_movies.1.title', null));
+            ->where('session.matched_movies.1.title', expected: null));
 });
 
 test('picks are validated', function (): void {

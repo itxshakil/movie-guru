@@ -9,12 +9,12 @@ use App\Models\Watchlist;
 
 final class WatchlistPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
 
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }

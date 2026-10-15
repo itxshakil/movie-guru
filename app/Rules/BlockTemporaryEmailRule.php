@@ -17,7 +17,7 @@ final class BlockTemporaryEmailRule implements Rule
 
         return array_all(
             $blockedPatterns,
-            static fn ($blockedPattern): bool => ! preg_match($blockedPattern, (string) $value),
+            static fn (string $blockedPattern): bool => ! preg_match($blockedPattern, (string) $value),
         );
     }
 

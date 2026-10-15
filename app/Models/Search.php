@@ -24,7 +24,7 @@ final class Search extends Model
 
         if (! Cache::has($cacheKey)) {
             $this->increment('search_count');
-            Cache::put($cacheKey, true, now()->addHour());
+            Cache::put($cacheKey, value: true, ttl: now()->addHour());
         }
     }
 

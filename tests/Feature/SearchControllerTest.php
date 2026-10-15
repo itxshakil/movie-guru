@@ -34,5 +34,6 @@ test('search endpoint renders a full inertia page for a plain link visit with no
     $response = $this->get(route('search', ['s' => 'batman', 'page' => 2]));
 
     $response->assertSuccessful();
+
     expect($response->headers->get('content-type'))->toContain('text/html');
 });
