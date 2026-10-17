@@ -1,9 +1,10 @@
 <template>
     <article
-        class="search-card group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
+        class="search-card group relative isolate flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"
         @pointerdown="warmDetail($event, movie.imdb_id)"
         @pointerup="warmDetailOnTap($event, movie.imdb_id)"
+        @click.capture="onDetailLinkClick"
     >
         <div class="relative aspect-2/3 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
             <img
@@ -20,7 +21,7 @@
             <span v-if="isValue(movie.type)" class="self-start rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-semibold capitalize text-primary-700 dark:bg-primary-950/60 dark:text-primary-300">
                 {{ movie.type }}
             </span>
-            <h3 class="text-base leading-snug font-semibold text-gray-900 dark:text-white" @click.capture="onTitleClick">
+            <h3 class="text-base leading-snug font-semibold text-gray-900 dark:text-white">
                 <Link
                     :href="route('movie.detail.full', {imdbID: movie.imdb_id})"
                     class="card-link line-clamp-2"
@@ -54,7 +55,7 @@
                 <UiButton class="flex-1" size="sm" variant="secondary" @click.stop="searchWatchDownload(movie.title)">
                     Where to watch
                 </UiButton>
-                <UiButton class="flex-1" size="sm" @click.stop="openFromButton">
+                <UiButton :href="route('movie.detail.full', {imdbID: movie.imdb_id})" class="flex-1" size="sm">
                     Details
                     <svg aria-hidden="true" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path d="M5 12h14m-7-7 7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -66,12 +67,13 @@
 </template>
 <script setup>
 import {computed, inject} from "vue";
-import {Link, router} from '@inertiajs/vue3';
+import {Link} from '@inertiajs/vue3';
 import WatchlistButton from "@/Components/WatchlistButton.vue";
 import WatchedButton from "@/Components/WatchedButton.vue";
 import UiButton from '@/Components/Ui/UiButton.vue';
 import UiChip from '@/Components/Ui/UiChip.vue';
 import {prefetchDetail} from '@/Composables/useDetailPrefetch.js';
+import {shouldOpenQuickView} from '@/Components/cardClicks.js';
 
 const props = defineProps({
     movie: Object
@@ -79,8 +81,6 @@ const props = defineProps({
 const emit = defineEmits(['selected', 'share']);
 
 const gtag = inject("gtag");
-
-const QUICK_VIEW_MAX_WIDTH = 1024;
 
 const isValue = (value) => Boolean(value) && value !== 'N/A';
 
@@ -93,8 +93,6 @@ const genres = computed(() => isValue(props.movie.genre)
     ? props.movie.genre.split(',').map((genre) => genre.trim()).filter(Boolean).slice(0, 2)
     : []);
 
-const isPlainClick = (event) => event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
-
 const openQuickView = () => {
     navigator.vibrate?.(10);
     if (document.startViewTransition) {
@@ -104,28 +102,24 @@ const openQuickView = () => {
     }
 };
 
-/** Below 1024px a plain click opens the quick-view sheet; anything else follows the link. */
-const onTitleClick = (event) => {
-    if (window.innerWidth < QUICK_VIEW_MAX_WIDTH && isPlainClick(event)) {
+/**
+ * The title link and the Details button are real links to the detail page. Below 1024px a plain
+ * click on either opens the quick-view sheet instead; Inertia's Link drops @click listeners, so
+ * this runs in the capture phase on the card and prevents the default before the Link sees it.
+ */
+const onDetailLinkClick = (event) => {
+    if (event.target.closest('a') && shouldOpenQuickView(event, window.innerWidth)) {
         event.preventDefault();
         openQuickView();
     }
 };
 
-const openFromButton = () => {
-    if (window.innerWidth < QUICK_VIEW_MAX_WIDTH) {
-        openQuickView();
-        return;
-    }
-    router.visit(route('movie.detail.full', {imdbID: props.movie.imdb_id}));
-};
-
-// Below 1024px a click opens the quick-view modal, so its data can start loading before the
+// Below 1024px a plain click opens the quick-view modal, so its data can start loading before the
 // click event. Every prefetch is recorded as a view, so it must only start when a click is
 // certain: on press for a mouse or pen, and on release for touch, because a scroll also starts
 // with a touch press but ends in pointercancel instead of pointerup.
 const shouldWarmDetail = (event, imdbID) => {
-    return window.innerWidth < QUICK_VIEW_MAX_WIDTH && imdbID && !event.target.closest('button');
+    return shouldOpenQuickView(event, window.innerWidth) && imdbID && !event.target.closest('button');
 };
 
 const warmDetail = (event, imdbID) => {

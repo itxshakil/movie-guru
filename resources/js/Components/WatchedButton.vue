@@ -92,7 +92,7 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         :class="watched ? 'bg-emerald-600 text-white' : 'bg-black/55 text-white hover:bg-black/70'"
         :style="{anchorName}"
         :title="watched ? 'Watched' : 'Mark as watched'"
-        class="relative z-10 grid h-9 w-9 place-items-center rounded-full backdrop-blur-md transition-colors active:scale-90"
+        class="relative z-10 grid h-9 w-9 place-items-center rounded-full ring-1 ring-white/20 backdrop-blur-md transition-colors active:scale-90"
         type="button"
         @click.stop.prevent="onButtonClick"
     >
