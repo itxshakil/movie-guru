@@ -1,6 +1,6 @@
 <script setup>
 import {inject} from 'vue';
-import {Head} from '@inertiajs/vue3';
+import {Head, router} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import NewsletterWidget from '@/Components/NewsletterWidget.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
@@ -99,8 +99,8 @@ const shareMovieFromCard = async (movie) => {
 
 /** Cards emit `selected` only for a plain tap below 1024px; this page has no quick view, so it navigates. */
 const viewDetail = (imdb_id, sectionName) => {
-    window.location.href = route('movie.detail.full', {imdbID: imdb_id});
     gtag?.trackViewDetail(imdb_id, sectionName);
+    router.visit(route('movie.detail.full', {imdbID: imdb_id}));
 };
 
 const generateMetaTitle = (detail) => {

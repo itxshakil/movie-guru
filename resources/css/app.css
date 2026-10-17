@@ -60,18 +60,8 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
-}
 
-h1, h2, h3{
-    @apply text-balance;
-}
-
-html:has([open]){
-    @apply overflow-hidden;
-}
-
-/* In the base layer so sizing utilities such as h-full on an <img> win over h-auto. */
-@layer base {
+    /* In the base layer so sizing utilities such as h-full on an <img> win over h-auto. */
     img {
         @apply text-gray-800;
         @apply dark:text-gray-200;
@@ -82,6 +72,14 @@ html:has([open]){
         @apply bg-no-repeat;
         @apply bg-cover;
     }
+}
+
+h1, h2, h3{
+    @apply text-balance;
+}
+
+html:has([open]){
+    @apply overflow-hidden;
 }
 
 body {
