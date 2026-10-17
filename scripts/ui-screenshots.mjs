@@ -55,11 +55,19 @@ socket.addEventListener('message', (event) => {
     }
     listeners.forEach((listener) => listener(message));
 });
-const send = (method, params = {}) => new Promise((resolve) => {
+const send = (method, params = {}) => new Promise((resolve, reject) => {
     const id = ++nextId;
-    pending.set(id, resolve);
+    pending.set(id, (message) => {
+        if (message.error) {
+            reject(new Error(`${method} failed: ${message.error.message}`));
+            return;
+        }
+        resolve(message);
+    });
     socket.send(JSON.stringify({id, method, params}));
 });
+
+const STATUS_PROBE = `performance.getEntriesByType('navigation')[0]?.responseStatus ?? null`;
 
 const OVERFLOW_PROBE = `(() => {
     const inScroller = (el) => { for (let p = el.parentElement; p; p = p.parentElement) {
@@ -71,41 +79,52 @@ const OVERFLOW_PROBE = `(() => {
     return {innerWidth, scrollWidth: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight, wide};
 })()`;
 
-await send('Page.enable');
 let failed = false;
-for (const path of paths.length ? paths : DEFAULT_PATHS) {
-    for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
-        for (const scheme of SCHEMES) {
-            await send('Emulation.setDeviceMetricsOverride', {width: viewport.width, height: viewport.height,
-                deviceScaleFactor: 1, mobile: viewport.mobile});
-            await send('Emulation.setTouchEmulationEnabled', {enabled: viewport.mobile});
-            await send('Emulation.setEmulatedMedia', {features: [{name: 'prefers-color-scheme', value: scheme}]});
-            const loaded = new Promise((resolve) => {
-                const onLoad = (message) => {
-                    if (message.method === 'Page.loadEventFired') {
-                        listeners.delete(onLoad);
-                        resolve();
-                    }
-                };
-                listeners.add(onLoad);
-            });
-            await send('Page.navigate', {url: new URL(path, baseUrl).href});
-            await Promise.race([loaded, sleep(20000)]);
-            await sleep(2500);
+try {
+    await send('Page.enable');
+    for (const path of paths.length ? paths : DEFAULT_PATHS) {
+        for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
+            for (const scheme of SCHEMES) {
+                await send('Emulation.clearDeviceMetricsOverride');
+                await send('Emulation.setDeviceMetricsOverride', {width: viewport.width, height: viewport.height,
+                    deviceScaleFactor: 1, mobile: viewport.mobile});
+                await send('Emulation.setTouchEmulationEnabled', {enabled: viewport.mobile});
+                await send('Emulation.setEmulatedMedia', {features: [{name: 'prefers-color-scheme', value: scheme},
+                    // Scroll-driven .scroll-reveal cards stay invisible in full-page shots unless motion is reduced.
+                    {name: 'prefers-reduced-motion', value: 'reduce'}]});
+                const loaded = new Promise((resolve) => {
+                    const onLoad = (message) => {
+                        if (message.method === 'Page.loadEventFired') {
+                            listeners.delete(onLoad);
+                            resolve();
+                        }
+                    };
+                    listeners.add(onLoad);
+                });
+                await send('Page.navigate', {url: new URL(path, baseUrl).href});
+                await Promise.race([loaded, sleep(20000)]);
+                await sleep(2500);
 
-            const probe = (await send('Runtime.evaluate', {expression: OVERFLOW_PROBE, returnByValue: true})).result.result.value;
-            const overflow = probe.scrollWidth > probe.innerWidth ? probe.wide : [];
-            failed ||= overflow.length > 0 || probe.scrollWidth > probe.innerWidth;
-            console.log(JSON.stringify({path, viewport: viewportName, scheme, scrollWidth: probe.scrollWidth,
-                innerWidth: probe.innerWidth, overflow}));
+                const probe = (await send('Runtime.evaluate', {expression: OVERFLOW_PROBE, returnByValue: true})).result.result.value;
+                const status = (await send('Runtime.evaluate', {expression: STATUS_PROBE, returnByValue: true}))
+                    .result.result.value;
+                const overflow = probe.scrollWidth > viewport.width ? probe.wide : [];
+                failed ||= overflow.length > 0 || probe.scrollWidth > viewport.width;
+                console.log(JSON.stringify({path, viewport: viewportName, scheme, status, scrollWidth: probe.scrollWidth,
+                    innerWidth: probe.innerWidth, overflow}));
 
-            const shot = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: true,
-                clip: {x: 0, y: 0, width: viewport.width, height: Math.min(probe.height, MAX_HEIGHT), scale: 1}});
-            const slug = path.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'home';
-            writeFileSync(join(outDir, `${slug}-${viewportName}-${scheme}.png`), Buffer.from(shot.result.data, 'base64'));
+                const shot = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: true,
+                    clip: {x: 0, y: 0, width: viewport.width, height: Math.min(probe.height, MAX_HEIGHT), scale: 1}});
+                const slug = path.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'home';
+                writeFileSync(join(outDir, `${slug}-${viewportName}-${scheme}.png`), Buffer.from(shot.result.data, 'base64'));
+            }
         }
     }
+} catch (error) {
+    console.error(error);
+    failed = true;
+    process.exitCode = 2;
+} finally {
+    chrome.kill('SIGKILL');
 }
-
-chrome.kill('SIGKILL');
-process.exit(failed ? 1 : 0);
+process.exit(process.exitCode ?? (failed ? 1 : 0));
