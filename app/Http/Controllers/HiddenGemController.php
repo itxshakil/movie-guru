@@ -12,7 +12,17 @@ use Illuminate\Support\Facades\Cache;
 
 final class HiddenGemController extends Controller
 {
-    private const array COLUMNS = ['imdb_id', 'title', 'year', 'poster', 'imdb_rating', 'genre', 'director'];
+    private const array COLUMNS = [
+        'imdb_id',
+        'title',
+        'year',
+        'type',
+        'poster',
+        'imdb_rating',
+        'genre',
+        'director',
+        'details->Plot as plot',
+    ];
 
     /**
      * Today's hidden gem, or with ?shuffle=1 (the "another gem" button and shake gesture) a random one.

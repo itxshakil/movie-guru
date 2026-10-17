@@ -1,7 +1,12 @@
 <script setup>
-import {ref, onMounted, onBeforeUnmount} from 'vue';
+import {computed, ref, onMounted, onBeforeUnmount} from 'vue';
+import {Link} from '@inertiajs/vue3';
 import SearchCard from '@/Components/SearchCard.vue';
 import Show from '@/Components/Show.vue';
+import WatchlistButton from '@/Components/WatchlistButton.vue';
+import WatchedButton from '@/Components/WatchedButton.vue';
+import SectionHeading from '@/Components/Ui/SectionHeading.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 const gem = ref(null);
 const loading = ref(true);
@@ -95,6 +100,18 @@ const onShuffleClick = () => {
 
 onBeforeUnmount(() => window.removeEventListener('devicemotion', handleDeviceMotion));
 
+const isValue = (value) => Boolean(value) && value !== 'N/A';
+
+const posterFor = (movie) => isValue(movie.poster) ? movie.poster : '/assets/images/no-poster.jpg';
+
+const metaLine = computed(() => {
+    const movie = gem.value ?? {};
+    const type = isValue(movie.type) ? movie.type.charAt(0).toUpperCase() + movie.type.slice(1) : '';
+    const rating = Number(movie.imdb_rating) ? `★ ${Number(movie.imdb_rating).toFixed(1)}` : '';
+
+    return [movie.year, type, movie.genre, rating].filter(isValue).join(' · ');
+});
+
 const viewDetail = (imdbID, title) => {
     selectedIMDBId.value = imdbID;
     selectedTitle.value = title;
@@ -102,45 +119,68 @@ const viewDetail = (imdbID, title) => {
 </script>
 
 <template>
-    <section id="hidden-gem" class="py-10 px-4 scroll-mt-20">
-        <div class="mx-auto max-w-7xl">
-            <div class="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">💎</span>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Hidden Gem of the Day</h2>
-                </div>
-                <button
-                    v-if="gem"
-                    :disabled="isShuffling"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-60 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                    type="button"
-                    @click="onShuffleClick"
-                >
-                    <svg :class="{'motion-safe:animate-spin': isShuffling}" aria-hidden="true" class="h-3.5 w-3.5"
-                         fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M4 4v5h5M20 20v-5h-5M5.6 15a7 7 0 0 0 12.3 2.3M18.4 9A7 7 0 0 0 6.1 6.7"
-                              stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Another gem
-                </button>
-                <span v-if="isShakeEnabled" class="text-xs text-gray-500 dark:text-gray-400">or shake your phone</span>
-            </div>
+    <section v-if="loading || gem?.imdb_id" id="hidden-gem" class="scroll-mt-20 py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading subtitle="One underrated film, picked for today." title="Hidden gem of the day">
+                <template v-if="gem" #action>
+                    <span v-if="isShakeEnabled" class="text-xs text-gray-500 dark:text-gray-400">or shake your phone</span>
+                    <UiButton :loading="isShuffling" size="sm" variant="secondary" @click="onShuffleClick">
+                        <template #icon>
+                            <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path d="M4 4v5h5M20 20v-5h-5M5.6 15a7 7 0 0 0 12.3 2.3M18.4 9A7 7 0 0 0 6.1 6.7"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </template>
+                        Another gem
+                    </UiButton>
+                </template>
+            </SectionHeading>
 
             <!-- Skeleton -->
-            <div v-if="loading"
-                 class="max-w-xs animate-pulse rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
-                <div class="h-64 bg-gray-200 dark:bg-gray-700"/>
-                <div class="p-4 space-y-3">
-                    <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"/>
-                    <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"/>
-                    <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"/>
+            <template v-if="loading">
+                <div class="max-w-sm animate-pulse overflow-hidden rounded-2xl border border-gray-200 bg-white md:hidden dark:border-gray-800 dark:bg-gray-900">
+                    <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700"/>
+                    <div class="space-y-3 p-4">
+                        <div class="h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-700"/>
+                        <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-gray-700"/>
+                        <div class="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-700"/>
+                    </div>
                 </div>
-            </div>
+                <div class="hidden animate-pulse overflow-hidden rounded-2xl border border-gray-200 bg-white md:grid md:grid-cols-[minmax(0,16rem)_1fr] dark:border-gray-800 dark:bg-gray-900">
+                    <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700"/>
+                    <div class="flex flex-col gap-3 p-6 lg:p-8">
+                        <div class="h-7 w-2/3 rounded bg-gray-200 dark:bg-gray-700"/>
+                        <div class="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700"/>
+                        <div class="h-4 w-full rounded bg-gray-200 dark:bg-gray-700"/>
+                    </div>
+                </div>
+            </template>
 
             <!-- Gem card -->
-            <div v-else-if="gem?.imdb_id" :key="gem.imdb_id" class="md:max-w-sm">
-                <SearchCard :movie="gem" @selected="viewDetail(gem.imdb_id, gem.title)"/>
-            </div>
+            <template v-else-if="gem?.imdb_id">
+                <div :key="`card-${gem.imdb_id}`" class="max-w-sm md:hidden">
+                    <SearchCard :movie="gem" @selected="viewDetail(gem.imdb_id, gem.title)"/>
+                </div>
+                <article :key="`featured-${gem.imdb_id}`"
+                         class="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:grid md:grid-cols-[minmax(0,16rem)_1fr] dark:border-gray-800 dark:bg-gray-900">
+                    <Link :href="route('movie.detail.full', {imdbID: gem.imdb_id})" class="block aspect-2/3 bg-gray-100 dark:bg-gray-800">
+                        <img :alt="gem.title + ' poster'" :src="posterFor(gem)" class="h-full w-full object-cover" loading="lazy">
+                    </Link>
+                    <div class="flex flex-col gap-3 p-6 lg:p-8">
+                        <h3 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                            <Link :href="route('movie.detail.full', {imdbID: gem.imdb_id})" class="hover:underline">{{ gem.title }}</Link>
+                        </h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ metaLine }}</p>
+                        <p v-if="isValue(gem.plot)" class="line-clamp-4 text-base text-gray-700 dark:text-gray-300">{{ gem.plot }}</p>
+                        <div class="mt-auto flex flex-wrap gap-2">
+                            <WatchlistButton :movie="gem" variant="label"/>
+                            <WatchedButton :movie="gem" variant="label"/>
+                            <UiButton :href="route('movie.detail.full', {imdbID: gem.imdb_id})" size="sm">Details</UiButton>
+                        </div>
+                    </div>
+                </article>
+            </template>
         </div>
 
         <Show v-if="selectedIMDBId" :imdbID="selectedIMDBId" :title="selectedTitle" @close="selectedIMDBId = null"/>

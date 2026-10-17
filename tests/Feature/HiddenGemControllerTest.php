@@ -18,7 +18,36 @@ test('hidden gem endpoint returns a qualifying movie with imdb_id for the detail
 
     $this->getJson(route('hidden-gem.show'))
         ->assertSuccessful()
-        ->assertJsonStructure(['imdb_id', 'title', 'year', 'poster', 'imdb_rating', 'genre', 'director']);
+        ->assertJsonStructure(['imdb_id', 'title', 'year', 'type', 'poster', 'imdb_rating', 'genre', 'director', 'plot']);
+});
+
+test('hidden gem endpoint includes the type and the plot for the featured card', function (): void {
+    MovieDetail::factory()->create([
+        'type' => 'movie',
+        'imdb_rating' => '8.0',
+        'imdb_votes' => '10000',
+        'poster' => 'https://example.com/poster.jpg',
+        'details' => ['Plot' => 'A quiet film about a lighthouse keeper.'],
+    ]);
+
+    $this->getJson(route('hidden-gem.show'))
+        ->assertSuccessful()
+        ->assertJsonPath('type', 'movie')
+        ->assertJsonPath('plot', 'A quiet film about a lighthouse keeper.')
+        ->assertJsonMissingPath('details');
+});
+
+test('shuffled hidden gem also includes the plot', function (): void {
+    MovieDetail::factory()->create([
+        'imdb_rating' => '8.0',
+        'imdb_votes' => '10000',
+        'poster' => 'https://example.com/poster.jpg',
+        'details' => ['Plot' => 'Shuffled plot text.'],
+    ]);
+
+    $this->getJson(route('hidden-gem.show', ['shuffle' => 1]))
+        ->assertSuccessful()
+        ->assertJsonPath('plot', 'Shuffled plot text.');
 });
 
 test('hidden gem endpoint excludes movies with too many votes', function (): void {
