@@ -1,4 +1,5 @@
 <script setup>
+import {inject} from 'vue';
 import {Head} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import NewsletterWidget from '@/Components/NewsletterWidget.vue';
@@ -26,6 +27,8 @@ const props = defineProps({
 })
 
 defineOptions({ layout: BaseLayout })
+
+const gtag = inject('gtag');
 
 const moviePoster = (movie) => {
     return movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : '/assets/images/no-poster.jpg';
@@ -94,15 +97,10 @@ const shareMovieFromCard = async (movie) => {
     }
 };
 
+/** Cards emit `selected` only for a plain tap below 1024px; this page has no quick view, so it navigates. */
 const viewDetail = (imdb_id, sectionName) => {
-    if (window.innerWidth < 1024) {
-        window.location.href = route('movie.detail.full', {imdbID: imdb_id});
-    } else {
-        window.open(route('movie.detail.full', {imdbID: imdb_id}), '_blank');
-    }
-    if (gtag) {
-        gtag.trackViewDetail(imdb_id, sectionName);
-    }
+    window.location.href = route('movie.detail.full', {imdbID: imdb_id});
+    gtag?.trackViewDetail(imdb_id, sectionName);
 };
 
 const generateMetaTitle = (detail) => {

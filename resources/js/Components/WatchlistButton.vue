@@ -1,38 +1,45 @@
 <template>
     <button
-        :class="[isInWatchlist ? 'watchlist-btn--saved bg-primary-500/80 hover:bg-primary-600/80' : 'bg-white/20 hover:bg-white/40']"
-        :title="isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'"
-        class="watchlist-btn squircle flex items-center gap-1 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all active:scale-90"
-        @click.stop="toggleWatchlist"
+        v-if="variant === 'icon'"
+        :aria-label="isInWatchlist ? `Remove ${movie.title} from watchlist` : `Add ${movie.title} to watchlist`"
+        :aria-pressed="isInWatchlist"
+        :class="isInWatchlist ? 'bg-primary-600 text-white' : 'bg-black/55 text-white hover:bg-black/70'"
+        :title="isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'"
+        class="relative z-10 grid h-9 w-9 place-items-center rounded-full backdrop-blur-md transition-colors active:scale-90"
+        type="button"
+        @click.stop.prevent="toggleWatchlist"
     >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-                v-if="isInWatchlist"
-                d="M5 13l4 4L19 7"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-            />
-            <path
-                v-else
-                d="M12 4v16m8-8H4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-            />
-        </svg>
-        <span class="text-box-tight watchlist-btn__label">{{ isInWatchlist ? 'Saved' : 'Watchlist' }}</span>
+        <Bookmark :filled="isInWatchlist" class="h-[18px] w-[18px]"/>
     </button>
+    <UiButton
+        v-else
+        :aria-pressed="isInWatchlist"
+        :title="isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'"
+        size="sm"
+        variant="secondary"
+        @click.stop.prevent="toggleWatchlist"
+    >
+        <template #icon>
+            <Bookmark :filled="isInWatchlist" class="h-4 w-4"/>
+        </template>
+        {{ isInWatchlist ? 'Saved' : 'Watchlist' }}
+    </UiButton>
 </template>
 
 <script setup>
 import {computed} from 'vue';
 import {useWatchlist} from '@/Composables/useWatchlist.js';
+import Bookmark from '@/Components/Icons/Bookmark.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 const props = defineProps({
     movie: {
         type: Object,
         required: true,
+    },
+    variant: {
+        type: String,
+        default: 'label',
     },
 });
 
@@ -44,29 +51,3 @@ const toggleWatchlist = () => {
     toggleMovie(props.movie);
 };
 </script>
-
-<style scoped>
-/* Same --card-density mechanism as SearchCard.vue: collapses to icon-only
-   in compact grids. No-op (falls back to the default label+icon layout)
-   wherever WatchlistButton renders outside a --card-density container,
-   e.g. DetailCard.vue's standalone usage. */
-@container style(--card-density: compact) {
-    .watchlist-btn__label {
-        display: none;
-    }
-}
-
-.watchlist-btn--saved {
-    background-color: color-mix(in srgb, var(--color-primary-500) 80%, transparent);
-}
-
-/* Experimental, decorative only: picks a readable text color for the
-   "saved" background automatically instead of assuming white always
-   contrasts. Falls back to the existing text-white utility everywhere
-   contrast-color() isn't supported. */
-@supports (color: contrast-color(white)) {
-    .watchlist-btn--saved {
-        color: contrast-color(var(--color-primary-500));
-    }
-}
-</style>

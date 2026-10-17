@@ -79,14 +79,8 @@ const shareMovieFromCard = (movie) => {
 };
 
 const viewDetail = (imdb_id, sectionName) => {
-    if (window.innerWidth < 1024) {
-        selectedIMDBId.value = imdb_id;
-    } else {
-        window.open(route('movie.detail.full', {imdbID: imdb_id}), '_blank');
-    }
-    if (gtag) {
-        gtag.trackViewDetail(imdb_id, sectionName);
-    }
+    selectedIMDBId.value = imdb_id;
+    gtag?.trackViewDetail(imdb_id, sectionName);
 };
 
 

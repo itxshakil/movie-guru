@@ -1,6 +1,8 @@
 <script setup>
 import {computed, onBeforeUnmount, ref, useId} from 'vue';
 import {useLibrary} from '@/Composables/useLibrary.js';
+import Eye from '@/Components/Icons/Eye.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 // Two root nodes (the button and its popover): parent classes go on the button.
 defineOptions({inheritAttrs: false});
@@ -9,6 +11,10 @@ const props = defineProps({
     movie: {
         type: Object,
         required: true,
+    },
+    variant: {
+        type: String,
+        default: 'label',
     },
 });
 
@@ -29,7 +35,7 @@ const reactionEmoji = computed(() => ({liked: '👍', disliked: '👎'})[reactio
 
 const openReactionPrompt = () => {
     try {
-        popover.value?.showPopover({source: button.value});
+        popover.value?.showPopover({source: button.value?.$el ?? button.value});
     } catch {
         popover.value?.showPopover();
     }
@@ -76,30 +82,48 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
 
 <template>
     <button
+        v-if="variant === 'icon'"
         ref="button"
         v-bind="$attrs"
+        :aria-expanded="watched ? isPopoverOpen : undefined"
+        :aria-haspopup="watched ? 'dialog' : undefined"
         :aria-label="watched ? `${movie.title}: watched${reaction ? `, ${reaction}` : ''}. Change` : `Mark ${movie.title} as watched`"
         :aria-pressed="watched"
-        :aria-haspopup="watched ? 'dialog' : undefined"
-        :aria-expanded="watched ? isPopoverOpen : undefined"
-        :class="watched ? 'bg-emerald-600/85 hover:bg-emerald-600' : 'bg-white/20 hover:bg-white/40'"
+        :class="watched ? 'bg-emerald-600 text-white' : 'bg-black/55 text-white hover:bg-black/70'"
         :style="{anchorName}"
-        class="watched-btn squircle flex items-center gap-1 backdrop-blur-md text-white text-xs font-medium px-2.5 py-0.5 rounded-sm transition-all active:scale-90"
+        :title="watched ? 'Watched' : 'Mark as watched'"
+        class="relative z-10 grid h-9 w-9 place-items-center rounded-full backdrop-blur-md transition-colors active:scale-90"
         type="button"
-        @click.stop="onButtonClick"
+        @click.stop.prevent="onButtonClick"
     >
-        <span aria-hidden="true" class="relative flex">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path v-if="watched" d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
-                <template v-else>
-                    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z" stroke-linejoin="round"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </template>
-            </svg>
-            <span v-if="reactionEmoji" class="watched-btn__badge absolute -top-1.5 -right-2 text-[10px] leading-none">{{ reactionEmoji }}</span>
-        </span>
-        <span class="text-box-tight watched-btn__label">{{ watched ? `Watched ${reactionEmoji}`.trim() : 'Watched?' }}</span>
+        <svg v-if="watched" aria-hidden="true" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <Eye v-else class="h-[18px] w-[18px]"/>
+        <span v-if="reactionEmoji" aria-hidden="true" class="absolute -right-1 -bottom-1 text-xs leading-none">{{ reactionEmoji }}</span>
     </button>
+    <UiButton
+        v-else
+        ref="button"
+        v-bind="$attrs"
+        :aria-expanded="watched ? isPopoverOpen : undefined"
+        :aria-haspopup="watched ? 'dialog' : undefined"
+        :aria-label="watched ? `${movie.title}: watched${reaction ? `, ${reaction}` : ''}. Change` : `Mark ${movie.title} as watched`"
+        :aria-pressed="watched"
+        :style="{anchorName}"
+        :title="watched ? 'Watched' : 'Mark as watched'"
+        size="sm"
+        variant="secondary"
+        @click.stop.prevent="onButtonClick"
+    >
+        <template #icon>
+            <svg v-if="watched" aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <Eye v-else class="h-4 w-4"/>
+        </template>
+        {{ watched ? `Watched ${reactionEmoji}`.trim() : 'Mark watched' }}
+    </UiButton>
 
     <div
         :id="popoverId"
@@ -142,21 +166,6 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
 </template>
 
 <style scoped>
-.watched-btn__badge {
-    display: none;
-}
-
-/* Compact grids hide the label, so the reaction moves onto the icon. */
-@container style(--card-density: compact) {
-    .watched-btn__label {
-        display: none;
-    }
-
-    .watched-btn__badge {
-        display: block;
-    }
-}
-
 .watched-popover {
     opacity: 0;
     transform: scale(0.95) translateY(-4px);

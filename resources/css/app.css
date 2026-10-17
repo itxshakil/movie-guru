@@ -70,15 +70,18 @@ html:has([open]){
     @apply overflow-hidden;
 }
 
-img {
-    @apply text-gray-800;
-    @apply dark:text-gray-200;
-    @apply max-w-full;
-    @apply h-auto;
-    @apply align-middle;
-    @apply italic;
-    @apply bg-no-repeat;
-    @apply bg-cover;
+/* In the base layer so sizing utilities such as h-full on an <img> win over h-auto. */
+@layer base {
+    img {
+        @apply text-gray-800;
+        @apply dark:text-gray-200;
+        @apply max-w-full;
+        @apply h-auto;
+        @apply align-middle;
+        @apply italic;
+        @apply bg-no-repeat;
+        @apply bg-cover;
+    }
 }
 
 body {
