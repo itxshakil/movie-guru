@@ -164,19 +164,22 @@ const viewDetail = (imdbID, title) => {
                 </div>
                 <article :key="`featured-${gem.imdb_id}`"
                          class="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:grid md:grid-cols-[minmax(0,16rem)_1fr] dark:border-gray-800 dark:bg-gray-900">
-                    <Link :href="route('movie.detail.full', {imdbID: gem.imdb_id})" class="block aspect-2/3 bg-gray-100 dark:bg-gray-800">
+                    <Link :href="route('movie.detail.full', {imdbID: gem.imdb_id})" class="block aspect-2/3 bg-gray-100 dark:bg-gray-800" tabindex="-1">
                         <img :alt="gem.title + ' poster'" :src="posterFor(gem)" class="h-full w-full object-cover" loading="lazy">
                     </Link>
                     <div class="flex flex-col gap-3 p-6 lg:p-8">
                         <h3 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                             <Link :href="route('movie.detail.full', {imdbID: gem.imdb_id})" class="hover:underline">{{ gem.title }}</Link>
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ metaLine }}</p>
+                        <p v-if="metaLine" class="text-sm text-gray-500 dark:text-gray-400">{{ metaLine }}</p>
+                        <p v-if="isValue(gem.director)" class="text-sm text-gray-500 dark:text-gray-400">
+                            Dir. <span class="font-medium text-gray-700 dark:text-gray-300">{{ gem.director }}</span>
+                        </p>
                         <p v-if="isValue(gem.plot)" class="line-clamp-4 text-base text-gray-700 dark:text-gray-300">{{ gem.plot }}</p>
-                        <div class="mt-auto flex flex-wrap gap-2">
-                            <WatchlistButton :movie="gem" variant="label"/>
-                            <WatchedButton :movie="gem" variant="label"/>
-                            <UiButton :href="route('movie.detail.full', {imdbID: gem.imdb_id})" size="sm">Details</UiButton>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <WatchlistButton :movie="gem" size="md" variant="label"/>
+                            <WatchedButton :movie="gem" size="md" variant="label"/>
+                            <UiButton :href="route('movie.detail.full', {imdbID: gem.imdb_id})" size="md">Details</UiButton>
                         </div>
                     </div>
                 </article>

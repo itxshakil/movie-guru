@@ -15,7 +15,7 @@
         v-else
         :aria-pressed="isInWatchlist"
         :title="isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'"
-        size="sm"
+        :size="size"
         variant="secondary"
         @click.stop.prevent="toggleWatchlist"
     >
@@ -40,6 +40,10 @@ const props = defineProps({
     variant: {
         type: String,
         default: 'label',
+    },
+    size: {
+        type: String,
+        default: 'sm',
     },
 });
 
