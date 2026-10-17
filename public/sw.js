@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.18.2';
-const SEARCH_CACHE = 'search-cache-v-4.18.2';
-const INFO_CACHE = 'info-cache-v-4.18.2';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.2';
-const POSTER_CACHE = 'poster-cache-v-4.18.2';
-const INERTIA_CACHE = 'inertia-cache-v-4.18.2';
+const APP_CACHE = 'v-4.18.3';
+const SEARCH_CACHE = 'search-cache-v-4.18.3';
+const INFO_CACHE = 'info-cache-v-4.18.3';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.3';
+const POSTER_CACHE = 'poster-cache-v-4.18.3';
+const INERTIA_CACHE = 'inertia-cache-v-4.18.3';
 // Not versioned: saved titles must survive app updates. Entries are only removed when unsaved.
 const WATCHLIST_CACHE = 'watchlist-cache-v1';
 
