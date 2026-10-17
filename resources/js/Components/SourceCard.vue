@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import {WATCH_TILE_LINK, WATCH_TILE_NEUTRAL, WATCH_TILE_SHAPE} from '@/Components/watchTileClasses.js';
+
 defineProps({
     source: {
         type: Object,
@@ -28,10 +30,10 @@ const BADGE_CLASS = 'rounded-md px-1.5 py-0.5 text-[11px] font-semibold';
 </script>
 
 <template>
-    <li class="flex rounded-xl border border-gray-200 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/60">
+    <li :class="[WATCH_TILE_SHAPE, WATCH_TILE_NEUTRAL]">
         <a
             :href="source.availability.webUrl"
-            class="flex min-w-0 flex-1 items-center gap-3 p-3"
+            :class="WATCH_TILE_LINK"
             rel="noopener noreferrer"
             target="_blank"
             @click="sendAnalytics(source.meta?.name, source.availability.webUrl)"

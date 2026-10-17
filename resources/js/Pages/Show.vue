@@ -161,7 +161,8 @@ const ogImage = moviePoster(props.detail);
     </Head>
 
     <div class="mx-auto max-w-7xl pt-6 sm:px-6 sm:pt-10 lg:px-8">
-        <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources" @share="shareMovie"/>
+        <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources" layout="page"
+                    @share="shareMovie"/>
     </div>
 
     <section v-if="trailerId" class="pt-12 sm:pt-16">
@@ -171,7 +172,7 @@ const ogImage = moviePoster(props.detail);
         </div>
     </section>
 
-    <div class="mx-auto max-w-7xl px-4 pt-12 sm:px-6 sm:pt-16 lg:px-8">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <NewsletterWidget/>
     </div>
 

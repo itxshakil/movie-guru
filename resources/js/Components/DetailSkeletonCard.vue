@@ -17,7 +17,7 @@
 
             <div class="mt-4 flex flex-wrap gap-2">
                 <div v-for="(width, index) in ['w-24', 'w-24', 'w-20']" :key="index"
-                     :class="width" class="h-8 rounded-xl bg-gray-200 dark:bg-gray-800"></div>
+                     :class="width" class="h-7 rounded-xl bg-gray-200 dark:bg-gray-800"></div>
             </div>
 
             <div class="mt-4 h-5 w-48 rounded-full bg-gray-200 dark:bg-gray-800"></div>
