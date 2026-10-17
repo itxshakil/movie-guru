@@ -22,12 +22,19 @@ mkdirSync(outDir, {recursive: true});
 const port = 9300 + Math.floor(Math.random() * 500);
 const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', `--remote-debugging-port=${port}`,
     `--user-data-dir=${join(outDir, '.profile')}`, 'about:blank'], {stdio: 'ignore'});
+let spawnError = null;
+chrome.on('error', (error) => {
+    spawnError = error;
+});
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function connect() {
     for (let attempt = 0; attempt < 50; attempt++) {
         await sleep(200);
+        if (spawnError) {
+            throw spawnError;
+        }
         try {
             const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
             const page = targets.find((target) => target.type === 'page');
@@ -41,28 +48,25 @@ async function connect() {
     throw new Error('Chrome did not expose a page target');
 }
 
-const socket = new WebSocket(await connect());
-await new Promise((resolve) => socket.addEventListener('open', resolve));
+let socket;
 let nextId = 0;
 const pending = new Map();
 const listeners = new Set();
-socket.addEventListener('message', (event) => {
-    const message = JSON.parse(event.data);
-    if (message.id && pending.has(message.id)) {
-        pending.get(message.id)(message);
-        pending.delete(message.id);
-        return;
-    }
-    listeners.forEach((listener) => listener(message));
-});
+const rejectPending = (reason) => {
+    pending.forEach((settle) => settle.reject(new Error(reason)));
+    pending.clear();
+};
 const send = (method, params = {}) => new Promise((resolve, reject) => {
     const id = ++nextId;
-    pending.set(id, (message) => {
-        if (message.error) {
-            reject(new Error(`${method} failed: ${message.error.message}`));
-            return;
-        }
-        resolve(message);
+    pending.set(id, {
+        reject,
+        resolve: (message) => {
+            if (message.error) {
+                reject(new Error(`${method} failed: ${message.error.message}`));
+                return;
+            }
+            resolve(message);
+        },
     });
     socket.send(JSON.stringify({id, method, params}));
 });
@@ -81,10 +85,27 @@ const OVERFLOW_PROBE = `(() => {
 
 let failed = false;
 try {
+    socket = new WebSocket(await connect());
+    await new Promise((resolve, reject) => {
+        socket.addEventListener('open', resolve);
+        socket.addEventListener('error', () => reject(new Error('Could not open the DevTools socket')));
+    });
+    socket.addEventListener('message', (event) => {
+        const message = JSON.parse(event.data);
+        if (message.id && pending.has(message.id)) {
+            pending.get(message.id).resolve(message);
+            pending.delete(message.id);
+            return;
+        }
+        listeners.forEach((listener) => listener(message));
+    });
+    socket.addEventListener('close', () => rejectPending('DevTools socket closed'));
+    socket.addEventListener('error', () => rejectPending('DevTools socket error'));
     await send('Page.enable');
     for (const path of paths.length ? paths : DEFAULT_PATHS) {
         for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
             for (const scheme of SCHEMES) {
+                // Without this reset, a full-page capture after a mobile-to-desktop switch hangs.
                 await send('Emulation.clearDeviceMetricsOverride');
                 await send('Emulation.setDeviceMetricsOverride', {width: viewport.width, height: viewport.height,
                     deviceScaleFactor: 1, mobile: viewport.mobile});
