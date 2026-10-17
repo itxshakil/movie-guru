@@ -2,12 +2,12 @@ const DEBUG = false;
 // Item 4: Single shared BroadcastChannel (deduplicated)
 const channel = new BroadcastChannel('service-worker-channel');
 
-const APP_CACHE = 'v-4.18.3';
-const SEARCH_CACHE = 'search-cache-v-4.18.3';
-const INFO_CACHE = 'info-cache-v-4.18.3';
-const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.3';
-const POSTER_CACHE = 'poster-cache-v-4.18.3';
-const INERTIA_CACHE = 'inertia-cache-v-4.18.3';
+const APP_CACHE = 'v-4.18.4';
+const SEARCH_CACHE = 'search-cache-v-4.18.4';
+const INFO_CACHE = 'info-cache-v-4.18.4';
+const DYNAMIC_CACHE = 'dynamic-cache-v-4.18.4';
+const POSTER_CACHE = 'poster-cache-v-4.18.4';
+const INERTIA_CACHE = 'inertia-cache-v-4.18.4';
 // Not versioned: saved titles must survive app updates. Entries are only removed when unsaved.
 const WATCHLIST_CACHE = 'watchlist-cache-v1';
 
@@ -427,6 +427,7 @@ self.addEventListener('install', event => {
 // block installation: the /build/assets/* runtime cache-first branch in the
 // fetch handler below covers assets regardless of whether precaching succeeds.
 async function precacheAssets() {
+    const isFirstInstall = !self.registration.active;
     const cache = await caches.open(APP_CACHE);
 
     try {
@@ -446,12 +447,14 @@ async function precacheAssets() {
     }
 
     self.skipWaiting();
-    // Notify the clients that the app is available offline
-    channel.postMessage({
-        type: 'APP_AVAILABLE_OFFLINE',
-        message: 'The app is now available offline. Enjoy your movie binge!',
-        level: 'success',
-    });
+    // Notify the clients only on a first install; an update is announced by activate()
+    if (isFirstInstall) {
+        channel.postMessage({
+            type: 'APP_AVAILABLE_OFFLINE',
+            message: 'The app is now available offline. Enjoy your movie binge!',
+            level: 'success',
+        });
+    }
 }
 
 self.addEventListener('periodicsync', (event) => {
@@ -582,26 +585,26 @@ async function activate() {
     log('Activated');
     try {
         const keyList = await caches.keys();
-        const promises = keyList.map((key) => {
-            if (!ALL_CACHES.includes(key)) {
-                log('Removing Old Cache', key);
-                return caches.delete(key);
-            }
-        });
-        await Promise.all(promises);
+        const staleKeys = keyList.filter((key) => !ALL_CACHES.includes(key));
+        await Promise.all(staleKeys.map((key) => {
+            log('Removing Old Cache', key);
+            return caches.delete(key);
+        }));
         // Cached watchlist pages reference this build's hashed assets, which were just deleted.
         await purgeWatchlistPages();
 
-        channel.postMessage({
-            type: 'APP_UPDATED',
-            message: 'The app has been updated and is ready to use.',
-            level: 'success',
-        });
+        if (staleKeys.length > 0) {
+            channel.postMessage({
+                type: 'APP_UPDATED',
+                message: 'The app has been updated and is ready to use.',
+                level: 'success',
+            });
 
-        broadcastTrackingEvent(`APP_UPDATED`, {
-            event_category: 'APP_UPDATED',
-            event_label: APP_CACHE,
-        });
+            broadcastTrackingEvent(`APP_UPDATED`, {
+                event_category: 'APP_UPDATED',
+                event_label: APP_CACHE,
+            });
+        }
     } catch (error) {
         logError('Error removing old cache', error);
     }
