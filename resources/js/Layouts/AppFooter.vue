@@ -9,7 +9,7 @@ import {Link} from '@inertiajs/vue3';
             <div class="md:flex md:justify-between">
                 <div class="mb-6 md:mb-0 md:max-w-lg">
                     <Link href="/" class="flex items-center">
-                        <ApplicationLogo class="w-16" />
+                        <ApplicationLogo class="h-12 w-12" />
                     </Link>
                     <p class="dark:text-white">
                         Movie Guru is a free, open-source project that lets you search movies and series and get all the

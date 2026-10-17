@@ -1,4 +1,10 @@
 <template>
-    <span class="sr-only">Movie Guru</span>
-    <img alt="Movie Guru Logo" class="h-16 w-auto font-semibold italic tracking-wider" v-bind="$attrs" src="/icons/ios/64.png">
+    <img
+        alt="Movie Guru"
+        class="aspect-square rounded-[22%] object-cover dark:ring-1 dark:ring-white/10"
+        height="64"
+        src="/icons/ios/128.png"
+        v-bind="$attrs"
+        width="64"
+    >
 </template>
