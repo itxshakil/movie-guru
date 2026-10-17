@@ -158,8 +158,7 @@ const addMovieNightToCalendar = async () => {
             <!-- Header -->
             <div class="mb-10 text-center">
                 <div class="text-4xl mb-3">🎬</div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight"
-                    style="font-feature-settings: 'kern' 1, 'liga' 1;">Movie Match</h1>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Movie Match</h1>
                 <p class="mt-2 text-gray-500 dark:text-gray-400">Pick movies you want to watch, share the link, and see
                     what you both agree on.</p>
             </div>

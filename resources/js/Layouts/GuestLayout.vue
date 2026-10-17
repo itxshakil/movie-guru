@@ -53,8 +53,7 @@ const posters = [
                 </Link>
 
                 <div class="max-w-md">
-                    <blockquote class="text-white/90 text-2xl font-semibold leading-snug mb-4"
-                                style="font-feature-settings: 'kern' 1, 'liga' 1;">
+                    <blockquote class="text-white/90 text-2xl font-semibold leading-snug mb-4">
                         "Discover your next favourite film - curated, personalised, and always fresh."
                     </blockquote>
                     <p class="text-white/50 text-sm font-medium">Trusted by thousands of movie lovers worldwide.</p>
@@ -75,8 +74,7 @@ const posters = [
             <div class="w-full max-w-sm">
                 <!-- Heading -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight"
-                        style="font-feature-settings: 'kern' 1, 'liga' 1;">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                         {{ title }}
                     </h1>
                     <p v-if="subtitle" class="mt-2 text-sm text-gray-500 dark:text-gray-400">

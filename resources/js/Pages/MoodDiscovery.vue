@@ -36,8 +36,7 @@ const moviePoster = (movie) => {
 
             <!-- Header -->
             <div class="mb-10 text-center">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight"
-                    style="font-feature-settings: 'kern' 1, 'liga' 1;">What's your mood?</h1>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">What's your mood?</h1>
                 <p class="mt-2 text-gray-500 dark:text-gray-400">Pick a vibe and we'll find the perfect film for
                     you.</p>
             </div>

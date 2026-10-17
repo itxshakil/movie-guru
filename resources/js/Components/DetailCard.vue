@@ -81,9 +81,8 @@
                     </div>
                     <div class="sm:col-span-8 lg:col-span-8">
                         <h1
-                            class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight tracking-tight text-box-tight"
+                            class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight tracking-tight text-box-tight"
                             itemprop="name"
-                            style="font-feature-settings: 'kern' 1, 'liga' 1;"
                             v-text="detail.Title"
                         />
                         <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -101,7 +100,7 @@
                             <span v-if="detail.Type !== 'series'" class="text-sm text-gray-500 dark:text-gray-400"
                                   itemprop="duration" title="Runtime" v-text="runtime"/>
                             <span v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'"
-                                  class="ml-1 text-[10px] font-black tracking-wider uppercase px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
+                                  class="ml-1 text-[10px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
                                   itemprop="contentRating" v-text="detail.Rated"/>
                         </div>
 
@@ -172,7 +171,7 @@
 
                           <!-- Watch Now Section -->
                             <section class="mt-3">
-                                <h3 class="text-xs font-black tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-2">
+                                <h3 class="text-xs font-bold tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-2">
                                     Where to Watch</h3>
                                 <ul class="flex flex-wrap items-center gap-1.5">
                                     <SourceCard
@@ -294,7 +293,7 @@
                                          itemprop="description"/>
 
                             <div class="mt-4">
-                                <h3 class="text-xs font-black tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-2 capitalize">
+                                <h3 class="text-xs font-bold tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-2 capitalize">
                                     {{ detail.Type }} Details
                                 </h3>
                                 <div>
