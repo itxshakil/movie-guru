@@ -1,40 +1,31 @@
+<script setup>
+import SectionHeading from "@/Components/Ui/SectionHeading.vue";
+</script>
+
 <template>
-    <div class="bg-white dark:bg-gray-950 dark:text-white py-24 sm:py-32 relative overflow-hidden">
+    <div class="bg-white dark:bg-gray-950 dark:text-white py-16 sm:py-24 relative overflow-hidden">
         <div
             class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-5 dark:opacity-10">
             <div
                 class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--color-primary-500),transparent_70%)]"></div>
         </div>
         <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-            <div class="mx-auto max-w-2xl lg:text-center">
-                <h2
-                    class="text-base font-bold leading-7 text-primary-600 dark:text-primary-500 uppercase tracking-widest"
-                >
-                    Premium Cinema Companion
-                </h2>
-                <p
-                    class="mt-2 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl"
-                >
-                    Everything you need for your next binge
-                </p>
-                <p
-                    class="mt-6 text-xl leading-relaxed text-gray-600 dark:text-gray-400 font-medium"
-                >
-                    Movie Guru is your ultimate cinematic guide. <strong>Explore movies, series, and episodes</strong>
-                    with ease. Find ratings
-                    from major platforms like <strong>Rotten Tomatoes and IMDB</strong> - all in one elegant interface.
-                </p>
-            </div>
+            <SectionHeading
+                align="center"
+                class="mx-auto max-w-2xl"
+                subtitle="Movie Guru is your ultimate cinematic guide. Explore movies, series, and episodes with ease. Find ratings from major platforms like Rotten Tomatoes and IMDB - all in one elegant interface."
+                title="Everything you need for your next binge"
+            />
             <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
                 <dl
                     class="grid max-w-xl grid-cols-1 gap-x-12 gap-y-12 lg:max-w-none lg:grid-cols-2 lg:gap-y-20"
                 >
                     <div class="relative pl-20 group">
                         <dt
-                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
                                     class="h-7 w-7"
@@ -72,10 +63,10 @@
                     </div>
                     <div class="relative pl-20 group">
                         <dt
-                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
                                     class="h-7 w-7"
@@ -118,10 +109,10 @@
                     </div>
                     <div class="relative pl-20 group">
                         <dt
-                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
                                     class="h-7 w-7"
@@ -161,10 +152,10 @@
                     </div>
                     <div class="relative pl-20 group">
                         <dt
-                            class="text-xl font-extrabold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                            class="text-base font-semibold leading-7 text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                         >
                             <div
-                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
+                                class="absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-primary-600 dark:text-primary-500 shadow-sm group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-1"
                             >
                                 <svg
                                     class="h-7 w-7"
