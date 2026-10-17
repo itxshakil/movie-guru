@@ -1,6 +1,8 @@
 <script setup>
 import {useForm} from "@inertiajs/vue3";
 import {inject} from "vue";
+import TextInput from "@/Components/TextInput.vue";
+import UiButton from "@/Components/Ui/UiButton.vue";
 
 const gtag = inject("gtag");
 
@@ -32,16 +34,14 @@ const subscribe = () => {
 };
 </script>
 <template>
-    <div
-        class="bg-white dark:bg-gray-900 py-4"
-    >
-      <div class=" w-full max-w-7xl mx-auto rounded-lg p-2">
-            <div
-                class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 sm:p-6 lg:p-8 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2"
-            >
+    <section class="px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div
+            class="mx-auto max-w-7xl rounded-2xl border border-gray-200 bg-gray-50 p-6 sm:p-10 dark:border-gray-800 dark:bg-gray-900"
+        >
+            <div class="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-2">
                 <div class="max-w-xl lg:max-w-lg">
                     <h2
-                        class="text-3xl font-bold tracking-tight dark:text-white sm:text-4xl"
+                        class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white"
                     >
                         Subscribe to our newsletter.
                     </h2>
@@ -54,34 +54,27 @@ const subscribe = () => {
                         class="mt-6 flex flex-col max-w-md gap-3"
                     >
                         <label class="sr-only" for="first-name">First name</label>
-                        <input
+                        <TextInput
                             id="first-name"
                             v-model="form.first_name"
                             autocomplete="given-name"
-                            class="rounded min-w-0 flex-auto px-3.5 py-2 dark:bg-white/5 dark:text-white shadow-xs ring-1 ring-inset ring-white focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
                             name="first_name"
                             placeholder="Your first name (optional)"
                             type="text"
                         />
                         <div class="newsletter-field-group flex gap-x-4">
                             <label class="sr-only" for="email-address">Email address</label>
-                        <input
-                            v-model="form.email"
+                        <TextInput
                             id="email-address"
-                            name="email"
-                            type="email"
+                            v-model="form.email"
                             autocomplete="email"
-                            required
-                            class="rounded min-w-0 flex-auto px-3.5 py-2 dark:bg-white/5 dark:text-white shadow-xs ring-1 ring-inset ring-white focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                            class="flex-auto"
+                            name="email"
                             placeholder="Enter your email"
+                            required
+                            type="email"
                         />
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            v-text="form.processing ? 'Subscribing...' : 'Subscribe'"
-                            class="flex-none rounded-md bg-primary-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-primary-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-                        >
-                        </button>
+                        <UiButton :loading="form.processing" class="shrink-0" type="submit">Subscribe</UiButton>
                         </div>
                     </form>
 
@@ -148,7 +141,7 @@ const subscribe = () => {
                 </dl>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <style scoped>
