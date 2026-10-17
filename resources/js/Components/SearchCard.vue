@@ -1,155 +1,76 @@
 <template>
-    <div
-        class="search-card bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800/60 rounded-2xl squircle shadow-sm group relative flex flex-col justify-between
-               hover:border-gray-200 dark:hover:border-gray-700
-               transition-colors duration-200 cursor-pointer overflow-hidden"
+    <article
+        class="search-card group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
         itemprop="mainEntity" itemscope itemtype="https://schema.org/Movie"
-        @click="openDetail(movie.imdb_id, movie.title)"
         @pointerdown="warmDetail($event, movie.imdb_id)"
         @pointerup="warmDetailOnTap($event, movie.imdb_id)"
     >
-        <div>
-            <!-- Poster -->
-            <div class="relative w-full overflow-hidden rounded-t-2xl bg-gray-100 dark:bg-gray-800 _aspect-2/3">
-                <img
-                    :alt="movie.title + ' Poster'"
-                    :src="moviePoster(movie)"
-                    class="h-full w-full object-cover object-center block"
-                    itemprop="image"
-                    loading="lazy"
-                    @error="handlePosterError"
-                >
-            </div>
-
-            <!-- Meta row: type + date -->
-            <div class="card-meta mt-3 px-3 flex items-center gap-1.5">
-                <span
-                    class="text-box-tight text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50">
-                    {{ movie.type }}
-                </span>
-                <span
-                    v-if="(movie.release_date && movie.release_date !== 'N/A') || (movie.year && movie.year !== 'N/A')"
-                    class="text-[10px] text-gray-400 dark:text-gray-500 font-medium" itemprop="datePublished">
-                    {{ movie.release_date !== 'N/A' ? movie.release_date : movie.year }}
-                </span>
-            </div>
-
-            <!-- Title -->
-            <div class="card-title-wrap px-3 pt-1.5 pb-1">
-                <p
-                    class="text-box-tight text-[15px] font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug"
-                    itemprop="name"
-                    v-text="movie.title"
-                />
-            </div>
-
-            <!-- Rating -->
-            <div v-if="Number(movie.imdb_rating)" class="rating-row flex items-center gap-2 px-3 mb-2">
-                <div class="flex items-center gap-0.5">
-                    <svg
-                        v-for="i in 5"
-                        :key="i"
-                        :class="i <= basicRating ? 'text-yellow-400' : 'text-gray-200 dark:text-gray-700'"
-                        aria-hidden="true"
-                        class="h-3 w-3 shrink-0 transition-colors"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path clip-rule="evenodd"
-                              d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                              fill-rule="evenodd"/>
-                    </svg>
-                </div>
-                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 tabular-nums">{{
-                        (movie.imdb_rating / 2).toFixed(1)
-                    }}</span>
-                <span v-if="movie.imdb_votes" class="text-[10px] text-gray-400 dark:text-gray-500 font-medium ml-auto">
-                    {{ formatVotes(movie.imdb_votes) }}
-                </span>
-            </div>
-
-            <!-- Director / Cast -->
-            <div class="px-3 pb-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
-                <p v-if="isValue(movie.director)" class="flex items-center gap-1.5 line-clamp-1">
-                    <span
-                        class="shrink-0 text-[8px] font-bold tracking-widest uppercase text-gray-400 dark:text-gray-600 w-6">Dir</span>
-                    <span class="truncate font-semibold text-gray-700 dark:text-gray-300" itemprop="director" itemscope
-                          itemtype="https://schema.org/Person">
-                        <span itemprop="name">{{ movie.director }}</span>
-                    </span>
-                </p>
-                <p v-if="isValue(movie.actors)" class="flex items-center gap-1.5 line-clamp-1">
-                    <span
-                        class="shrink-0 text-[8px] font-bold tracking-widest uppercase text-gray-400 dark:text-gray-600 w-6">Cast</span>
-                    <span class="truncate font-semibold text-gray-700 dark:text-gray-300">
-                        <span v-for="(actor, index) in movie.actors.split(',').slice(0, 2)" :key="index"
-                              itemprop="actor" itemscope itemtype="https://schema.org/Person">
-                            <span itemprop="name">{{ actor.trim() }}</span><span v-if="index < 1">, </span>
-                        </span>
-                    </span>
-                </p>
-
-                <!-- Genre tags -->
-                <div v-if="movie.genre"
-                     class="flex flex-wrap gap-1 pt-2 border-t border-gray-100 dark:border-gray-800/60">
-                    <span
-                        v-for="genre in movie.genre.split(',').slice(0, 3)"
-                        :key="genre"
-                        class="text-[8px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wide"
-                    >
-                        {{ genre.trim() }}
-                    </span>
-                </div>
-            </div>
+        <div class="relative aspect-2/3 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <img
+                :alt="movie.title + ' poster'"
+                :src="moviePoster(movie)"
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                itemprop="image"
+                loading="lazy"
+                @error="handlePosterError"
+            >
         </div>
 
-        <!-- Action buttons -->
-        <div class="flex flex-wrap gap-2 p-3 pt-0 mt-auto">
-            <div class="flex flex-none gap-2">
-                <WatchlistButton
-                    :movie="movie"
-                    class="flex-none !bg-gray-100 dark:!bg-gray-800 hover:!bg-gray-200 dark:hover:!bg-gray-700 !text-gray-900 dark:!text-white !text-xs !font-bold !py-2.5 !px-3 !rounded-xl !transition-all !duration-200"
-                />
-                <WatchedButton
-                    :movie="movie"
-                    class="flex-none !bg-gray-100 dark:!bg-gray-800 hover:!bg-gray-200 dark:hover:!bg-gray-700 !text-gray-900 dark:!text-white !text-xs !font-bold !py-2.5 !px-3 !rounded-xl !transition-all !duration-200"
-                />
+        <div class="search-card__body flex flex-1 flex-col gap-2 p-4">
+            <span v-if="isValue(movie.type)" class="self-start rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-semibold capitalize text-primary-700 dark:bg-primary-950/60 dark:text-primary-300">
+                {{ movie.type }}
+            </span>
+            <h3 class="text-base leading-snug font-semibold text-gray-900 dark:text-white" @click.capture="onTitleClick">
+                <Link
+                    :href="route('movie.detail.full', {imdbID: movie.imdb_id})"
+                    class="card-link line-clamp-2"
+                    itemprop="url"
+                ><span itemprop="name">{{ movie.title }}</span></Link>
+            </h3>
+            <!-- After the title in the DOM so Tab reaches the card link first; positioned over the poster's corner. -->
+            <div class="absolute top-2 right-2 flex gap-2">
+                <WatchlistButton :movie="movie" variant="icon"/>
+                <WatchedButton :movie="movie" variant="icon"/>
             </div>
-            <div class="flex flex-1 gap-2 min-w-[10rem]">
-                <button
-                    class="flex-1 flex justify-center items-center gap-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold py-2.5 px-3 rounded-xl transition-colors duration-200 text-xs"
-                    type="button"
-                    @click.stop="searchWatchDownload(movie.title)"
-                >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                        <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"
-                              stroke-width="2"/>
+            <p v-if="releaseYear || Number(movie.imdb_rating)" class="flex flex-wrap items-center gap-x-1.5 text-xs text-gray-500 dark:text-gray-400">
+                <span v-if="releaseYear" itemprop="datePublished">{{ releaseYear }}</span>
+                <span v-if="releaseYear && Number(movie.imdb_rating)" aria-hidden="true">·</span>
+                <span v-if="Number(movie.imdb_rating)" class="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300">
+                    <svg aria-hidden="true" class="h-3.5 w-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"/>
                     </svg>
-                    Watch
-                </button>
-                <button
-                    class="flex-1 flex justify-center items-center gap-1.5 bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 px-3 rounded-xl group/detail transition-colors duration-200 text-xs shadow-md shadow-primary-500/25"
-                    type="button"
-                    @click.stop="openDetail(movie.imdb_id, movie.title)"
-                >
-                    <span class="text-box-tight">Details</span>
-                    <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover/detail:translate-x-0.5"
-                         fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                         viewBox="0 0 24 24">
-                        <path d="M5 12h14m-7-7 7 7-7 7"/>
+                    <span class="tabular-nums">{{ (movie.imdb_rating / 2).toFixed(1) }}</span>
+                    <span class="sr-only">out of 5</span>
+                </span>
+            </p>
+            <p v-if="isValue(movie.director)" class="truncate text-xs text-gray-500 dark:text-gray-400" itemprop="director" itemscope itemtype="https://schema.org/Person">
+                Dir. <span class="text-gray-700 dark:text-gray-300" itemprop="name">{{ movie.director }}</span>
+            </p>
+            <div v-if="genres.length" class="flex flex-wrap gap-1.5">
+                <UiChip v-for="genre in genres" :key="genre" as="span" size="sm">{{ genre }}</UiChip>
+            </div>
+
+            <div class="relative z-10 mt-auto flex gap-2 pt-2">
+                <UiButton class="flex-1" size="sm" variant="secondary" @click.stop="searchWatchDownload(movie.title)">
+                    Where to watch
+                </UiButton>
+                <UiButton class="flex-1" size="sm" @click.stop="openFromButton">
+                    Details
+                    <svg aria-hidden="true" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M5 12h14m-7-7 7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                </button>
+                </UiButton>
             </div>
         </div>
-    </div>
+    </article>
 </template>
 <script setup>
 import {computed, inject} from "vue";
+import {Link, router} from '@inertiajs/vue3';
 import WatchlistButton from "@/Components/WatchlistButton.vue";
 import WatchedButton from "@/Components/WatchedButton.vue";
+import UiButton from '@/Components/Ui/UiButton.vue';
+import UiChip from '@/Components/Ui/UiChip.vue';
 import {prefetchDetail} from '@/Composables/useDetailPrefetch.js';
 
 const props = defineProps({
@@ -159,12 +80,44 @@ const emit = defineEmits(['selected', 'share']);
 
 const gtag = inject("gtag");
 
-const viewDetail = (imdbID) => {
-    // Vibrate on mobile if supported
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
+const QUICK_VIEW_MAX_WIDTH = 1024;
+
+const isValue = (value) => Boolean(value) && value !== 'N/A';
+
+const releaseYear = computed(() => {
+    const value = isValue(props.movie.year) ? props.movie.year : props.movie.release_date;
+    return isValue(value) ? String(value).slice(0, 4) : '';
+});
+
+const genres = computed(() => isValue(props.movie.genre)
+    ? props.movie.genre.split(',').map((genre) => genre.trim()).filter(Boolean).slice(0, 2)
+    : []);
+
+const isPlainClick = (event) => event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+
+const openQuickView = () => {
+    navigator.vibrate?.(10);
+    if (document.startViewTransition) {
+        document.startViewTransition(() => emit('selected'));
+    } else {
+        emit('selected');
     }
-    emit('selected');
+};
+
+/** Below 1024px a plain click opens the quick-view sheet; anything else follows the link. */
+const onTitleClick = (event) => {
+    if (window.innerWidth < QUICK_VIEW_MAX_WIDTH && isPlainClick(event)) {
+        event.preventDefault();
+        openQuickView();
+    }
+};
+
+const openFromButton = () => {
+    if (window.innerWidth < QUICK_VIEW_MAX_WIDTH) {
+        openQuickView();
+        return;
+    }
+    router.visit(route('movie.detail.full', {imdbID: props.movie.imdb_id}));
 };
 
 // Below 1024px a click opens the quick-view modal, so its data can start loading before the
@@ -172,7 +125,7 @@ const viewDetail = (imdbID) => {
 // certain: on press for a mouse or pen, and on release for touch, because a scroll also starts
 // with a touch press but ends in pointercancel instead of pointerup.
 const shouldWarmDetail = (event, imdbID) => {
-    return window.innerWidth < 1024 && imdbID && !event.target.closest('button, a');
+    return window.innerWidth < QUICK_VIEW_MAX_WIDTH && imdbID && !event.target.closest('button');
 };
 
 const warmDetail = (event, imdbID) => {
@@ -187,28 +140,6 @@ const warmDetailOnTap = (event, imdbID) => {
     }
 };
 
-const openDetail = (imdbID, title) => {
-    // Vibrate on mobile if supported
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
-    }
-
-    if (window.innerWidth < 1024) {
-        if (document.startViewTransition) {
-            document.startViewTransition(() => {
-                emit('selected');
-            });
-        } else {
-            emit('selected');
-        }
-    } else {
-        window.open(route('movie.detail.full', {imdbID: imdbID}), '_blank');
-    }
-};
-const isValue = function (value) {
-  return value && value !== 'N/A';
-};
-
 const moviePoster = (movie)=>{
   return movie.poster && movie.poster !== 'N/A' ? movie.poster : '/assets/images/no-poster.jpg';
 }
@@ -217,31 +148,6 @@ const handlePosterError = (event) => {
     event.target.src = '/assets/images/no-poster.jpg';
     event.target.classList.add('opacity-40', 'grayscale');
 };
-
-const formatVotes = (votes) => {
-    if (!votes) return '';
-    const num = parseInt(votes.toString().replace(/,/g, ''));
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M votes';
-    }
-    if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K votes';
-    }
-    return num + ' votes';
-};
-
-const basicRating = computed(() => {
-  if (props.movie.imdb_rating) {
-    let mappedRating = Math.round(props.movie.imdb_rating / 2);
-
-    mappedRating = Math.max(1, Math.min(5, mappedRating));
-
-    return mappedRating;
-  }
-
-  return null;
-
-});
 
 const freeSites = [
     'FMovies',
@@ -297,32 +203,30 @@ const searchWatchDownload = (title) => {
 </script>
 
 <style scoped>
-/* Reacts to a --card-density custom property set on an ancestor grid (see
-   Search.vue/Show.vue), so cards tighten their padding in denser grids
-   without the grid and card needing to coordinate via props/JS. */
+/* The title link stretches over the whole card, so the card is one link without nesting the
+   icon and action buttons inside an <a>; those sit above it with z-index. */
+.card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+/* The ring goes on the whole card instead; this beats the unlayered global :focus-visible rule. */
+.card-link:focus-visible {
+    outline: none;
+}
+
+.search-card:has(.card-link:focus-visible) {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
+
+/* Denser grids (style="--card-density: compact" on the grid) keep the structure, with tighter padding. */
 @container style(--card-density: compact) {
-    .card-meta {
-        padding-inline: 0.5rem;
-    }
-
-    .card-title-wrap {
-        padding-inline: 0.5rem;
-    }
-}
-
-/* Nested size container: reacts to the card's own rendered width (distinct
-   from --card-density above, which reflects the grid's declared intent).
-   Stacks the rating row under itself instead of forcing everything onto one
-   line when the card is rendered narrow (e.g. a sidebar/related-movies
-   slot), independent of how many columns the surrounding grid has. */
-.search-card {
-    container-type: inline-size;
-    container-name: search-card;
-}
-
-@container search-card (width < 220px) {
-    .rating-row {
-        flex-wrap: wrap;
+    .search-card__body {
+        padding: 0.75rem;
     }
 }
 </style>

@@ -138,7 +138,7 @@ const viewDetail = (imdbID, title) => {
             </div>
 
             <!-- Gem card -->
-            <div v-else-if="gem" :key="gem.imdb_id" class="md:max-w-sm">
+            <div v-else-if="gem?.imdb_id" :key="gem.imdb_id" class="md:max-w-sm">
                 <SearchCard :movie="gem" @selected="viewDetail(gem.imdb_id, gem.title)"/>
             </div>
         </div>
