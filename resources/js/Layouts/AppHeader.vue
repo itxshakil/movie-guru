@@ -1,9 +1,11 @@
 <script setup>
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import {Link, router} from '@inertiajs/vue3';
+import {Link, router, usePage} from '@inertiajs/vue3';
 import {ref} from 'vue';
 import {useWatchlist} from '@/Composables/useWatchlist.js';
+import {NAV_ITEMS} from '@/Layouts/navItems.js';
 
+const page = usePage();
 const {watchlist} = useWatchlist();
 
 const titleBarSearch = ref('');
@@ -25,8 +27,8 @@ const submitTitleBarSearch = () => {
         <nav aria-label="Global" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 h-16">
             <div class="flex lg:flex-1 items-center gap-4">
                 <Link class="app-header__control -m-1.5 p-1.5 flex items-center gap-2 group" href="/">
-                    <ApplicationLogo class="app-header__logo h-9 w-9 transition-transform duration-300 group-hover:scale-105"/>
-                    <span class="app-header__name text-xl font-bold tracking-tight text-gray-900 dark:text-white hidden sm:block">Movie Guru</span>
+                    <ApplicationLogo alt="" class="app-header__logo h-9 w-9 transition-transform duration-300 group-hover:scale-105"/>
+                    <span class="app-header__name text-lg font-bold tracking-tight text-gray-900 dark:text-white">Movie Guru</span>
                 </Link>
             </div>
 
@@ -51,19 +53,25 @@ const submitTitleBarSearch = () => {
                 />
             </form>
 
-            <div class="flex items-center gap-4 lg:flex-1 lg:justify-end">
+            <div class="hidden items-center gap-1 md:flex lg:flex-1 lg:justify-end">
                 <Link
-                    :href="route('watchlist')"
-                    class="app-header__control app-header__watchlist relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                    v-for="item in NAV_ITEMS"
+                    :key="item.route"
+                    :aria-current="item.match(page.url) ? 'page' : undefined"
+                    :class="[
+                        item.match(page.url)
+                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white',
+                        item.showsCount ? 'app-header__watchlist' : 'app-header__link',
+                    ]"
+                    :href="route(item.route)"
+                    class="app-header__control relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" stroke-linecap="round"
-                              stroke-linejoin="round" stroke-width="2"/>
-                    </svg>
-                    <span class="hidden sm:inline">Watchlist</span>
+                    <component :is="item.icon" class="h-4 w-4"/>
+                    {{ item.label }}
                     <span
-                        v-if="watchlist.length > 0"
-                        class="app-header__count absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white"
+                        v-if="item.showsCount && watchlist.length > 0"
+                        class="app-header__count ml-0.5 rounded-full bg-primary-600 px-1.5 text-[11px] font-semibold leading-5 text-white"
                     >{{ watchlist.length }}</span>
                 </Link>
             </div>
@@ -125,7 +133,8 @@ nav {
         display: block;
     }
 
-    .app-header__watchlist {
+    .app-header__watchlist,
+    .app-header__link {
         padding-block: 0.125rem;
     }
 

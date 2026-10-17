@@ -11,14 +11,31 @@ import {Link} from '@inertiajs/vue3';
                     <Link href="/" class="flex items-center">
                         <ApplicationLogo class="h-12 w-12" />
                     </Link>
-                    <p class="dark:text-white">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
                         Movie Guru is a free, open-source project that lets you search movies and series and get all the
                         details about it.
                     </p>
                 </div>
-                <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+                <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-4">
                     <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Resources</h2>
+                        <h2 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">Discover</h2>
+                        <ul class="text-gray-500 dark:text-gray-400 font-medium">
+                            <li class="mb-4">
+                                <Link :href="route('mood.index')" class="hover:underline">Mood</Link>
+                            </li>
+                            <li class="mb-4">
+                                <Link :href="route('movie-match.create')" class="hover:underline">Movie Match</Link>
+                            </li>
+                            <li class="mb-4">
+                                <Link :href="route('watchlist')" class="hover:underline">Watchlist</Link>
+                            </li>
+                            <li>
+                                <Link href="/#hidden-gem" class="hover:underline">Hidden Gem</Link>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">Resources</h2>
                         <ul class="text-gray-500 dark:text-gray-400 font-medium">
                             <li class="mb-4">
                                 <Link href="/" class="hover:underline">Movie Guru</Link>
@@ -29,7 +46,7 @@ import {Link} from '@inertiajs/vue3';
                         </ul>
                     </div>
                     <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Follow us</h2>
+                        <h2 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">Follow us</h2>
                         <ul class="text-gray-500 dark:text-gray-400 font-medium">
                             <li class="mb-4">
                                 <a href="https://www.facebook.com/moviegurufb" class="hover:underline ">Facebook</a>
@@ -40,7 +57,7 @@ import {Link} from '@inertiajs/vue3';
                         </ul>
                     </div>
                     <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Legal</h2>
+                        <h2 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">Legal</h2>
                         <ul class="text-gray-500 dark:text-gray-400 font-medium">
                             <li class="mb-4">
                                 <Link href="/privacy" class="hover:underline">Privacy Policy</Link>
@@ -54,7 +71,7 @@ import {Link} from '@inertiajs/vue3';
             </div>
             <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
             <div class="sm:flex sm:items-center sm:justify-between">
-          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2019-2026  <Link class="hover:underline"
+          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2019-{{ new Date().getFullYear() }}  <Link class="hover:underline"
                                                                                                    href="/">Movie Guru™</Link>. All Rights Reserved.
           </span>
                 <div class="flex mt-4 sm:justify-center sm:mt-0 gap-2">
