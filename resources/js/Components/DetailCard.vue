@@ -2,7 +2,8 @@
     <div class="flex min-h-full items-stretch justify-center text-center md:items-center">
         <div class="flex text-left text-base w-full">
             <div
-                class="relative rounded-xl squircle flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white shadow-2xl">
+                :class="layout === 'page' ? 'sm:rounded-xl sm:shadow-2xl' : 'rounded-xl shadow-2xl'"
+                class="relative squircle flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white">
 
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="relative grid w-full grid-cols-1 items-start gap-x-6 gap-y-6 sm:grid-cols-12 lg:gap-x-8 p-4 sm:p-6 lg:p-8">
@@ -15,20 +16,10 @@
                                  @error="handlePosterError">
                         </div>
                         <span v-if="statusBadge" :class="badgeClass">
-                            <svg v-if="statusBadge === 'Trending'" aria-hidden="true" class="h-3.5 w-3.5" fill="none"
+                            <svg v-if="statusIcon" aria-hidden="true" class="h-3.5 w-3.5" fill="none"
                                  stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                  viewBox="0 0 24 24">
-                                <path d="M3 17l6 -6l4 4l8 -8"/>
-                                <path d="M14 7l7 0l0 7"/>
-                            </svg>
-                            <svg v-else-if="statusBadge !== 'New'" aria-hidden="true" class="h-3.5 w-3.5" fill="none"
-                                 stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                 viewBox="0 0 24 24">
-                                <path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/>
-                                <path
-                                    d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/>
-                                <path
-                                    d="M12.5 13.847l-1.5 1.153l.532 -1.857l-1.532 -1.143h1.902l.598 -1.8l.598 1.8h1.902l-1.532 1.143l.532 1.857z"/>
+                                <path v-for="path in statusIcon" :key="path" :d="path"/>
                             </svg>
                             {{ statusBadge }}
                         </span>
@@ -48,9 +39,11 @@
                                 <span aria-hidden="true" class="text-gray-300 dark:text-gray-600">·</span>
                                 <span itemprop="duration" v-text="runtime"/>
                             </template>
-                            <span v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'"
-                                  class="rounded-md border border-gray-300 px-1.5 py-0.5 text-[11px] font-semibold text-gray-600 dark:border-gray-600 dark:text-gray-300"
-                                  itemprop="contentRating" v-text="detail.Rated"/>
+                            <template v-if="isValue(detail.Rated) && detail.Rated !== 'Not Rated'">
+                                <span aria-hidden="true" class="text-gray-300 dark:text-gray-600">·</span>
+                                <span class="rounded-md border border-gray-300 px-1.5 py-0.5 text-[11px] font-semibold text-gray-600 dark:border-gray-600 dark:text-gray-300"
+                                      itemprop="contentRating" v-text="detail.Rated"/>
+                            </template>
                         </div>
 
                         <div class="mt-4 flex flex-wrap gap-2">
@@ -126,11 +119,11 @@
                             <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Where to watch</h2>
                             <ul class="mt-3 grid auto-rows-fr gap-2 sm:grid-cols-2 xl:grid-cols-3">
                                 <li v-if="affiliateLink"
-                                    :class="tileClass"
-                                    class="border-primary-500 bg-primary-50 sm:col-span-2 xl:col-span-3 dark:border-primary-500 dark:bg-primary-950/40">
+                                    :class="[WATCH_TILE_SHAPE, WATCH_TILE_FEATURED]"
+                                    class="sm:col-span-2 xl:col-span-3">
                                     <a
                                         :href="affiliateLink.link"
-                                        :class="tileLinkClass"
+                                        :class="WATCH_TILE_LINK"
                                         class="group"
                                         rel="noopener noreferrer"
                                         target="_blank"
@@ -167,10 +160,10 @@
                                     :source="source"
                                 />
 
-                                <li v-if="youtubeSearchLink" :class="tileClass">
+                                <li v-if="youtubeSearchLink" :class="[WATCH_TILE_SHAPE, WATCH_TILE_NEUTRAL]">
                                     <a
                                         :href="youtubeSearchLink"
-                                        :class="tileLinkClass"
+                                        :class="WATCH_TILE_LINK"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                         @click="sendAnalytics('Watch on YouTube', youtubeSearchLink)"
@@ -187,10 +180,10 @@
                                     </a>
                                 </li>
 
-                                <li :class="tileClass">
+                                <li :class="[WATCH_TILE_SHAPE, WATCH_TILE_NEUTRAL]">
                                     <a
                                         :href="searchFallbackLink.url"
-                                        :class="tileLinkClass"
+                                        :class="WATCH_TILE_LINK"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                         @click="sendAnalytics(searchFallbackLink.platform + ' Search', searchFallbackLink.url)"
@@ -305,7 +298,7 @@
                         d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                 </svg>
-                Book Tickets: {{ affiliateLink.title }}
+                Book tickets: {{ affiliateLink.title }}
             </a>
         </div>
     </Teleport>
@@ -322,6 +315,7 @@ import {createPosterCard} from '@/Composables/usePosterCard.js';
 import {createCalendarFile} from '@/Composables/useCalendarEvent.js';
 import {shareOrDownloadFile} from '@/Composables/useFileSharing.js';
 import {movieStatusBadge, ratingSourceLabel} from '@/Composables/movieStatus.js';
+import {WATCH_TILE_FEATURED, WATCH_TILE_LINK, WATCH_TILE_NEUTRAL, WATCH_TILE_SHAPE} from '@/Components/watchTileClasses.js';
 
 const gtag = inject('gtag');
 
@@ -340,7 +334,12 @@ const props = defineProps({
         type: Object,
         required: false,
         default: null,
-  }
+    },
+    /** "page" sits flush on phones (the full detail page); "sheet" keeps its card look (the quick-view sheet). */
+    layout: {
+        type: String,
+        default: 'sheet',
+    },
 });
 
 const emit = defineEmits(['share']);
@@ -440,10 +439,21 @@ const statusBadge = computed(() => movieStatusBadge(props.detail));
 const badgeClass = 'absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs '
     + 'font-semibold text-white backdrop-blur-md';
 
-/** One shape for every Where to watch tile; the link fills the tile so all of it is clickable. */
-const tileClass = 'flex rounded-xl border border-gray-200 transition-colors hover:bg-gray-50 dark:border-gray-800 '
-    + 'dark:hover:bg-gray-800/60';
-const tileLinkClass = 'flex min-w-0 flex-1 items-center gap-3 p-3';
+const TAG_STAR_ICON = [
+    'M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0',
+    'M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z',
+    'M12.5 13.847l-1.5 1.153l.532 -1.857l-1.532 -1.143h1.902l.598 -1.8l.598 1.8h1.902l-1.532 1.143l.532 1.857z',
+];
+
+/** Icon paths per poster status; New has no icon. */
+const STATUS_ICONS = {
+    'Trending': ['M3 17l6 -6l4 4l8 -8', 'M14 7l7 0l0 7'],
+    'New': null,
+    'Top rated': TAG_STAR_ICON,
+    'Hidden gem': TAG_STAR_ICON,
+};
+
+const statusIcon = computed(() => STATUS_ICONS[statusBadge.value] ?? null);
 
 const YOUTUBE_ICON_PATH = 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z';
 
