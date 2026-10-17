@@ -403,7 +403,7 @@
 
     <Teleport to="body">
         <div v-if="affiliateLink"
-             class="fixed bottom-0 left-0 right-0 z-50 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-primary-200 dark:border-primary-800 shadow-2xl md:hidden"
+             class="fixed bottom-[var(--tab-bar-height)] left-0 right-0 z-50 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-primary-200 dark:border-primary-800 shadow-2xl md:hidden"
         >
             <a
                 :href="affiliateLink.link"

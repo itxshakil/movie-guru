@@ -224,6 +224,13 @@ select:focus {
        intrinsic keyword (auto, max-content, etc.) to animate smoothly
        instead of jumping instantly - see .snippet-text in SnippetText.vue. */
     interpolate-size: allow-keywords;
+    --tab-bar-height: calc(4rem + env(safe-area-inset-bottom));
+}
+
+@media (width >= 48rem) {
+    :root {
+        --tab-bar-height: 0px;
+    }
 }
 
 /* Only overrides the easing curve, so it layers onto Tailwind's existing
