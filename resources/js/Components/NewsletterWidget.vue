@@ -30,8 +30,7 @@ const subscribe = () => {
         <div class="mb-4">
             <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
                 Newsletter</p>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-snug"
-                style="font-feature-settings: 'kern' 1, 'liga' 1;">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-snug">
                 Never miss a great film.
             </h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Weekly picks, hidden gems, and cinematic news -

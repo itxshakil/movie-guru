@@ -13,7 +13,7 @@
                     Premium Cinema Companion
                 </h2>
                 <p
-                    class="mt-2 text-4xl font-black tracking-tight text-gray-900 dark:text-white sm:text-5xl"
+                    class="mt-2 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl"
                 >
                     Everything you need for your next binge
                 </p>

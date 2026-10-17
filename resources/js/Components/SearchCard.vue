@@ -24,7 +24,7 @@
             <!-- Meta row: type + date -->
             <div class="card-meta mt-3 px-3 flex items-center gap-1.5">
                 <span
-                    class="text-box-tight text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50">
+                    class="text-box-tight text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50">
                     {{ movie.type }}
                 </span>
                 <span
@@ -39,7 +39,6 @@
                 <p
                     class="text-box-tight text-[15px] font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug"
                     itemprop="name"
-                    style="font-feature-settings: 'kern' 1, 'liga' 1;"
                     v-text="movie.title"
                 />
             </div>
@@ -73,7 +72,7 @@
             <div class="px-3 pb-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
                 <p v-if="isValue(movie.director)" class="flex items-center gap-1.5 line-clamp-1">
                     <span
-                        class="shrink-0 text-[8px] font-black tracking-widest uppercase text-gray-400 dark:text-gray-600 w-6">Dir</span>
+                        class="shrink-0 text-[8px] font-bold tracking-widest uppercase text-gray-400 dark:text-gray-600 w-6">Dir</span>
                     <span class="truncate font-semibold text-gray-700 dark:text-gray-300" itemprop="director" itemscope
                           itemtype="https://schema.org/Person">
                         <span itemprop="name">{{ movie.director }}</span>
@@ -81,7 +80,7 @@
                 </p>
                 <p v-if="isValue(movie.actors)" class="flex items-center gap-1.5 line-clamp-1">
                     <span
-                        class="shrink-0 text-[8px] font-black tracking-widest uppercase text-gray-400 dark:text-gray-600 w-6">Cast</span>
+                        class="shrink-0 text-[8px] font-bold tracking-widest uppercase text-gray-400 dark:text-gray-600 w-6">Cast</span>
                     <span class="truncate font-semibold text-gray-700 dark:text-gray-300">
                         <span v-for="(actor, index) in movie.actors.split(',').slice(0, 2)" :key="index"
                               itemprop="actor" itemscope itemtype="https://schema.org/Person">
