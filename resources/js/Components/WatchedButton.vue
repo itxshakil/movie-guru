@@ -16,6 +16,10 @@ const props = defineProps({
         type: String,
         default: 'label',
     },
+    size: {
+        type: String,
+        default: 'sm',
+    },
 });
 
 const REACTION_PROMPT_MS = 5000;
@@ -112,7 +116,7 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         :aria-pressed="watched"
         :style="{anchorName}"
         :title="watched ? 'Watched' : 'Mark as watched'"
-        size="sm"
+        :size="size"
         variant="secondary"
         @click.stop.prevent="onButtonClick"
     >

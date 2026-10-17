@@ -26,6 +26,8 @@ final class HiddenGemController extends Controller
 
     /**
      * Today's hidden gem, or with ?shuffle=1 (the "another gem" button and shake gesture) a random one.
+     *
+     * The daily gem is cached per day, so a change to the payload must bump the version in the cache key.
      */
     public function show(HiddenGemRequest $request): JsonResponse
     {
@@ -39,7 +41,7 @@ final class HiddenGemController extends Controller
             return response()->json($gem);
         }
 
-        $cacheKey = 'hidden_gem_' . now()->format('Y-m-d');
+        $cacheKey = 'hidden_gem_v2_' . now()->format('Y-m-d');
 
         $gem = Cache::remember($cacheKey, now()->endOfDay(), fn () => $this->hiddenGems()
             ->inRandomOrder((string) (int) now()->format('Ymd'))

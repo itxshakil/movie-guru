@@ -37,6 +37,19 @@ test('hidden gem endpoint includes the type and the plot for the featured card',
         ->assertJsonMissingPath('details');
 });
 
+test('hidden gem without a plot returns a null plot', function (): void {
+    MovieDetail::factory()->create([
+        'imdb_rating' => '8.0',
+        'imdb_votes' => '10000',
+        'poster' => 'https://example.com/poster.jpg',
+        'details' => ['Title' => 'No plot here'],
+    ]);
+
+    $this->getJson(route('hidden-gem.show'))
+        ->assertSuccessful()
+        ->assertJsonPath('plot', null);
+});
+
 test('shuffled hidden gem also includes the plot', function (): void {
     MovieDetail::factory()->create([
         'imdb_rating' => '8.0',
