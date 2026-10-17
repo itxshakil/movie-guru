@@ -317,10 +317,6 @@ dialog[open] {
         border: none !important;
     }
 
-    .dark .modal-dialog {
-        background-color: rgba(17, 24, 39, var(--tw-bg-opacity, 1)) !important;
-    }
-
     .modal-dialog::after {
         content: '';
         position: absolute;
@@ -334,8 +330,15 @@ dialog[open] {
         z-index: 20;
     }
 
-    .dark .modal-dialog::after {
-        background-color: #4b5563;
+    /* Dark mode follows prefers-color-scheme (Tailwind's default dark variant), so a .dark class never matches. */
+    @media (prefers-color-scheme: dark) {
+        .modal-dialog {
+            background-color: color-mix(in oklab, var(--color-gray-950) calc(var(--tw-bg-opacity, 1) * 100%), transparent) !important;
+        }
+
+        .modal-dialog::after {
+            background-color: #4b5563;
+        }
     }
 
     .modal-dialog > div {

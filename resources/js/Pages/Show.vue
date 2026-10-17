@@ -6,6 +6,7 @@ import NewsletterWidget from '@/Components/NewsletterWidget.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import DetailCard from '@/Components/DetailCard.vue';
 import SearchCard from "@/Components/SearchCard.vue";
+import SectionHeading from '@/Components/Ui/SectionHeading.vue';
 import TrailerPlayer from '@/Components/TrailerPlayer.vue';
 
 const props = defineProps({
@@ -159,71 +160,57 @@ const ogImage = moviePoster(props.detail);
         <link rel="canonical" :href="pageUrl" head-key="canonical" />
     </Head>
 
-    <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources"
-                @share="shareMovie"
-                class="relative isolate px-6 pt-14 lg:px-8 dark:bg-gray-900 dark:text-white"/>
-
-    <div v-if="trailerId" class="mx-auto max-w-4xl px-4 lg:px-8 pt-2 pb-6">
-        <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-            🎬 Watch the Trailer
-        </h2>
-        <TrailerPlayer :video-id="trailerId" :title="detail?.Title ?? 'Movie'"/>
+    <div class="mx-auto max-w-7xl pt-6 sm:px-6 sm:pt-10 lg:px-8">
+        <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources" @share="shareMovie"/>
     </div>
 
-    <div class="mx-auto max-w-7xl px-4 lg:px-8 py-8">
+    <section v-if="trailerId" class="pt-12 sm:pt-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading title="Watch the trailer"/>
+            <TrailerPlayer :title="detail?.Title ?? 'Movie'" :video-id="trailerId" class="max-w-4xl"/>
+        </div>
+    </section>
+
+    <div class="mx-auto max-w-7xl px-4 pt-12 sm:px-6 sm:pt-16 lg:px-8">
         <NewsletterWidget/>
     </div>
 
-    <div class="mt-4">
-        <div v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="bg-white dark:bg-gray-900 py-8">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎉 Fresh Releases</h2>
-                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Stay up-to-date with the latest
-                        movies hitting
-                        the screens.</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
-                    <SearchCard
-                        v-for="movie in recentlyReleasedMovies"
-                        :key="movie.imdb_id"
-                        :movie="movie"
-                        class="scroll-reveal cv-card"
-                        @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                        @share="shareMovieFromCard"
-                    />
-                </div>
+    <section v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading subtitle="The latest movies to hit the screens." title="Fresh releases"/>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <SearchCard
+                    v-for="movie in recentlyReleasedMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    class="scroll-reveal cv-card"
+                    @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+                    @share="shareMovieFromCard"
+                />
             </div>
         </div>
+    </section>
 
-        <div v-if="recommendedMovies && recommendedMovies.length" class="bg-white dark:bg-gray-900 py-8">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 Recommended Movies</h2>
-                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Timeless classics and must-watch
-                        films for
-                        every movie lover.</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
-                    <SearchCard
-                        v-for="movie in recommendedMovies"
-                        :key="movie.imdb_id"
-                        :movie="movie"
-                        class="scroll-reveal cv-card"
-                        @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                        @share="shareMovieFromCard"
-                    />
-                </div>
+    <section v-if="recommendedMovies && recommendedMovies.length" class="py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading subtitle="Timeless classics and must-watch films." title="Recommended"/>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <SearchCard
+                    v-for="movie in recommendedMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    class="scroll-reveal cv-card"
+                    @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
+                    @share="shareMovieFromCard"
+                />
             </div>
         </div>
-    </div>
-    <div v-if="similarMovies && similarMovies.length" class="bg-white dark:bg-gray-900 py-8">
-        <div class="mx-auto max-w-7xl px-4 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 More Like This</h2>
-                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Similar movies you might enjoy.</p>
-            </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
+    </section>
+
+    <section v-if="similarMovies && similarMovies.length" class="py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading subtitle="Similar titles you might enjoy." title="More like this"/>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <SearchCard
                     v-for="movie in similarMovies"
                     :key="movie.imdb_id"
@@ -234,6 +221,7 @@ const ogImage = moviePoster(props.detail);
                 />
             </div>
         </div>
-    </div>
+    </section>
+
     <NewsletterForm/>
 </template>

@@ -5,6 +5,7 @@ import {
     isDocumentPictureInPictureSupported,
     useTrailerPictureInPicture,
 } from '@/Composables/useTrailerPictureInPicture.js';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 const props = defineProps({
     videoId: {
@@ -146,18 +147,15 @@ onBeforeUnmount(() => window.removeEventListener('message', handlePlayerMessage)
         </div>
 
         <div v-if="loaded && isDocumentPictureInPictureSupported" class="mt-2 flex justify-end">
-            <button
-                type="button"
-                class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-                title="Keep the trailer playing while you browse"
-                @click="popOut"
-            >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                    <rect height="14" rx="2" width="20" x="2" y="5"/>
-                    <rect fill="currentColor" height="5" rx="1" stroke="none" width="8" x="12" y="12"/>
-                </svg>
+            <UiButton size="sm" title="Keep the trailer playing while you browse" variant="ghost" @click="popOut">
+                <template #icon>
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect height="14" rx="2" width="20" x="2" y="5"/>
+                        <rect fill="currentColor" height="5" rx="1" stroke="none" width="8" x="12" y="12"/>
+                    </svg>
+                </template>
                 Pop out while browsing
-            </button>
+            </UiButton>
         </div>
     </div>
 </template>
