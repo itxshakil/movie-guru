@@ -62,7 +62,7 @@ const closeReactionPrompt = ({hadFocus}) => {
         <meta content="Your watchlist in two tabs: To watch for movies you want to see, and Watched for movies you've seen, liked or disliked. Available offline." head-key="description" name="description"/>
     </Head>
 
-    <div class="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">
+    <div class="min-h-screen py-12 px-4">
         <div class="mx-auto max-w-7xl">
             <div class="mb-6">
                 <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">My watchlist</h1>
