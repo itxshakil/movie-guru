@@ -10,7 +10,7 @@
         >
             <div
                 v-if="show"
-                class="relative w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-400 m-2"
+                class="relative m-2 w-full max-w-xs rounded-2xl border border-gray-200 bg-white p-4 text-gray-500 shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400"
                 role="alert"
             >
                 <div class="flex">
@@ -42,23 +42,9 @@
                         <div class="mb-2 text-sm font-normal">
                             {{ description }}
                         </div>
-                        <div class="w-full flex gap-2 justify-end">
-                            <div>
-                                <button
-                                    @click="onCancel"
-                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-transparent border rounded-lg hover:bg-gray-100 focus:ring-4 border-none focus:outline-hidden focus:ring-gray-200 dark:text-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700"
-                                >
-                                    {{ secondaryAction }}
-                                </button>
-                            </div>
-                            <div v-if="primaryAction">
-                                <button
-                                    @click="onConfirm"
-                                    class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:outline-hidden focus:ring-primary-300 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800"
-                                >
-                                    {{ primaryAction }}
-                                </button>
-                            </div>
+                        <div class="flex w-full justify-end gap-2">
+                            <UiButton size="sm" variant="secondary" @click="onCancel">{{ secondaryAction }}</UiButton>
+                            <UiButton v-if="primaryAction" size="sm" @click="onConfirm">{{ primaryAction }}</UiButton>
                         </div>
                     </div>
                     <button
@@ -93,6 +79,7 @@
 
 <script setup>
 import {onMounted, ref} from "vue";
+import UiButton from "@/Components/Ui/UiButton.vue";
 
 const props = defineProps({
     title: String,

@@ -1,9 +1,9 @@
 <script setup>
 import {Head, useForm} from '@inertiajs/vue3';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
-import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 import InputError from '@/Components/InputError.vue';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import {inject} from "vue";
@@ -47,11 +47,11 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
         <meta :content="pageTitle" head-key="og:title" name="og:title"/>
         <meta :content="pageDescription" head-key="og:description" name="og:description"/>
     </Head>
-    <div class="pt-24 pb-8 bg-gray-100 dark:bg-gray-900 dark:text-white">
-            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-                <div class="bg-gray-100 dark:bg-gray-800 dark:text-white p-4 rounded-lg my-4 duration-500">
-                    <h2 class="text-2xl font-bold">Get in touch</h2>
-                    <p class="mb-4 text-lg text-gray-600 dark:text-gray-300">Catch Us If You Can – Spoiler: You Totally Can. Let's Chat!</p>
+    <div class="pt-24 pb-8 sm:pt-28 dark:text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="my-4 rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Get in touch</h1>
+                    <p class="mt-2 mb-6 text-gray-500 dark:text-gray-400">Catch Us If You Can – Spoiler: You Totally Can. Let's Chat!</p>
                     <Transition
                         enter-active-class="transition ease-in-out"
                         enter-from-class="opacity-0"
@@ -71,28 +71,28 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                         <label for="website" class="sr-only">Website (Leave blank)</label>
                         <input type="text" v-model="form.website" id="website" name="website" class="hidden" />
                         <div class="col-span-2 md:col-span-1">
-                            <InputLabel for="name" required value="Name" class="font-bold text-medium mb-2" />
-                            <TextInput id="name" placeholder="What should we call you?" v-model="form.name" type="text" class="w-full" required autofocus autocomplete="full-name" />
+                            <InputLabel for="name" required value="Name" class="mb-2" />
+                            <TextInput id="name" placeholder="What should we call you?" v-model="form.name" type="text" required autofocus autocomplete="full-name" />
                             <InputError :message="form.errors.name" />
                         </div>
                         <div class="col-span-2 md:col-span-1">
-                            <InputLabel for="email" required value="Email" class="font-bold text-medium mb-2" />
-                            <TextInput id="email" v-model="form.email" placeholder="Where should we contact you?" name="email" type="email" class="w-full" required autocomplete="email" maxlength="100" />
+                            <InputLabel for="email" required value="Email" class="mb-2" />
+                            <TextInput id="email" v-model="form.email" placeholder="Where should we contact you?" name="email" type="email" required autocomplete="email" maxlength="100" />
                             <InputError :message="form.errors.email" />
                         </div>
                         <div class="col-span-2">
-                            <InputLabel for="message" required value="Message" class="font-bold text-medium mb-2" />
-                          <textarea id="message" v-model="form.message" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 border-transparent transition duration-75 rounded-lg focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-700 dark:placeholder-gray-400 focus:read-only:text-gray-200" name="message"
+                            <InputLabel for="message" required value="Message" class="mb-2" />
+                          <textarea id="message" v-model="form.message" class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-xs placeholder:text-gray-400 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500" name="message"
                                     placeholder="Your Message"
                                     required
                                     rows="6"></textarea>
                             <InputError :message="form.errors.message" />
                         </div>
                         <div class="col-span-2">
-                            <LoadingSpinnerButton :is-loading="form.processing" value="Send Message" />
+                            <UiButton :loading="form.processing" type="submit">Send Message</UiButton>
                         </div>
                     </form>
-                    <hr class="my-4">
+                    <hr class="my-6 border-gray-200 dark:border-gray-800">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div class="col-span-1 md:col-span-2">

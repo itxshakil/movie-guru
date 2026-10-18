@@ -67,7 +67,7 @@ const posters = [
             <!-- Mobile logo -->
             <div class="lg:hidden mb-8">
                 <Link class="flex items-center gap-2" href="/">
-                    <img alt="Movie Guru" class="h-9 w-9 rounded-xl" src="/icons/ios/64.png"/>
+                    <img alt="Movie Guru" class="h-12 w-12 rounded-xl" src="/icons/ios/64.png"/>
                     <span class="text-gray-900 dark:text-white font-bold text-lg tracking-tight">Movie Guru</span>
                 </Link>
             </div>
@@ -75,7 +75,7 @@ const posters = [
             <div class="w-full max-w-sm">
                 <!-- Heading -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                         {{ title }}
                     </h1>
                     <p v-if="subtitle" class="mt-2 text-sm text-gray-500 dark:text-gray-400">

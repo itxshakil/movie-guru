@@ -216,11 +216,10 @@ defineExpose({close});
             style="-webkit-overflow-scrolling: touch;">
             <button
                 tabindex="-1"
-                class="fixed top-4 right-4 md:absolute md:top-2 md:right-2 ml-auto inline-flex items-center rounded-lg bg-gray-200/50 backdrop-blur-sm p-1 text-sm text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-600/50 dark:text-gray-100 z-50"
-                type="button" @click="close">
+                class="fixed top-4 right-4 md:absolute md:top-2 md:right-2 ml-auto inline-flex items-center rounded-full bg-gray-200/50 backdrop-blur-sm p-1 text-sm text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-600/50 dark:text-gray-100 z-50"
+                type="button" aria-label="Close" @click="close">
                 <TimesIcon class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" />
-                <span class="sr-only">Close modal</span>
-            </button>
+                            </button>
             <slot/>
         </div>
     </dialog>
