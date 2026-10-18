@@ -138,7 +138,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                         v-model="form.s"
                         autocomplete="off"
                         autofocus
-                        class="min-w-0 flex-1 border-0 bg-transparent px-1 py-2.5 text-base text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:outline-none sm:text-lg dark:text-white [&::-webkit-search-cancel-button]:appearance-none"
+                        class="min-w-0 flex-1 border-0 bg-transparent px-1 py-2.5 text-base text-gray-900 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-0 focus:outline-none sm:text-lg dark:text-white [&::-webkit-search-cancel-button]:appearance-none"
                         enterkeyhint="search"
                         name="s"
                         placeholder="Search movies and series..."
