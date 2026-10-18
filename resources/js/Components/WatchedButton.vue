@@ -36,6 +36,8 @@ let hidePromptTimer = null;
 const watched = computed(() => isWatched(props.movie.imdb_id));
 const reaction = computed(() => reactionFor(props.movie.imdb_id));
 const reactionEmoji = computed(() => ({liked: '👍', disliked: '👎'})[reaction.value] ?? '');
+// A stable name with aria-pressed, like WatchlistButton; once watched, a press opens the reaction popover.
+const accessibleName = computed(() => `Watched: ${props.movie.title}${reaction.value ? ` (${reaction.value})` : ''}`);
 
 const openReactionPrompt = () => {
     try {
@@ -91,7 +93,7 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         v-bind="$attrs"
         :aria-expanded="watched ? isPopoverOpen : undefined"
         :aria-haspopup="watched ? 'dialog' : undefined"
-        :aria-label="watched ? `${movie.title}: watched${reaction ? `, ${reaction}` : ''}. Change` : `Mark ${movie.title} as watched`"
+        :aria-label="accessibleName"
         :aria-pressed="watched"
         :class="watched ? 'bg-emerald-600 text-white' : 'bg-black/55 text-white hover:bg-black/70'"
         :style="{anchorName}"
@@ -112,7 +114,7 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         v-bind="$attrs"
         :aria-expanded="watched ? isPopoverOpen : undefined"
         :aria-haspopup="watched ? 'dialog' : undefined"
-        :aria-label="watched ? `${movie.title}: watched${reaction ? `, ${reaction}` : ''}. Change` : `Mark ${movie.title} as watched`"
+        :aria-label="accessibleName"
         :aria-pressed="watched"
         :style="{anchorName}"
         :title="watched ? 'Watched' : 'Mark as watched'"
@@ -126,7 +128,7 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
             </svg>
             <Eye v-else class="h-4 w-4"/>
         </template>
-        {{ watched ? `Watched ${reactionEmoji}`.trim() : 'Mark watched' }}
+        {{ `Watched ${reactionEmoji}`.trim() }}
     </UiButton>
 
     <div

@@ -1,7 +1,8 @@
+<!-- A toggle: the name stays put and aria-pressed (plus the filled bookmark) carries the state. -->
 <template>
     <button
         v-if="variant === 'icon'"
-        :aria-label="isInWatchlist ? `Remove ${movie.title} from watchlist` : `Add ${movie.title} to watchlist`"
+        :aria-label="`Watchlist: ${movie.title}`"
         :aria-pressed="isInWatchlist"
         :class="isInWatchlist ? 'bg-primary-600 text-white' : 'bg-black/55 text-white hover:bg-black/70'"
         :title="isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'"
@@ -13,6 +14,7 @@
     </button>
     <UiButton
         v-else
+        :aria-label="`Watchlist: ${movie.title}`"
         :aria-pressed="isInWatchlist"
         :title="isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'"
         :size="size"
@@ -22,7 +24,7 @@
         <template #icon>
             <Bookmark :filled="isInWatchlist" class="h-4 w-4"/>
         </template>
-        {{ isInWatchlist ? 'Saved' : 'Watchlist' }}
+        Watchlist
     </UiButton>
 </template>
 
