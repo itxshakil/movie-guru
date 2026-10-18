@@ -8,7 +8,6 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import LoadingSpinner from '@/Components/Icons/LoadingSpinner.vue';
 import UiButton from '@/Components/Ui/UiButton.vue';
-import {buttonClasses} from '@/Components/Ui/buttonClasses.js';
 
 defineOptions({layout: BaseLayout});
 
@@ -242,8 +241,7 @@ const addMovieNightToCalendar = async () => {
                         <span v-for="id in picks" :key="id"
                               class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ id }}
-                            <button :aria-label="`Remove ${id}`" class="text-gray-400 hover:text-red-500 transition-colors"
-                                    type="button" @click="removePick(id)">×</button>
+                            <UiButton :aria-label="`Remove ${id}`" class="size-7 p-0! -mr-2 rounded-full! text-gray-500!" size="sm" variant="ghost" @click="removePick(id)">×</UiButton>
                         </span>
                     </div>
 
@@ -261,10 +259,7 @@ const addMovieNightToCalendar = async () => {
                         Share this link:</p>
                     <div class="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3 dark:bg-gray-800/60">
                         <span class="flex-1 text-xs text-gray-500 dark:text-gray-400 truncate">{{ shareUrl }}</span>
-                        <button class="text-xs font-semibold text-primary-600 dark:text-primary-400 hover:underline shrink-0"
-                                type="button" @click="copyLink">
-                            Copy
-                        </button>
+                        <UiButton class="shrink-0" size="sm" variant="ghost" @click="copyLink">Copy</UiButton>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2 justify-center">
                         <UiButton @click="shareLink">Share link</UiButton>
@@ -275,9 +270,9 @@ const addMovieNightToCalendar = async () => {
                     <div v-if="pickedContact" class="space-y-2">
                         <p class="text-sm text-gray-600 dark:text-gray-400">Send it to {{ pickedContact.name }}:</p>
                         <div class="flex gap-2 justify-center">
-                            <a :class="[buttonClasses(), 'bg-green-600! hover:bg-green-500!']" :href="whatsAppUrl"
-                               rel="noopener" target="_blank">WhatsApp</a>
-                            <a :class="buttonClasses({variant: 'secondary'})" :href="smsUrl">SMS</a>
+                            <UiButton :href="whatsAppUrl" class="bg-green-600! hover:bg-green-500! active:bg-green-700!"
+                                      external rel="noopener" target="_blank">WhatsApp</UiButton>
+                            <UiButton :href="smsUrl" external variant="secondary">SMS</UiButton>
                         </div>
                     </div>
                     <p aria-live="polite" class="min-h-5 text-xs font-medium text-primary-600 dark:text-primary-400">{{ shareFeedback }}</p>
@@ -305,8 +300,7 @@ const addMovieNightToCalendar = async () => {
                     <span v-for="id in picks" :key="id"
                           class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ id }}
-                        <button :aria-label="`Remove ${id}`" class="text-gray-400 hover:text-red-500 transition-colors"
-                                type="button" @click="removePick(id)">×</button>
+                        <UiButton :aria-label="`Remove ${id}`" class="size-7 p-0! -mr-2 rounded-full! text-gray-500!" size="sm" variant="ghost" @click="removePick(id)">×</UiButton>
                     </span>
                 </div>
 

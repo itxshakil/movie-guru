@@ -98,9 +98,9 @@ const closeReactionPrompt = ({hadFocus}) => {
                 <div v-for="placeholder in 6" :key="placeholder"
                      class="animate-pulse rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800">
                     <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700"/>
-                    <div class="p-2 space-y-2">
-                        <div class="h-3 rounded bg-gray-200 dark:bg-gray-700 w-3/4"/>
-                        <div class="h-2.5 rounded bg-gray-200 dark:bg-gray-700 w-1/3"/>
+                    <div class="p-3">
+                        <div class="h-4 rounded bg-gray-200 dark:bg-gray-700 w-3/4"/>
+                        <div class="mt-1.5 h-3 rounded bg-gray-200 dark:bg-gray-700 w-1/3"/>
                     </div>
                 </div>
             </div>

@@ -22,8 +22,11 @@ export function buttonClasses({variant = 'primary', size = 'md', block = false} 
     return [BASE, VARIANTS[variant] ?? VARIANTS.primary, SIZES[size] ?? SIZES.md, block ? 'w-full' : ''].join(' ').trim();
 }
 
-export function buttonTag({href, disabled} = {}) {
-    return href && !disabled ? 'link' : 'button';
+export function buttonTag({href, disabled, external = false} = {}) {
+    if (!href || disabled) {
+        return 'button';
+    }
+    return external ? 'external' : 'link';
 }
 
 export function chipClasses({active = false, size = 'md', interactive = true} = {}) {

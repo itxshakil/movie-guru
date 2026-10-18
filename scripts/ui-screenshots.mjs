@@ -1,4 +1,4 @@
-// Screenshots pages at phone and desktop widths in light and dark mode through the Chrome
+// Screenshots pages (JPEG files, <slug>-<viewport>-<scheme>.jpg) at phone and desktop widths in light and dark mode through the Chrome
 // DevTools protocol, and fails when a page is wider than its viewport.
 // Usage: node scripts/ui-screenshots.mjs <baseUrl> <outDir> [path ...]
 import {spawn} from 'node:child_process';
