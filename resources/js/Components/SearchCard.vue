@@ -207,7 +207,7 @@ const searchWatchDownload = (title) => {
     border-radius: inherit;
 }
 
-/* The ring goes on the whole card instead; this beats the unlayered global :focus-visible rule. */
+/* The ring goes on the whole card instead of the default :focus-visible outline on the title link. */
 .card-link:focus-visible {
     outline: none;
 }
