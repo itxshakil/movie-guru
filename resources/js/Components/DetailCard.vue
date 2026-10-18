@@ -3,7 +3,7 @@
         <div class="flex text-left text-base w-full">
             <div
                 :class="layout === 'page' ? 'sm:rounded-xl sm:shadow-2xl' : 'rounded-xl shadow-2xl'"
-                class="relative squircle flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white">
+                class="relative flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white">
 
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="relative grid w-full grid-cols-1 items-start gap-x-6 gap-y-6 sm:grid-cols-12 lg:gap-x-8 p-4 sm:p-6 lg:p-8">
