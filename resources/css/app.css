@@ -50,6 +50,34 @@
         @apply bg-no-repeat;
         @apply bg-cover;
     }
+
+    /* Default focus ring. In the base layer so a component's own focus utilities win (the search
+       pill rings its wrapper instead of the input), and with no border-radius so the outline
+       follows the element's own shape instead of squaring off round buttons and chips. */
+    :focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+    }
+
+    /* Input micro-interactions. In the base layer so a field's own focus utilities
+       (focus:ring-0 on the search pill input) can turn the glow off. */
+    input[type='text'],
+    input[type='email'],
+    input[type='password'],
+    input[type='search'],
+    textarea,
+    select {
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type='text']:focus,
+    input[type='email']:focus,
+    input[type='password']:focus,
+    input[type='search']:focus,
+    textarea:focus,
+    select:focus {
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+    }
 }
 
 h1, h2, h3{
@@ -156,13 +184,6 @@ a[href] {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Smooth focus rings */
-:focus-visible {
-    outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
-    border-radius: 6px;
-}
-
 /* Frosted glass navbar enhancement */
 header.sticky {
     -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -175,25 +196,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-}
-
-/* Input micro-interactions */
-input[type='text'],
-input[type='email'],
-input[type='password'],
-input[type='search'],
-textarea,
-select {
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-input[type='text']:focus,
-input[type='email']:focus,
-input[type='password']:focus,
-input[type='search']:focus,
-textarea:focus,
-select:focus {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 /* Brand spring easing for tactile press/hover feedback */
