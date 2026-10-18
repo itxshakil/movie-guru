@@ -1,10 +1,12 @@
 <script setup>
 import {useForm} from "@inertiajs/vue3";
-import {inject} from "vue";
+import {inject, ref} from "vue";
 import TextInput from "@/Components/TextInput.vue";
 import UiButton from "@/Components/Ui/UiButton.vue";
 
 const gtag = inject("gtag");
+
+const newsletterForm = ref(null);
 
 const form = useForm({
     email: "",
@@ -21,7 +23,11 @@ const subscribe = () => {
     form.post(route("subscribe"), {
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset();
+            // Clears the browser's user-validity flag so the emptied email field is not flagged red.
+            newsletterForm.value?.reset();
+        },
     });
 };
 </script>
@@ -42,8 +48,9 @@ const subscribe = () => {
                         cinematic gems, reviews, and trends every week.
                     </p>
                     <form
-                        @submit.prevent="subscribe"
+                        ref="newsletterForm"
                         class="mt-6 flex flex-col max-w-md gap-3"
+                        @submit.prevent="subscribe"
                     >
                         <label class="sr-only" for="first-name">First name</label>
                         <TextInput
