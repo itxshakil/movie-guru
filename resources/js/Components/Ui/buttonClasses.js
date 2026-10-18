@@ -1,6 +1,6 @@
+const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500';
 const BASE = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors press-spring '
-    + 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 '
-    + 'disabled:pointer-events-none disabled:opacity-60';
+    + FOCUS_RING + ' disabled:pointer-events-none disabled:opacity-60';
 
 const VARIANTS = {
     primary: 'bg-primary-600 text-white shadow-sm hover:bg-primary-500 active:bg-primary-700',
@@ -38,5 +38,13 @@ export function chipClasses({active = false, size = 'md', interactive = true} = 
     const hover = interactive && !active
         ? 'hover:border-primary-400 hover:text-primary-700 dark:hover:border-primary-500 dark:hover:text-white'
         : '';
-    return [CHIP_BASE, CHIP_SIZES[size] ?? CHIP_SIZES.md, colours, hover].join(' ').trim();
+    return [CHIP_BASE, CHIP_SIZES[size] ?? CHIP_SIZES.md, colours, hover, interactive ? FOCUS_RING : ''].join(' ').trim();
+}
+
+/**
+ * A button chip that is given an active state is a toggle, so it reports that state as aria-pressed.
+ * Action chips (no active binding) and static chips get no aria-pressed at all.
+ */
+export function chipPressed({as = 'button', active} = {}) {
+    return as === 'button' && typeof active === 'boolean' ? active : undefined;
 }
