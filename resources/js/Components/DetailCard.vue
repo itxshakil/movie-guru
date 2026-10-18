@@ -283,23 +283,28 @@
     </div>
 
     <Teleport to="body">
-        <div v-if="affiliateLink"
-             class="fixed bottom-[var(--tab-bar-height)] left-0 right-0 z-50 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-primary-200 dark:border-primary-800 shadow-2xl md:hidden"
+        <div
+            v-if="affiliateLink"
+            class="booking-bar fixed inset-x-0 bottom-(--tab-bar-height) z-50 flex h-(--booking-bar-height) items-center border-t border-primary-200 bg-white/95 px-3 shadow-2xl backdrop-blur-sm md:hidden dark:border-primary-800 dark:bg-gray-900/95"
         >
-            <a
+            <UiButton
                 :href="affiliateLink.link"
-                class="flex items-center justify-center gap-2 w-full py-3.5 px-6 bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white font-bold text-base rounded-xl shadow-lg transition-colors"
+                block
+                external
                 rel="noopener noreferrer"
+                size="lg"
                 target="_blank"
                 @click="sendAnalytics('Affiliate Sticky: ' + affiliateLink.title, affiliateLink.link)"
             >
-                <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
+                <template #icon>
+                    <svg aria-hidden="true" class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                    </svg>
+                </template>
                 Book tickets: {{ affiliateLink.title }}
-            </a>
+            </UiButton>
         </div>
     </Teleport>
 </template>

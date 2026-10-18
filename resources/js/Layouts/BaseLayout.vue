@@ -10,7 +10,7 @@ import NotificationBanner from "@/Components/NotificationBanner.vue";
 </script>
 
 <template>
-    <div class="min-h-screen bg-white dark:bg-gray-950 pb-[var(--tab-bar-height)] md:pb-[env(safe-area-inset-bottom)]">
+    <div class="base-layout min-h-screen bg-white dark:bg-gray-950 pb-[var(--tab-bar-height)] md:pb-[env(safe-area-inset-bottom)]">
         <AppHeader/>
         <slot/>
         <AppFooter/>
