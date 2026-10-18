@@ -206,11 +206,21 @@ body {
        instead of jumping instantly - see .snippet-text in SnippetText.vue. */
     interpolate-size: allow-keywords;
     --tab-bar-height: calc(4rem + env(safe-area-inset-bottom));
+    /* The phone "Book tickets" bar on the detail page (DetailCard) is this tall. */
+    --booking-bar-height: 4.5rem;
 }
 
 @media (width >= 48rem) {
     :root {
         --tab-bar-height: 0px;
+    }
+}
+
+/* While the phone "Book tickets" bar is shown, reserve its height under the page as well as the
+   tab bar's, so the bar never covers the end of the footer. */
+@media (width < 48rem) {
+    body:has(.booking-bar) .base-layout {
+        padding-bottom: calc(var(--tab-bar-height) + var(--booking-bar-height));
     }
 }
 
