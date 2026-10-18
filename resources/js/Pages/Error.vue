@@ -1,6 +1,7 @@
 <script setup>
 import {computed} from 'vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 const props = defineProps({ status: Number })
 
@@ -36,19 +37,14 @@ const pageDescription = description;
         <meta :content="pageTitle" head-key="og:title" name="og:title"/>
         <meta :content="pageDescription" head-key="og:description" name="og:description"/>
     </Head>
-    <main class="grid min-h-full place-items-center bg-white dark:bg-gray-900 text-white py-24 sm:py-32 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+    <main class="grid min-h-full place-items-center dark:text-white py-24 sm:py-32 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div class="text-center">
             <p class="text-base font-semibold text-primary-600 dark:text-gray-400">{{  status }}</p>
-            <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">{{ title }}</h1>
+            <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ title }}</h1>
             <p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">{{ description}}</p>
-            <div class="mt-10 flex items-center justify-center gap-x-6">
-                <a href="/"
-                   class="rounded-md bg-primary-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">
-                    Go back home
-                </a>
-                <a href="/contact" class="text-sm font-semibold text-gray-900 dark:texxt-white">
-                    Contact support<span aria-hidden="true">&rarr;</span>
-                </a>
+            <div class="mt-10 flex items-center justify-center gap-x-3">
+                <UiButton external href="/">Go home</UiButton>
+                <UiButton external href="/contact" variant="ghost">Contact support</UiButton>
             </div>
         </div>
     </main>

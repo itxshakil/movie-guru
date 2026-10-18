@@ -1,7 +1,7 @@
 <script setup>
 import {computed} from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 import {Head, Link, useForm} from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -35,13 +35,9 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </div>
 
         <form class="space-y-4" @submit.prevent="submit">
-            <PrimaryButton
-                :class="{ 'opacity-50': form.processing }"
-                :disabled="form.processing"
-                class="w-full justify-center py-3 rounded-xl text-sm font-semibold"
-            >
+            <UiButton block :loading="form.processing" size="lg" type="submit">
                 Resend verification email
-            </PrimaryButton>
+            </UiButton>
 
             <Link
                 :href="route('logout')"
