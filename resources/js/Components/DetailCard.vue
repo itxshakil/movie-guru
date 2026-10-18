@@ -2,8 +2,10 @@
     <div class="flex min-h-full items-stretch justify-center text-center md:items-center">
         <div class="flex text-left text-base w-full">
             <div
-                :class="layout === 'page' ? 'sm:rounded-xl sm:shadow-2xl' : 'rounded-xl shadow-2xl'"
-                class="relative flex w-full items-center overflow-hidden bg-white dark:bg-gray-950 dark:text-white">
+                :class="layout === 'page'
+                    ? 'bg-white dark:bg-gray-950 sm:rounded-2xl sm:border sm:border-gray-200 sm:dark:border-gray-800 sm:dark:bg-gray-900'
+                    : 'rounded-xl bg-white shadow-2xl dark:bg-gray-950'"
+                class="relative flex w-full items-center overflow-hidden dark:text-white">
 
                 <div v-if="detail" itemscope itemtype="https://schema.org/Movie"
                      class="relative grid w-full grid-cols-1 items-start gap-x-6 gap-y-6 sm:grid-cols-12 lg:gap-x-8 p-4 sm:p-6 lg:p-8">
@@ -340,7 +342,7 @@ const props = defineProps({
         required: false,
         default: null,
     },
-    /** "page" sits flush on phones (the full detail page); "sheet" keeps its card look (the quick-view sheet). */
+    /** "page" sits flush on phones and on the shared card surface from sm up (the full detail page); "sheet" keeps its card look (the quick-view sheet). */
     layout: {
         type: String,
         default: 'sheet',
