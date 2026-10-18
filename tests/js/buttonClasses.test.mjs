@@ -23,6 +23,13 @@ test('unknown variant or size falls back to the defaults', () => {
     assert.equal(buttonClasses({variant: 'nope', size: 'huge'}), buttonClasses({}));
 });
 
+test('an external button renders as a plain anchor only with an href and while enabled', () => {
+    assert.equal(buttonTag({href: 'https://wa.me/1', external: true}), 'external');
+    assert.equal(buttonTag({href: '', external: true}), 'button');
+    assert.equal(buttonTag({href: 'https://wa.me/1', external: true, disabled: true}), 'button');
+    assert.equal(buttonTag({href: '/mood', external: false}), 'link');
+});
+
 test('a button renders as a link only with an href and while enabled', () => {
     assert.equal(buttonTag({href: '/mood'}), 'link');
     assert.equal(buttonTag({href: ''}), 'button');
