@@ -18,7 +18,7 @@ final class SearchQueryFactory extends Factory
     {
         return [
             'query' => $this->faker->word(),
-            'page' => fake()->optional()->numberBetween(1, 255),
+            'page' => fake()->numberBetween(1, 255),
             'type' => fake()->optional()->word(),
             'year' => fake()->optional()->year(),
             'ip_address' => fake()->optional()->ipv4(),
