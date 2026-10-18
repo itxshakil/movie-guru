@@ -50,7 +50,7 @@
                     <button
                         @click="onCancel"
                         type="button"
-                        class="-mx-1.5 -my-1.5 absolute bg-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white dark:text-gray-500 shrink-0 focus:ring-2 focus:ring-gray-300 h-8 hover:bg-gray-100 hover:text-gray-900 inline-flex items-center justify-center ms-auto p-1.5 right-2 rounded-lg text-gray-400 top-2 w-8"
+                        class="-mx-1.5 -my-1.5 absolute bg-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white dark:text-gray-400 shrink-0 focus:ring-2 focus:ring-gray-300 h-8 hover:bg-gray-100 hover:text-gray-900 inline-flex items-center justify-center ms-auto p-1.5 right-2 rounded-lg text-gray-500 top-2 w-8"
                         data-dismiss-target="#toast-interactive"
                         aria-label="Close"
                     >

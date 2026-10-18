@@ -94,7 +94,7 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Connect With Us</h3>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Follow us on social media for news, updates, and special offers.</p>
                             <div class="mt-6 flex space-x-3">
-                                <a class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                <a class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                    href="https://www.facebook.com/moviegurufb"
                                    rel="noopener noreferrer" target="_blank">
                                     <span class="sr-only">Join our Facebook Page</span>
@@ -103,7 +103,7 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                                         <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
                                     </svg>
                                 </a>
-                                <a class="text-gray-400 hover:text-green-500 transition-colors"
+                                <a class="text-gray-500 dark:text-gray-400 hover:text-green-500 transition-colors"
                                    href="https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17" rel="noopener noreferrer"
                                    target="_blank">
                                     <span class="sr-only">Whatsapp Channel</span>
@@ -113,7 +113,7 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                                         <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
                                     </svg>
                                 </a>
-                                <a class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                <a class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                    href="https://www.facebook.com/groups/movieguru1"
                                    rel="noopener noreferrer" target="_blank">
                                     <span class="sr-only">Facebook Group</span>
