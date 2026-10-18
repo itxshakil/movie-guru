@@ -22,7 +22,7 @@ import NotificationBanner from "@/Components/NotificationBanner.vue";
         <NetworkStatus/>
 
         <div
-            class="fixed bottom-[var(--tab-bar-height)] right-0 z-50 flex flex-col snackbar-container mb-2"
+            class="fixed bottom-[var(--overlay-bottom)] right-0 z-50 flex flex-col snackbar-container mb-2"
         ></div>
     </div>
 </template>

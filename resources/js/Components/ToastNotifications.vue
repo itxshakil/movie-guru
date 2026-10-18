@@ -63,7 +63,7 @@ swChannel.onmessage = (event) => {
 <template>
     <div
         aria-live="polite"
-        class="flex flex-col-reverse gap-4 fixed bottom-[calc(var(--tab-bar-height)+1rem)] right-4 z-50 pointer-events-none w-full max-w-80 stagger-siblings"
+        class="flex flex-col-reverse gap-4 fixed bottom-[calc(var(--overlay-bottom)+1rem)] right-4 z-50 pointer-events-none w-full max-w-80 stagger-siblings"
         role="status"
     >
         <ToastNotificationItem

@@ -87,7 +87,7 @@ onBeforeUnmount(() => clearTimeout(hideTimer));
     <div
         ref="dialog"
         :aria-labelledby="headingId"
-        class="reaction-prompt fixed inset-x-4 bottom-[calc(var(--tab-bar-height)+1.5rem)] z-60 mx-auto flex max-w-sm items-center gap-2 rounded-2xl border border-gray-200 bg-white/95 py-2 pl-4 pr-2 text-gray-900 shadow-lg outline-none backdrop-blur-md focus-visible:ring-2 focus-visible:ring-primary-500 lg:bottom-6 dark:border-gray-700 dark:bg-gray-800/95 dark:text-white"
+        class="reaction-prompt fixed inset-x-4 bottom-[calc(var(--overlay-bottom)+1.5rem)] z-60 mx-auto flex max-w-sm items-center gap-2 rounded-2xl border border-gray-200 bg-white/95 py-2 pl-4 pr-2 text-gray-900 shadow-lg outline-none backdrop-blur-md focus-visible:ring-2 focus-visible:ring-primary-500 lg:bottom-6 dark:border-gray-700 dark:bg-gray-800/95 dark:text-white"
         role="dialog"
         tabindex="-1"
         @focusin="onFocusin"
