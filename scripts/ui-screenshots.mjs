@@ -102,6 +102,12 @@ try {
     socket.addEventListener('close', () => rejectPending('DevTools socket closed'));
     socket.addEventListener('error', () => rejectPending('DevTools socket error'));
     await send('Page.enable');
+    // content-visibility: auto skips painting off-screen cards in full-page captures, so force it visible.
+    await send('Page.addScriptToEvaluateOnNewDocument', {source: `document.addEventListener('DOMContentLoaded', () => {
+        const style = document.createElement('style');
+        style.textContent = '.cv-card, .cv-card-compact { content-visibility: visible !important; }';
+        document.head.appendChild(style);
+    });`});
     for (const path of paths.length ? paths : DEFAULT_PATHS) {
         for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
             for (const scheme of SCHEMES) {
@@ -134,10 +140,11 @@ try {
                 console.log(JSON.stringify({path, viewport: viewportName, scheme, status, scrollWidth: probe.scrollWidth,
                     innerWidth: probe.innerWidth, overflow}));
 
-                const shot = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: true,
+                // JPEG keeps a tall desktop capture under the WebSocket client's 4 MiB decompressed message limit.
+                const shot = await send('Page.captureScreenshot', {format: 'jpeg', quality: 90, captureBeyondViewport: true,
                     clip: {x: 0, y: 0, width: viewport.width, height: Math.min(probe.height, MAX_HEIGHT), scale: 1}});
                 const slug = path.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'home';
-                writeFileSync(join(outDir, `${slug}-${viewportName}-${scheme}.png`), Buffer.from(shot.result.data, 'base64'));
+                writeFileSync(join(outDir, `${slug}-${viewportName}-${scheme}.jpg`), Buffer.from(shot.result.data, 'base64'));
             }
         }
     }
