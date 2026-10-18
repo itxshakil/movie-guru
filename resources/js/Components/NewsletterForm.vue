@@ -21,15 +21,7 @@ const subscribe = () => {
     form.post(route("subscribe"), {
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => {
-        form.reset();
-
-        const broadcastChannel = new BroadcastChannel('toast-notifications');
-        broadcastChannel.postMessage({
-          message: 'Thanks for subscribing!',
-          level: 'success',
-        });
-      },
+        onSuccess: () => form.reset(),
     });
 };
 </script>
@@ -77,10 +69,6 @@ const subscribe = () => {
                         <UiButton :loading="form.processing" class="shrink-0" type="submit">Subscribe</UiButton>
                         </div>
                     </form>
-
-                  <p v-if="form.recentlySuccessful" class="mt-4 text-green-500 dark:text-green-400">
-                    Thank you for subscribing!
-                  </p>
                 </div>
                 <dl
                     class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2"

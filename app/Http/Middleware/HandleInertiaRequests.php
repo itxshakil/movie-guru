@@ -41,7 +41,7 @@ final class HandleInertiaRequests extends Middleware
             ],
             'appName' => config('app.name'),
             'success' => session('success'),
-            'danger' => session('danger'),
+            'error' => session('error'),
             'info' => session('info'),
             'warning' => session('warning'),
         ];
