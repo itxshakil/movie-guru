@@ -4,6 +4,11 @@ import {Head, Link, useForm} from '@inertiajs/vue3';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import {shareOrCopyLink, shareOrDownloadFile} from '@/Composables/useFileSharing.js';
 import {createCalendarFile} from '@/Composables/useCalendarEvent.js';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import LoadingSpinner from '@/Components/Icons/LoadingSpinner.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
+import {buttonClasses} from '@/Components/Ui/buttonClasses.js';
 
 defineOptions({layout: BaseLayout});
 
@@ -157,19 +162,18 @@ const addMovieNightToCalendar = async () => {
 
             <!-- Header -->
             <div class="mb-10 text-center">
-                <div class="text-4xl mb-3">🎬</div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Movie Match</h1>
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Movie Match</h1>
                 <p class="mt-2 text-gray-500 dark:text-gray-400">Pick movies you want to watch, share the link, and see
                     what you both agree on.</p>
             </div>
 
             <!-- Results view -->
-            <div v-if="hasResults" class="space-y-8">
-                <div class="rounded-2xl border border-gray-100 dark:border-gray-800 p-6 bg-gray-50 dark:bg-gray-800/50">
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                        🎉 You matched on {{ session.matched.length }} movie{{
+            <div v-if="hasResults" class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+                    <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+                        You matched on {{ session.matched.length }} movie{{
                             session.matched.length !== 1 ? 's' : ''
-                        }}!
+                        }}
                     </h2>
                     <div v-if="session.matched.length === 0" class="text-gray-500 dark:text-gray-400 text-sm">
                         No overlapping picks - try again with different movies!
@@ -179,7 +183,7 @@ const addMovieNightToCalendar = async () => {
                             <Link
                                 :href="route('movie.detail.full', { imdbID: movie.imdb_id })"
                                 prefetch="click"
-                                class="flex items-center gap-3 rounded-xl p-2 -m-2 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                                class="flex items-center gap-3 rounded-xl p-2 -m-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                             >
                                 <img
                                     v-if="movie.poster"
@@ -197,118 +201,83 @@ const addMovieNightToCalendar = async () => {
                 </div>
 
                 <div v-if="session.matched.length"
-                     class="rounded-2xl border border-gray-100 dark:border-gray-800 p-6 space-y-3">
-                    <h2 class="text-base font-bold text-gray-900 dark:text-white">Plan your movie night</h2>
+                     class="space-y-3 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Plan your movie night</h2>
+                    <InputLabel class="sr-only" for="movie-night-at" value="Movie night date and time"/>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <label class="sr-only" for="movie-night-at">Movie night date and time</label>
-                        <input
-                            id="movie-night-at"
-                            v-model="movieNightAt"
-                            class="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            type="datetime-local"
-                        />
-                        <button
-                            class="px-4 py-2.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-semibold transition-colors"
-                            type="button"
-                            @click="addMovieNightToCalendar"
-                        >
-                            📅 Add to calendar
-                        </button>
+                        <TextInput id="movie-night-at" v-model="movieNightAt" class="flex-1" type="datetime-local"/>
+                        <UiButton @click="addMovieNightToCalendar">Add to calendar</UiButton>
                     </div>
                 </div>
 
                 <div class="text-center">
-                    <Link :href="route('movie-match.create')"
-                          class="inline-block px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-colors text-sm">
-                        Start a new match
-                    </Link>
+                    <UiButton :href="route('movie-match.create')" size="lg">Start a new match</UiButton>
                 </div>
             </div>
 
             <!-- Partner pick submission -->
             <div v-else-if="session && !isCreator" class="space-y-6">
                 <div
-                    class="rounded-2xl border border-primary-100 dark:border-primary-900/40 bg-primary-50 dark:bg-primary-900/20 p-4 text-sm text-primary-700 dark:text-primary-300">
+                    class="rounded-2xl border border-primary-100 dark:border-primary-900/40 bg-primary-50 dark:bg-primary-950/40 p-4 text-sm text-primary-700 dark:text-primary-300">
                     Your friend has picked their movies. Now add yours - we'll find the overlap!
                 </div>
 
-                <div>
-                    <label
-                        class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Enter
-                        IMDB IDs (e.g. tt0111161)</label>
-                    <div class="flex gap-2">
-                        <input
-                            v-model="searchQuery"
-                            class="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                            placeholder="tt0111161"
-                            type="text"
-                            @keydown.enter.prevent="addPick(searchQuery.trim()); searchQuery = ''"
-                        />
-                        <button
-                            class="px-4 py-2.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-semibold transition-colors"
-                            type="button"
-                            @click="addPick(searchQuery.trim()); searchQuery = ''"
-                        >Add
-                        </button>
+                <div class="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+                    <div>
+                        <InputLabel class="mb-2" for="match-pick" value="Enter IMDb IDs (e.g. tt0111161)"/>
+                        <div class="flex gap-2">
+                            <TextInput
+                                id="match-pick"
+                                v-model="searchQuery"
+                                class="flex-1"
+                                placeholder="tt0111161"
+                                type="text"
+                                @keydown.enter.prevent="addPick(searchQuery.trim()); searchQuery = ''"
+                            />
+                            <UiButton @click="addPick(searchQuery.trim()); searchQuery = ''">Add</UiButton>
+                        </div>
                     </div>
-                </div>
 
-                <div v-if="picks.length" class="flex flex-wrap gap-2">
-                    <span v-for="id in picks" :key="id"
-                          class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {{ id }}
-                        <button class="text-gray-400 hover:text-red-500 transition-colors"
-                                @click="removePick(id)">×</button>
-                    </span>
-                </div>
+                    <div v-if="picks.length" class="flex flex-wrap gap-2">
+                        <span v-for="id in picks" :key="id"
+                              class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {{ id }}
+                            <button :aria-label="`Remove ${id}`" class="text-gray-400 hover:text-red-500 transition-colors"
+                                    type="button" @click="removePick(id)">×</button>
+                        </span>
+                    </div>
 
-                <button
-                    :disabled="picks.length === 0 || form.processing"
-                    class="w-full py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm"
-                    @click="submitPicks"
-                >
-                    See our matches →
-                </button>
+                    <UiButton :disabled="picks.length === 0" :loading="form.processing" block size="lg" @click="submitPicks">
+                        See our matches
+                    </UiButton>
+                </div>
             </div>
 
             <!-- Creator waiting view -->
             <div v-else-if="session && isCreator" class="space-y-6">
-                <div class="rounded-2xl border border-gray-100 dark:border-gray-800 p-6 text-center space-y-4">
-                    <div class="text-3xl">⏳</div>
+                <div class="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900">
+                    <LoadingSpinner aria-hidden="true" class="mx-auto h-8 w-8 text-primary-600 dark:text-primary-400"/>
                     <p class="text-gray-600 dark:text-gray-400 text-sm">Waiting for your friend to pick their movies.
                         Share this link:</p>
-                    <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
+                    <div class="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3 dark:bg-gray-800/60">
                         <span class="flex-1 text-xs text-gray-500 dark:text-gray-400 truncate">{{ shareUrl }}</span>
                         <button class="text-xs font-semibold text-primary-600 dark:text-primary-400 hover:underline shrink-0"
-                                @click="copyLink">
+                                type="button" @click="copyLink">
                             Copy
                         </button>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                        <button
-                            class="px-4 py-2.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-semibold transition-colors"
-                            type="button"
-                            @click="shareLink"
-                        >
-                            Share link
-                        </button>
-                        <button
-                            v-if="isContactPickerSupported"
-                            class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-xl text-sm font-semibold transition-colors"
-                            type="button"
-                            @click="pickContact"
-                        >
+                        <UiButton @click="shareLink">Share link</UiButton>
+                        <UiButton v-if="isContactPickerSupported" variant="secondary" @click="pickContact">
                             Pick a friend
-                        </button>
+                        </UiButton>
                     </div>
                     <div v-if="pickedContact" class="space-y-2">
                         <p class="text-sm text-gray-600 dark:text-gray-400">Send it to {{ pickedContact.name }}:</p>
                         <div class="flex gap-2 justify-center">
-                            <a :href="whatsAppUrl"
-                               class="px-4 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-sm font-semibold transition-colors"
+                            <a :class="[buttonClasses(), 'bg-green-600! hover:bg-green-500!']" :href="whatsAppUrl"
                                rel="noopener" target="_blank">WhatsApp</a>
-                            <a :href="smsUrl"
-                               class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm font-semibold transition-colors">SMS</a>
+                            <a :class="buttonClasses({variant: 'secondary'})" :href="smsUrl">SMS</a>
                         </div>
                     </div>
                     <p aria-live="polite" class="min-h-5 text-xs font-medium text-primary-600 dark:text-primary-400">{{ shareFeedback }}</p>
@@ -316,25 +285,19 @@ const addMovieNightToCalendar = async () => {
             </div>
 
             <!-- Create new session -->
-            <div v-else class="space-y-6">
+            <div v-else class="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
                 <div>
-                    <label
-                        class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Enter
-                        IMDB IDs of movies you want to watch (up to 10)</label>
+                    <InputLabel class="mb-2" for="match-pick" value="Enter IMDb IDs of movies you want to watch (up to 10)"/>
                     <div class="flex gap-2">
-                        <input
+                        <TextInput
+                            id="match-pick"
                             v-model="searchQuery"
-                            class="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                            class="flex-1"
                             placeholder="tt0111161"
                             type="text"
                             @keydown.enter.prevent="addPick(searchQuery.trim()); searchQuery = ''"
                         />
-                        <button
-                            class="px-4 py-2.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-semibold transition-colors"
-                            type="button"
-                            @click="addPick(searchQuery.trim()); searchQuery = ''"
-                        >Add
-                        </button>
+                        <UiButton @click="addPick(searchQuery.trim()); searchQuery = ''">Add</UiButton>
                     </div>
                 </div>
 
@@ -342,18 +305,14 @@ const addMovieNightToCalendar = async () => {
                     <span v-for="id in picks" :key="id"
                           class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ id }}
-                        <button class="text-gray-400 hover:text-red-500 transition-colors"
-                                @click="removePick(id)">×</button>
+                        <button :aria-label="`Remove ${id}`" class="text-gray-400 hover:text-red-500 transition-colors"
+                                type="button" @click="removePick(id)">×</button>
                     </span>
                 </div>
 
-                <button
-                    :disabled="picks.length === 0 || form.processing"
-                    class="w-full py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm"
-                    @click="submitPicks"
-                >
-                    Create match link →
-                </button>
+                <UiButton :disabled="picks.length === 0" :loading="form.processing" block size="lg" @click="submitPicks">
+                    Create match link
+                </UiButton>
             </div>
         </div>
     </div>

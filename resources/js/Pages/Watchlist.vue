@@ -2,13 +2,16 @@
 import {computed, ref, watch} from 'vue';
 import {Head, Link, usePage} from '@inertiajs/vue3';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
+import PosterTile from '@/Components/PosterTile.vue';
 import WatchedButton from '@/Components/WatchedButton.vue';
+import WatchlistButton from '@/Components/WatchlistButton.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 import ReactionPrompt from '@/Components/ReactionPrompt.vue';
 import {useLibrary} from '@/Composables/useLibrary.js';
 
 defineOptions({layout: BaseLayout});
 
-const {toWatch, watched, isLibraryLoaded, loadError, retryLoad, lastMarkedWatched, remove} = useLibrary();
+const {toWatch, watched, isLibraryLoaded, loadError, retryLoad, lastMarkedWatched} = useLibrary();
 
 const page = usePage();
 
@@ -51,8 +54,6 @@ const closeReactionPrompt = ({hadFocus}) => {
         tabLinks.value.find((link) => link.$el.getAttribute('aria-current') === 'page')?.$el.focus();
     }
 };
-
-const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.poster : '/assets/images/no-poster.jpg');
 </script>
 
 <template>
@@ -64,7 +65,7 @@ const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.p
     <div class="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">
         <div class="mx-auto max-w-7xl">
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🎬 My Watchlist</h1>
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">My watchlist</h1>
                 <p class="mt-1 text-gray-500 dark:text-gray-400">{{ storageDescription }}</p>
             </div>
 
@@ -75,33 +76,27 @@ const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.p
                     ref="tabLinks"
                     :aria-current="activeTab === tab.key ? 'page' : undefined"
                     :class="activeTab === tab.key
-                        ? 'border-primary-600 text-primary-700 dark:border-primary-400 dark:text-primary-300'
-                        : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'"
+                        ? 'border-primary-600 text-gray-900 dark:text-white'
+                        : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
                     :href="tab.href"
                     class="-mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors"
                     preserve-scroll
                 >
                     {{ tab.label }}
-                    <span class="ml-1 tabular-nums text-xs font-medium opacity-70">({{ tab.count }})</span>
+                    <span class="ml-1.5 rounded-full bg-gray-100 px-2 text-xs tabular-nums dark:bg-gray-800">{{ tab.count }}</span>
                 </Link>
             </nav>
 
             <div v-if="!isLibraryLoaded && loadError" class="text-center py-24" role="alert">
                 <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">We couldn't load your watchlist</h2>
                 <p class="mt-2 text-gray-500 dark:text-gray-400">Check your connection and try again.</p>
-                <button
-                    class="mt-6 inline-block px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-colors"
-                    type="button"
-                    @click="retryLoad"
-                >
-                    Try again
-                </button>
+                <UiButton class="mt-6" size="lg" @click="retryLoad">Try again</UiButton>
             </div>
 
             <div v-else-if="!isLibraryLoaded" aria-busy="true" aria-label="Loading your watchlist"
                  class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 <div v-for="placeholder in 6" :key="placeholder"
-                     class="animate-pulse rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                     class="animate-pulse rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800">
                     <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700"/>
                     <div class="p-2 space-y-2">
                         <div class="h-3 rounded bg-gray-200 dark:bg-gray-700 w-3/4"/>
@@ -113,46 +108,14 @@ const moviePoster = (movie) => (movie.poster && movie.poster !== 'N/A' ? movie.p
             <div v-else-if="items.length === 0" class="text-center py-24">
                 <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">{{ emptyState.title }}</h2>
                 <p class="mt-2 text-gray-500 dark:text-gray-400">{{ emptyState.body }}</p>
-                <Link :href="route('home')"
-                      class="mt-6 inline-block px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-colors">
-                    Browse Movies
-                </Link>
+                <UiButton :href="route('home')" class="mt-6" size="lg">Browse movies</UiButton>
             </div>
 
             <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                <div
-                    v-for="movie in items"
-                    :key="movie.imdb_id"
-                    class="group relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cv-card-compact"
-                >
-                    <Link :href="route('movie.detail.full', {imdbID: movie.imdb_id})" prefetch="click">
-                        <div class="aspect-2/3 overflow-hidden">
-                            <img :alt="movie.title + ' Poster'" :src="moviePoster(movie)"
-                                 class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                                 loading="lazy"/>
-                        </div>
-                        <div class="p-2">
-                            <p class="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight">{{ movie.title }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ movie.year }}</p>
-                        </div>
-                    </Link>
-
-                    <div class="absolute top-2 left-2">
-                        <WatchedButton :movie="movie"/>
-                    </div>
-
-                    <button
-                        v-if="activeTab === 'to-watch'"
-                        :aria-label="`Remove ${movie.title} from Watchlist`"
-                        class="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-all active:scale-90 focus-visible:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
-                        title="Remove from Watchlist"
-                        @click.prevent="remove(movie.imdb_id)"
-                    >
-                        <svg aria-hidden="true" class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
-                        </svg>
-                    </button>
-                </div>
+                <PosterTile v-for="movie in items" :key="movie.imdb_id" :movie="movie">
+                    <WatchlistButton :movie="movie" variant="icon"/>
+                    <WatchedButton :movie="movie" variant="icon"/>
+                </PosterTile>
             </div>
         </div>
 

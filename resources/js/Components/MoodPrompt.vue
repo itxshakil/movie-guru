@@ -1,6 +1,9 @@
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
 import {router} from '@inertiajs/vue3';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 /**
  * Free-text mood matching with Chrome's built-in Prompt API (on-device Gemini Nano):
@@ -151,29 +154,23 @@ onBeforeUnmount(() => baseSession?.destroy());
 
 <template>
     <form v-if="isAvailable" class="mx-auto mb-12 max-w-2xl" @submit.prevent="matchMood">
-        <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300" for="mood-description">
-            Or describe it in your own words
-        </label>
+        <InputLabel class="mb-2" for="mood-description" value="Or describe it in your own words"/>
         <div class="flex flex-col gap-2 sm:flex-row">
-            <input
+            <TextInput
                 id="mood-description"
                 v-model="description"
                 :disabled="isMatching"
                 autocomplete="off"
-                class="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                class="flex-1"
                 enterkeyhint="go"
                 maxlength="200"
                 placeholder="Something cosy after a long day"
                 type="text"
                 @focus="warmUpSession"
             />
-            <button
-                :disabled="isMatching || !description.trim()"
-                class="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-500 disabled:opacity-50"
-                type="submit"
-            >
+            <UiButton :disabled="isMatching || !description.trim()" type="submit">
                 {{ isMatching ? 'Matching...' : 'Find my mood' }}
-            </button>
+            </UiButton>
         </div>
         <p aria-live="polite" class="mt-2 min-h-5 text-xs text-gray-500 dark:text-gray-400">
             {{ status || 'Runs privately on your device.' }}
