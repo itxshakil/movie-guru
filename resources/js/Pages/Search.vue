@@ -2,9 +2,11 @@
 import {Head, useForm} from '@inertiajs/vue3';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
 import {computed, inject, nextTick, ref} from 'vue';
-import LoadingSpinnerButton from '@/Components/LoadingSpinnerButton.vue';
 import Show from '@/Components/Show.vue';
 import TextInput from '@/Components/TextInput.vue';
+import SectionHeading from '@/Components/Ui/SectionHeading.vue';
+import SelectInput from '@/Components/Ui/SelectInput.vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 import VoiceSearchButton from '@/Components/VoiceSearchButton.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
@@ -63,6 +65,13 @@ const form = useForm({
     type: props.movieType,
     year: props.year || '',
     page: 1,
+});
+
+const typeModel = computed({
+    get: () => form.type ?? '',
+    set: (value) => {
+        form.type = value || null;
+    },
 });
 
 const nextURLLink = ref(props.nextUrl);
@@ -226,114 +235,100 @@ const moviePoster = (movie) => {
     </Head>
     <div class="bg-gray-100 dark:bg-gray-900 dark:text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl pt-24 sm:py-24 lg:max-w-none">
-
-                <div class="mt-2 flex flex-col-reverse lg:flex-row gap-2 justify-between w-full items-baseline">
-                    <h1 v-if="searchResults.Response === 'False'"
-                        class="mb-4 text-xl font-bold text-gray-900 dark:text-white w-full ">
-                        No results found for {{ search }}
-                    </h1>
-                    <h1 v-else class="text-xl font-bold text-gray-900 dark:text-white w-full ">
-                        {{ searchResults.totalResults }} results found for {{ search }}
-                    </h1>
-
-                    <form :action="route('search')" class="flex flex-col sm:flex-row gap-2 items-center w-full group/search"
-                          method="get"
-                          @submit.prevent="doSearch">
-                        <div class="w-full sm:min-w-64 grow relative">
-                            <label class="sr-only" for="search-input">Search</label>
-                            <div class="relative flex items-center">
-                                <svg
-                                    class="absolute left-3.5 h-5 w-5 text-gray-400 group-focus-within/search:text-primary-500 transition-colors pointer-events-none"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          stroke-width="2.5"/>
+            <div class="mx-auto max-w-2xl pt-24 pb-8 sm:pt-28 sm:pb-12 lg:max-w-none">
+                <form :action="route('search')" class="w-full" method="get" role="search" @submit.prevent="doSearch">
+                    <div class="relative">
+                        <label class="sr-only" for="search-input">Search movies and series</label>
+                        <div
+                            class="flex items-center gap-2 rounded-full border border-gray-300 bg-white p-1.5 pr-3 pl-5 shadow-lg shadow-gray-900/5 transition-colors focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-500/20 dark:border-gray-700 dark:bg-gray-900 dark:shadow-black/30"
+                        >
+                            <svg aria-hidden="true" class="h-5 w-5 shrink-0 text-gray-400" fill="none"
+                                 stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                            <input
+                                id="search-input"
+                                v-model="form.s"
+                                autocomplete="off"
+                                class="min-w-0 flex-1 border-0 bg-transparent px-1 py-2.5 text-base text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:outline-none sm:text-lg dark:text-white"
+                                enterkeyhint="search"
+                                name="s"
+                                placeholder="Search movies and series..."
+                                type="search"
+                                @blur="hideSuggestions"
+                                @focus="showSuggestions = true"
+                                @input="filterTrendingQueries"
+                            />
+                            <VoiceSearchButton v-if="!form.s" class="shrink-0" @result="searchByVoice"/>
+                            <button
+                                v-else
+                                aria-label="Clear search"
+                                class="shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                type="button"
+                                @click="clearSearch"
+                            >
+                                <svg aria-hidden="true" class="h-5 w-5" fill="none" stroke="currentColor"
+                                     stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                                <TextInput
-                                    id="search-input"
-                                    v-model="form.s"
-                                    autocomplete="off"
-                                    class="w-full !rounded-xl !border-2 !pl-11 !pr-10 !py-3 focus:!ring-primary-500/20"
-                                    enterkeyhint="search"
-                                    name="s"
-                                    placeholder="Search movies and series..."
-                                    type="search"
-                                    @blur="hideSuggestions"
-                                    @focus="showSuggestions = true"
-                                    @input="filterTrendingQueries"
-                                />
-                                <VoiceSearchButton
-                                    v-if="!form.s"
-                                    class="absolute right-3"
-                                    @result="searchByVoice"
-                                />
-                                <button
-                                    v-else
-                                    class="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                                    type="button"
-                                    @click="clearSearch"
-                                >
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"
-                                              stroke-width="2"/>
-                                    </svg>
-                                </button>
-                            </div>
+                            </button>
+                        </div>
 
-                            <ul
-                                v-if="showSuggestions && filteredTrendingQueries.length > 0"
-                                class="search-suggestions absolute bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 w-full z-10 border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <li class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900/50 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
-                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"></path>
-                                    </svg>
-                                    Trending Searches
-                                </li>
-                                <li
-                                    v-for="query in filteredTrendingQueries"
-                                    :key="query"
-                                    class="px-4 py-2 hover:bg-primary-50 dark:hover:bg-primary-900/30 cursor-pointer flex items-center gap-2 text-gray-700 dark:text-gray-200 transition-colors"
-                                    @mousedown="selectTrendingQuery(query)">
-                                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"></path>
-                                    </svg>
-                                    {{ query }}
-                                </li>
-                            </ul>
+                        <ul
+                            v-if="showSuggestions && filteredTrendingQueries.length > 0"
+                            class="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                            <li class="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-500 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">
+                                <svg aria-hidden="true" class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round"
+                                          stroke-linejoin="round" stroke-width="2"></path>
+                                </svg>
+                                Trending searches
+                            </li>
+                            <li
+                                v-for="query in filteredTrendingQueries"
+                                :key="query"
+                                class="flex cursor-pointer items-center gap-2 px-4 py-2 text-gray-700 transition-colors hover:bg-primary-50 dark:text-gray-200 dark:hover:bg-primary-900/30"
+                                @mousedown="selectTrendingQuery(query)">
+                                <svg aria-hidden="true" class="h-4 w-4 text-gray-400" fill="none"
+                                     stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"
+                                          stroke-linejoin="round" stroke-width="2"></path>
+                                </svg>
+                                {{ query }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:flex sm:items-center">
+                        <div class="sm:w-40">
+                            <label class="sr-only" for="movie-type-select">Select type</label>
+                            <SelectInput id="movie-type-select" v-model="typeModel" name="type">
+                                <option value="">All types</option>
+                                <option v-for="type in movieTypes" :key="type" :value="type" class="capitalize">
+                                    {{ type }}
+                                </option>
+                            </SelectInput>
                         </div>
-                        <div class="flex gap-2 sm:w-64 w-full relative">
-                            <div class="w-full sm:w-40">
-                                <label class="sr-only" for="movie-type-select">Select Type</label>
-                                <select id="movie-type-select" v-model="form.type"
-                                        class="w-full !rounded-xl !border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 disabled:bg-slate-400 dark:disabled:bg-gray-600 dark:read-only:bg-gray-600 dark:text-gray-300 dark:focus:border-primary-600 dark:focus:ring-primary-600 shadow-xs bg-gray-400/10 placeholder-gray-500 transition duration-75 focus:bg-white focus:placeholder-gray-400 focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 dark:focus:text-gray-200 dark:placeholder-gray-400 focus:read-only:text-gray-200"
-                                        name="type">
-                                    <option :value="null">All types</option>
-                                    <option v-for="type in movieTypes" :key="type" :value="type" class="capitalize">
-                                        {{ type }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="w-full sm:w-24">
-                                <label class="sr-only" for="year-input">Year</label>
-                                <TextInput id="year-input" v-model="form.year" class="w-full !rounded-xl !border-2"
-                                           name="year" placeholder="Year" type="number"/>
-                            </div>
+                        <div class="sm:w-28">
+                            <label class="sr-only" for="year-input">Year</label>
+                            <TextInput id="year-input" v-model="form.year" name="year" placeholder="Year"
+                                       type="number"/>
                         </div>
-                        <LoadingSpinnerButton :is-loading="form.processing"
-                                              class="w-full sm:w-auto justify-center !rounded-xl !px-6 !py-3 !font-bold"
-                                              value="Search"/>
-                    </form>
-                </div>
+                        <UiButton :loading="form.processing" class="col-span-2 sm:w-auto" type="submit">
+                            Search
+                        </UiButton>
+                    </div>
+                </form>
+
+                <h1 class="mt-8 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    <template v-if="searchResults.Response === 'False'">No results for '{{ search }}'</template>
+                    <template v-else>{{ searchResults.totalResults }} results for '{{ search }}'</template>
+                </h1>
 
                 <div v-if="movieList && movieList.length" ref="resultsGrid"
-                     class="py-6 space-y-12 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8 sm:space-y-0 grid-divided"
+                     class="grid gap-6 pt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                      style="--card-density: compact;">
                     <SearchCard
                         v-for="movie in movieList"
@@ -345,95 +340,79 @@ const moviePoster = (movie) => {
                     />
                 </div>
 
-                <div v-show="nextURLLink" class="flex justify-center my-2">
-                    <a v-show="nextURLLink && loading === false"
-                       :href="nextURLLink"
-                       class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-sm hover:scale-105 transition-all duration-300"
-                       @click.prevent="loadMore">Load More
-                    </a>
-                    <LoadingSpinnerButton v-show="loading" :isLoading="true" value="Loading..."/>
+                <div v-show="nextURLLink" class="mt-8 flex justify-center">
+                    <UiButton :loading="loading" variant="secondary" @click="loadMore">
+                        {{ loading ? 'Loading...' : 'Load more' }}
+                    </UiButton>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="mt-4">
-        <div v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="bg-white dark:bg-gray-900 py-8">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎉 Fresh Releases</h2>
-                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Stay up-to-date with the latest
-                        movies hitting
-                        the screens.</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
-                    <SearchCard
-                        v-for="movie in recentlyReleasedMovies"
-                        :key="movie.imdb_id"
-                        :movie="movie"
-                        class="scroll-reveal cv-card"
-                        @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                        @share="shareMovieFromCard"
-                    />
-                </div>
+    <section v-if="recentlyReleasedMovies && recentlyReleasedMovies.length" class="py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading subtitle="The latest movies to hit the screens." title="Fresh releases"/>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <SearchCard
+                    v-for="movie in recentlyReleasedMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    class="scroll-reveal cv-card"
+                    @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
+                    @share="shareMovieFromCard"
+                />
             </div>
         </div>
+    </section>
 
-        <div v-if="recommendedMovies && recommendedMovies.length" class="bg-white dark:bg-gray-900 py-8">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-base font-semibold text-primary-600 dark:text-primary-500">🎥 Recommended Movies</h2>
-                    <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Timeless classics and must-watch
-                        films for
-                        every movie lover.</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 grid-divided" style="--card-density: spacious;">
-                    <SearchCard
-                        v-for="movie in recommendedMovies"
-                        :key="movie.imdb_id"
-                        :movie="movie"
-                        class="scroll-reveal cv-card"
-                        @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                        @share="shareMovieFromCard"
-                    />
-                </div>
+    <section v-if="recommendedMovies && recommendedMovies.length" class="py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading subtitle="Timeless classics and must-watch films for every movie lover."
+                            title="Recommended movies"/>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <SearchCard
+                    v-for="movie in recommendedMovies"
+                    :key="movie.imdb_id"
+                    :movie="movie"
+                    class="scroll-reveal cv-card"
+                    @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
+                    @share="shareMovieFromCard"
+                />
             </div>
         </div>
-    </div>
+    </section>
 
     <NewsletterForm/>
 
-    <div
-        class="install-prompt-container w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-        <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Access details from anywhere</h5>
-        <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Stay up to date and move work forward
-            with Movie Guru on iOS & Android. Install the app today.</p>
-        <div class="items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
-            <div
-                class="install-prompt w-full sm:w-auto bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-hidden focus:ring-gray-300 text-white rounded-lg inline-flex items-center justify-center px-4 py-2.5 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
-                <svg aria-hidden="true" class="me-3 w-7 h-7" data-icon="apple" data-prefix="fab" focusable="false"
-                     role="img" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"
-                        fill="currentColor"></path>
-                </svg>
-                <div class="text-left rtl:text-right">
-                    <div class="mb-1 text-xs">Install on the</div>
-                    <div class="-mt-1 font-sans text-sm font-semibold">Mac App Store</div>
-                </div>
-            </div>
-            <div
-                class="install-prompt w-full sm:w-auto bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-hidden focus:ring-gray-300 text-white rounded-lg inline-flex items-center justify-center px-4 py-2.5 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
-                <svg aria-hidden="true" class="me-3 w-7 h-7" data-icon="google-play" data-prefix="fab"
-                     focusable="false" role="img" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"
-                        fill="currentColor"></path>
-                </svg>
-                <div class="text-left rtl:text-right">
-                    <div class="mb-1 text-xs">Get in on</div>
-                    <div class="-mt-1 font-sans text-sm font-semibold">Google Play</div>
-                </div>
+    <div class="install-prompt-container mx-auto my-12 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+            class="rounded-2xl border border-gray-200 bg-white p-6 text-center sm:p-10 dark:border-gray-800 dark:bg-gray-900">
+            <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">Access details from anywhere</h2>
+            <p class="mx-auto mb-6 max-w-xl text-base text-gray-500 sm:text-lg dark:text-gray-400">Stay up to date
+                and move work forward with Movie Guru on iOS & Android. Install the app today.</p>
+            <div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <UiButton class="w-full sm:w-auto" variant="secondary">
+                    <template #icon>
+                        <svg aria-hidden="true" class="h-5 w-5" focusable="false" viewBox="0 0 384 512"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </template>
+                    Mac App Store
+                </UiButton>
+                <UiButton class="w-full sm:w-auto" variant="secondary">
+                    <template #icon>
+                        <svg aria-hidden="true" class="h-5 w-5" focusable="false" viewBox="0 0 512 512"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </template>
+                    Google Play
+                </UiButton>
             </div>
         </div>
     </div>
@@ -445,29 +424,6 @@ const moviePoster = (movie) => {
 @media (display-mode: standalone) {
     .install-prompt-container {
         display: none;
-    }
-}
-
-ul {
-    transition: all 0.2s ease-in-out;
-}
-
-/* Anchors the trending-suggestions dropdown directly to the search input,
-   so it stays correctly positioned regardless of the surrounding form's
-   layout (it reflows between column/row at the sm breakpoint). Falls back
-   to the existing .absolute/.relative wrapper-based positioning above in
-   browsers without anchor positioning support. */
-@supports (anchor-name: --search-input) {
-    #search-input {
-        anchor-name: --search-input;
-    }
-
-    .search-suggestions {
-        position: absolute;
-        position-anchor: --search-input;
-        position-area: bottom span-right;
-        top: auto;
-        left: auto;
     }
 }
 </style>
