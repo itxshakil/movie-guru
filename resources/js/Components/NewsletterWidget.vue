@@ -18,11 +18,7 @@ const subscribe = () => {
     form.post(route('subscribe'), {
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => {
-            form.reset();
-            const channel = new BroadcastChannel('toast-notifications');
-            channel.postMessage({message: 'Thanks for subscribing! 🎬', level: 'success'});
-        },
+        onSuccess: () => form.reset(),
     });
 };
 </script>
@@ -38,7 +34,7 @@ const subscribe = () => {
         </div>
 
         <div v-if="form.recentlySuccessful" class="text-sm text-green-600 dark:text-green-400 font-medium py-2">
-            ✓ You're subscribed! Check your inbox.
+            ✓ You're on the list.
         </div>
 
         <form v-else class="space-y-2.5" @submit.prevent="subscribe">

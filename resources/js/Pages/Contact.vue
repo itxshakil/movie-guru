@@ -52,21 +52,6 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                 <div class="my-4 rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
                     <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Get in touch</h1>
                     <p class="mt-2 mb-6 text-gray-500 dark:text-gray-400">Catch Us If You Can – Spoiler: You Totally Can. Let's Chat!</p>
-                    <Transition
-                        enter-active-class="transition ease-in-out"
-                        enter-from-class="opacity-0"
-                        leave-active-class="transition ease-in-out"
-                        leave-to-class="opacity-0"
-                    >
-                        <div v-if="form.recentlySuccessful" id="form-success" role="alert" aria-live="assertive" class="col-span-2 bg-green-500 text-white p-4 rounded-md shadow-md mb-4 dark:bg-green-700 dark:text-gray-100">
-                            <div class="flex gap-1 flex-wrap items-center">
-                                <strong class="font-bold">Success!</strong>
-                                <span id="form-success-message" class="block sm:inline">
-                                    Thanks for your message. We'll be in touch.
-                                </span>
-                            </div>
-                        </div>
-                    </Transition>
                     <form class="grid grid-cols-2 gap-4" id="contact-form" @submit.prevent="storeContact" method="POST">
                         <label for="website" class="sr-only">Website (Leave blank)</label>
                         <input type="text" v-model="form.website" id="website" name="website" class="hidden" />
