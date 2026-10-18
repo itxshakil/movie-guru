@@ -1,4 +1,4 @@
-<!-- A toggle: the name stays put and aria-pressed (plus the filled bookmark) carries the state. -->
+<!-- A toggle: the name stays put; aria-pressed, the pressed tint and the filled bookmark carry the state. -->
 <template>
     <button
         v-if="variant === 'icon'"
@@ -16,8 +16,10 @@
         v-else
         :aria-label="`Watchlist: ${movie.title}`"
         :aria-pressed="isInWatchlist"
+        :pressed="isInWatchlist"
         :title="isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'"
         :size="size"
+        pressed-tone="primary"
         variant="secondary"
         @click.stop.prevent="toggleWatchlist"
     >
