@@ -245,7 +245,7 @@ const moviePoster = (movie) => {
 
         <link :href="pageUrl" head-key="canonical" rel="canonical"/>
     </Head>
-    <div class="bg-gray-100 dark:bg-gray-900 dark:text-white">
+    <div class="dark:text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl pt-24 pb-8 sm:pt-28 sm:pb-12 lg:max-w-none">
                 <form :action="route('search')" class="w-full" method="get" role="search" @submit.prevent="doSearch">

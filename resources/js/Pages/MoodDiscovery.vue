@@ -29,7 +29,7 @@ defineProps({
         <meta content="Find movies that match your mood." head-key="description" name="description"/>
     </Head>
 
-    <div class="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">
+    <div class="min-h-screen py-12 px-4">
         <div class="mx-auto max-w-7xl">
 
             <!-- Header -->

@@ -156,7 +156,7 @@ const addMovieNightToCalendar = async () => {
         <meta content="Find movies you and a friend both want to watch." head-key="description" name="description"/>
     </Head>
 
-    <div class="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">
+    <div class="min-h-screen py-12 px-4">
         <div class="mx-auto max-w-2xl">
 
             <!-- Header -->
