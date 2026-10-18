@@ -139,10 +139,12 @@ nav {
     }
 
     .app-header__count {
-        top: -0.125rem;
+        min-width: 1rem;
         height: 1rem;
-        width: 1rem;
-        font-size: 0.625rem;
+        padding-inline: 0.25rem;
+        font-size: 0.6875rem;
+        line-height: 1rem;
+        text-align: center;
     }
 }
 
