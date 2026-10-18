@@ -9,7 +9,7 @@ import SectionHeading from "@/Components/Ui/SectionHeading.vue";
             <div
                 class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--color-primary-500),transparent_70%)]"></div>
         </div>
-        <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
             <SectionHeading
                 align="center"
                 class="mx-auto max-w-2xl"
