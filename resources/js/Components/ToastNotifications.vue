@@ -1,14 +1,12 @@
 <script setup>
 import {usePage} from '@inertiajs/vue3';
 import {router} from '@inertiajs/core';
-import {ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import ToastNotificationItem from '@/Components/ToastNotificationItem.vue';
 
+// Mounted once at the app root (app.js), so it never remounts between visits and never double-toasts.
 const notifications = ref([]);
-
-router.on('finish', () => {
-    addNotificationFromPage();
-});
+const page = usePage();
 
 const addNotification = (message, level = 'info') => {
     notifications.value.push({
@@ -19,7 +17,6 @@ const addNotification = (message, level = 'info') => {
 };
 
 function addNotificationFromPage() {
-    const page = usePage();
     if (page.props.success) {
         addNotification(page.props.success, 'success');
     }
@@ -36,6 +33,11 @@ function addNotificationFromPage() {
         addNotification(page.props.info);
     }
 }
+
+// The first page arrives with the full page load (e.g. a redirect from an emailed link), where no
+// router "finish" event fires; later visits are picked up when they finish.
+addNotificationFromPage();
+const removeFinishListener = router.on('finish', addNotificationFromPage);
 
 const remove = (index) => {
     notifications.value.splice(index, 1);
@@ -58,6 +60,11 @@ swChannel.onmessage = (event) => {
     }
 };
 
+onUnmounted(() => {
+    removeFinishListener();
+    broadcastChannel.close();
+    swChannel.close();
+});
 </script>
 
 <template>
