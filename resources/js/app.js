@@ -8,6 +8,7 @@ import {ZiggyVue} from '../../vendor/tightenco/ziggy';
 import useInstallPrompt from '@/Composables/useInstalPrompt.js';
 import Analytics from '@/Plugins/analytics.js';
 import {requestPersistentStorage} from '@/Composables/useLibrary.js';
+import ToastNotifications from '@/Components/ToastNotifications.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Movie Guru';
 
@@ -34,7 +35,9 @@ createInertiaApp({
     },
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
+        // Toasts live beside the page rather than in a layout, so flashes reach every layout and the
+        // component (with its router listener) is mounted exactly once.
+        return createApp({ render: () => [h(App, props), h(ToastNotifications)] })
             .use(plugin)
             .use(ZiggyVue)
             .use(Analytics)

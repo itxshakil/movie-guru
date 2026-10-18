@@ -1,6 +1,5 @@
 <script setup>
 import AppFooter from "@/Layouts/AppFooter.vue";
-import ToastNotifications from "@/Components/ToastNotifications.vue";
 import InstallBanner from "@/Components/InstallBanner.vue";
 import AppHeader from "@/Layouts/AppHeader.vue";
 import OfflineSearchPrompt from "@/Components/OfflineSearchPrompt.vue";
@@ -15,7 +14,6 @@ import NotificationBanner from "@/Components/NotificationBanner.vue";
         <slot/>
         <AppFooter/>
         <AppTabBar/>
-        <ToastNotifications/>
         <InstallBanner/>
         <NotificationBanner/>
         <OfflineSearchPrompt/>
