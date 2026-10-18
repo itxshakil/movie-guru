@@ -20,6 +20,6 @@ final class TrendingMovieService
         return Cache::remember('trending-movies', now()->endOfDay(), static fn () => MovieDetail::trending()
             ->inRandomOrder()
             ->take(6)
-            ->get(MovieCollectionService::CARD_COLUMNS));
+            ->get(MovieDetail::CARD_COLUMNS));
     }
 }

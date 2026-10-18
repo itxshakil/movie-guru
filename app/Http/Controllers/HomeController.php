@@ -24,7 +24,7 @@ final class HomeController extends Controller
         $popularMovies = Cache::remember(
             'popular-movies',
             now()->endOfDay(),
-            static fn () => MovieDetail::popular()->take(6)->get(MovieCollectionService::CARD_COLUMNS),
+            static fn () => MovieDetail::popular()->take(6)->get(MovieDetail::CARD_COLUMNS),
         );
 
         $trendingMovies = $trendingMovieService->fetch();
@@ -35,7 +35,7 @@ final class HomeController extends Controller
             static fn () => MovieDetail::hiddenGems()
                 ->inRandomOrder()
                 ->take(6)
-                ->get(MovieCollectionService::CARD_COLUMNS),
+                ->get(MovieDetail::CARD_COLUMNS),
         );
 
         $recentlyReleasedMovies = $movieCollectionService->recentlyReleased();
@@ -45,7 +45,7 @@ final class HomeController extends Controller
         $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), static fn () => MovieDetail::topRated()
             ->inRandomOrder()
             ->take(6)
-            ->get(MovieCollectionService::CARD_COLUMNS));
+            ->get(MovieDetail::CARD_COLUMNS));
 
         return Inertia::render(
             'Welcome',
@@ -68,7 +68,7 @@ final class HomeController extends Controller
 
                     return MovieDetail::query()
                         ->whereIn('imdb_id', $topImdbIds)
-                        ->get(MovieCollectionService::CARD_COLUMNS)
+                        ->get(MovieDetail::CARD_COLUMNS)
                         ->sortBy(fn ($m) => $topImdbIds->search($m->imdb_id))
                         ->values();
                 }),
