@@ -13,6 +13,9 @@ const props = defineProps({
     disabled: {type: Boolean, default: false},
     block: {type: Boolean, default: false},
     external: {type: Boolean, default: false},
+    // Styling only: a toggle passes its on state here and its aria-pressed (or other state ARIA) itself.
+    pressed: {type: Boolean, default: false},
+    pressedTone: {type: String, default: 'primary'},
 });
 
 const classes = computed(() => buttonClasses(props));
