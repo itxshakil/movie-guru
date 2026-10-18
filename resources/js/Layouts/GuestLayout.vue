@@ -14,7 +14,7 @@ defineProps({
 
 const posters = [
     'https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg',
-    'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsLLeHjnDPEYB.jpg',
+    'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
     'https://image.tmdb.org/t/p/w500/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg',
     'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
     'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
@@ -34,8 +34,9 @@ const posters = [
                     class="overflow-hidden"
                 >
                     <img
-                        :alt="`Movie poster ${i + 1}`"
                         :src="poster"
+                        alt=""
+                        @error="$event.target.hidden = true"
                         class="h-full w-full object-cover object-center"
                         loading="lazy"
                     />
