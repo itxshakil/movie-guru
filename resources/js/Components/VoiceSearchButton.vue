@@ -1,5 +1,6 @@
 <script setup>
 import {onBeforeUnmount, ref} from 'vue';
+import UiButton from '@/Components/Ui/UiButton.vue';
 
 const emit = defineEmits(['result']);
 
@@ -54,14 +55,15 @@ onBeforeUnmount(() => recognition?.abort());
 </script>
 
 <template>
-    <button
+    <UiButton
         v-if="isSupported"
         :aria-label="isListening ? 'Stop voice search' : 'Search by voice'"
         :aria-pressed="isListening"
-        :class="isListening ? 'text-red-500 dark:text-red-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'"
+        :class="isListening ? 'text-red-500! dark:text-red-400!' : ''"
         :title="isListening ? 'Listening... tap to stop' : 'Search by voice'"
-        class="relative flex items-center justify-center rounded-full p-1 transition-colors"
-        type="button"
+        class="relative"
+        size="icon"
+        variant="ghost"
         @click="toggleListening"
     >
         <span v-if="isListening" aria-hidden="true" class="absolute inset-0 rounded-full bg-red-500/20 motion-safe:animate-ping"/>
@@ -69,5 +71,5 @@ onBeforeUnmount(() => recognition?.abort());
             <rect height="12" rx="3" width="6" x="9" y="3"/>
             <path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke-linecap="round"/>
         </svg>
-    </button>
+    </UiButton>
 </template>

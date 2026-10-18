@@ -19,6 +19,21 @@ test('each variant and size maps to its own classes', () => {
     assert.match(buttonClasses({block: true}), /w-full/);
 });
 
+test('the icon size is a round 40px square with no text padding', () => {
+    const classes = buttonClasses({variant: 'ghost', size: 'icon'});
+    assert.match(classes, /size-10/);
+    assert.match(classes, /rounded-full/);
+    assert.doesNotMatch(classes, /rounded-xl|px-|py-|text-(xs|sm|base)\b/);
+    assert.match(classes, /focus-visible:outline-2/);
+});
+
+test('text sizes keep the shared rounded-xl shape', () => {
+    for (const size of ['sm', 'md', 'lg']) {
+        assert.match(buttonClasses({size}), /rounded-xl/);
+        assert.doesNotMatch(buttonClasses({size}), /rounded-full/);
+    }
+});
+
 test('unknown variant or size falls back to the defaults', () => {
     assert.equal(buttonClasses({variant: 'nope', size: 'huge'}), buttonClasses({}));
 });

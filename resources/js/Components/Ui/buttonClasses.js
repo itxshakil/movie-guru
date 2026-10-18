@@ -1,4 +1,4 @@
-const BASE = 'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors press-spring '
+const BASE = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors press-spring '
     + 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 '
     + 'disabled:pointer-events-none disabled:opacity-60';
 
@@ -9,10 +9,12 @@ const VARIANTS = {
     danger: 'bg-red-600 text-white shadow-sm hover:bg-red-500 active:bg-red-700',
 };
 
+// Each size owns its corner radius so an icon-only button can be round without a class conflict.
 const SIZES = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2.5 text-sm',
-    lg: 'px-6 py-3 text-base',
+    sm: 'rounded-xl px-3 py-1.5 text-xs',
+    md: 'rounded-xl px-4 py-2.5 text-sm',
+    lg: 'rounded-xl px-6 py-3 text-base',
+    icon: 'size-10 shrink-0 rounded-full',
 };
 
 const CHIP_BASE = 'inline-flex items-center gap-1.5 rounded-full border font-medium transition-colors';
