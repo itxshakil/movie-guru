@@ -10,6 +10,7 @@ import UiButton from '@/Components/Ui/UiButton.vue';
 import VoiceSearchButton from '@/Components/VoiceSearchButton.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
+import {isPlainClick} from '@/Components/cardClicks.js';
 
 const gtag = inject('gtag');
 
@@ -148,6 +149,17 @@ const loadMore = async () => {
         notifyError('Something went wrong. Please try again later.');
     } finally {
         loading.value = false;
+    }
+};
+
+const onLoadMoreClick = (event) => {
+    if (!isPlainClick(event)) {
+        return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    if (!loading.value) {
+        loadMore();
     }
 };
 
@@ -340,8 +352,8 @@ const moviePoster = (movie) => {
                     />
                 </div>
 
-                <div v-show="nextURLLink" class="mt-8 flex justify-center">
-                    <UiButton :loading="loading" variant="secondary" @click="loadMore">
+                <div v-show="nextURLLink" class="mt-8 flex justify-center" @click.capture="onLoadMoreClick">
+                    <UiButton :href="nextURLLink" :loading="loading" variant="secondary">
                         {{ loading ? 'Loading...' : 'Load more' }}
                     </UiButton>
                 </div>
