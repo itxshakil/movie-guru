@@ -4,14 +4,15 @@ import {Link} from '@inertiajs/vue3';
 </script>
 
 <template>
-    <footer class="bg-white dark:bg-gray-900 pt-8">
-        <div class="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-            <div class="md:flex md:justify-between">
-                <div class="mb-6 md:mb-0 md:max-w-lg">
-                    <Link href="/" class="flex items-center">
-                        <ApplicationLogo class="h-12 w-12" />
+    <footer class="bg-white pt-12 pb-8 dark:bg-gray-900">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:justify-between md:gap-12">
+                <div class="mb-10 md:mb-0 md:max-w-sm">
+                    <Link class="inline-flex items-center gap-2" href="/">
+                        <ApplicationLogo alt="" class="h-9 w-9"/>
+                        <span class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Movie Guru</span>
                     </Link>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <p class="mt-4 text-sm leading-6 text-gray-600 dark:text-gray-400">
                         Movie Guru is a free, open-source project that lets you search movies and series and get all the
                         details about it.
                     </p>
@@ -70,27 +71,27 @@ import {Link} from '@inertiajs/vue3';
                 </div>
             </div>
             <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-            <div class="sm:flex sm:items-center sm:justify-between">
-          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2019-{{ new Date().getFullYear() }}  <Link class="hover:underline"
-                                                                                                   href="/">Movie Guru™</Link>. All Rights Reserved.
-          </span>
-                <div class="flex mt-4 sm:justify-center sm:mt-0 gap-2">
-                    <a href="https://www.facebook.com/moviegurufb" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
-                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 8 19">
+            <div class="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                    © 2019-{{ new Date().getFullYear() }} <Link class="hover:underline" href="/">Movie Guru™</Link>. All Rights Reserved.
+                </span>
+                <div class="-mx-2 flex gap-1">
+                    <a href="https://www.facebook.com/moviegurufb" class="rounded-full p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                        <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 8 19">
                             <path fill-rule="evenodd" d="M6.135 3H8V0H6.135a4.147 4.147 0 0 0-4.142 4.142V6H0v3h2v9.938h3V9h2.021l.592-3H5V3.591A.6.6 0 0 1 5.592 3h.543Z" clip-rule="evenodd"/>
                         </svg>
                         <span class="sr-only">Facebook page</span>
                     </a>
-                    <a href="https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="https://whatsapp.com/channel/0029VaLNhA9HFxOyPamoRO17" class="rounded-full p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
                             <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
                         </svg>
                         <span class="sr-only">WhatsApp channel</span>
                     </a>
-                    <a href="https://www.facebook.com/groups/movieguru1" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="https://www.facebook.com/groups/movieguru1" class="rounded-full p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                             <path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
