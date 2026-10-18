@@ -14,24 +14,6 @@ use Illuminate\Support\Facades\Cache;
 final class MovieCollectionService
 {
     /**
-     * Columns the movie cards need.
-     */
-    public const array CARD_COLUMNS = [
-        'imdb_id',
-        'title',
-        'year',
-        'release_date',
-        'poster',
-        'type',
-        'imdb_rating',
-        'imdb_votes',
-        'genre',
-        'director',
-        'writer',
-        'actors',
-    ];
-
-    /**
      * @return Collection<int, MovieDetail>
      */
     public function recentlyReleased(): Collection
@@ -39,7 +21,7 @@ final class MovieCollectionService
         return Cache::remember('recently-released-movies', now()->endOfDay(), static fn () => MovieDetail::recentlyReleased()
             ->inRandomOrder()
             ->take(6)
-            ->get(self::CARD_COLUMNS));
+            ->get(MovieDetail::CARD_COLUMNS));
     }
 
     /**
@@ -50,7 +32,7 @@ final class MovieCollectionService
         return Cache::remember('recommended-movies', now()->endOfDay(), static fn () => MovieDetail::recommended()
             ->inRandomOrder()
             ->take(6)
-            ->get(self::CARD_COLUMNS));
+            ->get(MovieDetail::CARD_COLUMNS));
     }
 
     /**
@@ -70,6 +52,6 @@ final class MovieCollectionService
             ->where('imdb_id', '!=', $excludedImdbId)
             ->orderByDesc('imdb_rating')
             ->take(6)
-            ->get(self::CARD_COLUMNS);
+            ->get(MovieDetail::CARD_COLUMNS);
     }
 }

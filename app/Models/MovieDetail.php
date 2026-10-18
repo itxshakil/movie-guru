@@ -20,6 +20,24 @@ final class MovieDetail extends Model
 {
     use HasFactory;
 
+    /**
+     * Columns the movie cards need.
+     */
+    public const array CARD_COLUMNS = [
+        'imdb_id',
+        'title',
+        'year',
+        'release_date',
+        'poster',
+        'type',
+        'imdb_rating',
+        'imdb_votes',
+        'genre',
+        'director',
+        'writer',
+        'actors',
+    ];
+
     protected $fillable = [
         'imdb_id',
         'title',
