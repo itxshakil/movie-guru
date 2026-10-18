@@ -241,7 +241,11 @@ const addMovieNightToCalendar = async () => {
                         <span v-for="id in picks" :key="id"
                               class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ id }}
-                            <UiButton :aria-label="`Remove ${id}`" class="size-7 p-0! -mr-2 rounded-full! text-gray-500!" size="sm" variant="ghost" @click="removePick(id)">×</UiButton>
+                            <UiButton :aria-label="`Remove ${id}`" class="-my-2 -mr-2.5" size="icon" variant="ghost" @click="removePick(id)">
+                                <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </UiButton>
                         </span>
                     </div>
 
@@ -300,7 +304,11 @@ const addMovieNightToCalendar = async () => {
                     <span v-for="id in picks" :key="id"
                           class="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ id }}
-                        <UiButton :aria-label="`Remove ${id}`" class="size-7 p-0! -mr-2 rounded-full! text-gray-500!" size="sm" variant="ghost" @click="removePick(id)">×</UiButton>
+                        <UiButton :aria-label="`Remove ${id}`" class="-my-2 -mr-2.5" size="icon" variant="ghost" @click="removePick(id)">
+                            <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </UiButton>
                     </span>
                 </div>
 
