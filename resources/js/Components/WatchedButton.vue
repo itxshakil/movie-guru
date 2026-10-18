@@ -36,8 +36,18 @@ let hidePromptTimer = null;
 const watched = computed(() => isWatched(props.movie.imdb_id));
 const reaction = computed(() => reactionFor(props.movie.imdb_id));
 const reactionEmoji = computed(() => ({liked: '👍', disliked: '👎'})[reaction.value] ?? '');
-// A stable name with aria-pressed, like WatchlistButton; once watched, a press opens the reaction popover.
-const accessibleName = computed(() => `Watched: ${props.movie.title}${reaction.value ? ` (${reaction.value})` : ''}`);
+/*
+ * "Seen it" is true whether or not the title is watched, so the visible text never contradicts the state.
+ * Unwatched, the button is a toggle (aria-pressed="false"). Watched, a press opens the reaction popover instead of
+ * un-pressing, so it drops aria-pressed and announces the popup; the state and reaction go in the description (title).
+ */
+const accessibleName = computed(() => `Seen it: ${props.movie.title}`);
+const description = computed(() => {
+    if (!watched.value) {
+        return 'Mark as watched';
+    }
+    return `Watched${reaction.value ? ` and ${reaction.value}` : ''}. Rate it or mark as not watched`;
+});
 
 const openReactionPrompt = () => {
     try {
@@ -91,13 +101,14 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         v-if="variant === 'icon'"
         ref="button"
         v-bind="$attrs"
+        :aria-controls="watched ? popoverId : undefined"
         :aria-expanded="watched ? isPopoverOpen : undefined"
         :aria-haspopup="watched ? 'dialog' : undefined"
         :aria-label="accessibleName"
-        :aria-pressed="watched"
+        :aria-pressed="watched ? undefined : false"
         :class="watched ? 'bg-emerald-600 text-white' : 'bg-black/55 text-white hover:bg-black/70'"
         :style="{anchorName}"
-        :title="watched ? 'Watched' : 'Mark as watched'"
+        :title="description"
         class="relative z-10 grid h-9 w-9 place-items-center rounded-full ring-1 ring-white/20 backdrop-blur-md transition-colors active:scale-90"
         type="button"
         @click.stop.prevent="onButtonClick"
@@ -112,13 +123,16 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
         v-else
         ref="button"
         v-bind="$attrs"
+        :aria-controls="watched ? popoverId : undefined"
         :aria-expanded="watched ? isPopoverOpen : undefined"
         :aria-haspopup="watched ? 'dialog' : undefined"
         :aria-label="accessibleName"
-        :aria-pressed="watched"
+        :aria-pressed="watched ? undefined : false"
+        :pressed="watched"
         :style="{anchorName}"
-        :title="watched ? 'Watched' : 'Mark as watched'"
+        :title="description"
         :size="size"
+        pressed-tone="success"
         variant="secondary"
         @click.stop.prevent="onButtonClick"
     >
@@ -128,7 +142,8 @@ onBeforeUnmount(() => clearTimeout(hidePromptTimer));
             </svg>
             <Eye v-else class="h-4 w-4"/>
         </template>
-        {{ `Watched ${reactionEmoji}`.trim() }}
+        Seen it
+        <span v-if="reactionEmoji" aria-hidden="true">{{ reactionEmoji }}</span>
     </UiButton>
 
     <div
