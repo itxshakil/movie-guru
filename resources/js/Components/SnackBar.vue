@@ -34,7 +34,7 @@
                         </svg>
                         <span class="sr-only">Refresh icon</span>
                     </div>
-                    <div class="ms-3 text-sm font-normal">
+                    <div class="ms-3 pe-8 text-sm font-normal">
                         <span
                             class="mb-1 text-sm font-semibold text-gray-900 dark:text-white"
                             >{{ title }}</span
@@ -47,14 +47,13 @@
                             <UiButton v-if="primaryAction" size="sm" @click="onConfirm">{{ primaryAction }}</UiButton>
                         </div>
                     </div>
-                    <button
-                        @click="onCancel"
-                        type="button"
-                        class="-mx-1.5 -my-1.5 absolute bg-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white dark:text-gray-400 shrink-0 focus:ring-2 focus:ring-gray-300 h-8 hover:bg-gray-100 hover:text-gray-900 inline-flex items-center justify-center ms-auto p-1.5 right-2 rounded-lg text-gray-500 top-2 w-8"
-                        data-dismiss-target="#toast-interactive"
+                    <UiButton
                         aria-label="Close"
+                        class="absolute top-1 right-1"
+                        size="icon"
+                        variant="ghost"
+                        @click="onCancel"
                     >
-                        <span class="sr-only">Close</span>
                         <svg
                             class="w-3 h-3"
                             aria-hidden="true"
@@ -70,7 +69,7 @@
                                 d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                             />
                         </svg>
-                    </button>
+                    </UiButton>
                 </div>
             </div>
         </transition>
