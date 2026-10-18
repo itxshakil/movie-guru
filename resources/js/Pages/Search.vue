@@ -346,10 +346,12 @@ const moviePoster = (movie) => {
                     />
                 </div>
 
-                <div v-show="nextURLLink" class="mt-8 flex justify-center" @click.capture="onLoadMoreClick">
-                    <UiButton :href="nextURLLink" :loading="loading" variant="secondary">
-                        {{ loading ? 'Loading...' : 'Load more' }}
-                    </UiButton>
+                <div v-show="nextURLLink" class="mt-8 flex justify-center">
+                    <span class="inline-flex" @click.capture="onLoadMoreClick">
+                        <UiButton :href="nextURLLink" :loading="loading" variant="secondary">
+                            {{ loading ? 'Loading...' : 'Load more' }}
+                        </UiButton>
+                    </span>
                 </div>
             </div>
         </div>
