@@ -18,7 +18,7 @@ const {watchlist} = useWatchlist();
                     :aria-current="item.match(page.url) ? 'page' : undefined"
                     :class="item.match(page.url) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'"
                     :href="route(item.route)"
-                    class="relative flex h-full flex-col items-center justify-center gap-1 text-[11px] font-medium"
+                    class="relative flex h-full flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-primary-500"
                 >
                     <component :is="item.icon" :filled="item.showsCount ? item.match(page.url) : undefined" class="h-6 w-6"/>
                     {{ item.short }}
