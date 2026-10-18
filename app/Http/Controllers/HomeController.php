@@ -22,7 +22,7 @@ final class HomeController extends Controller
     ): Response {
         $trendingSearchQueries = $trendingQueryService->fetch();
         $popularMovies = Cache::remember(
-            'popular-movies',
+            MovieDetail::cardCacheKey('popular-movies'),
             now()->endOfDay(),
             static fn () => MovieDetail::popular()->take(6)->get(MovieDetail::CARD_COLUMNS),
         );
@@ -30,7 +30,7 @@ final class HomeController extends Controller
         $trendingMovies = $trendingMovieService->fetch();
 
         $hiddenGemsMovies = Cache::remember(
-            'hidden-gems-movies',
+            MovieDetail::cardCacheKey('hidden-gems-movies'),
             now()->endOfDay(),
             static fn () => MovieDetail::hiddenGems()
                 ->inRandomOrder()
@@ -42,7 +42,7 @@ final class HomeController extends Controller
 
         $recommendedMovies = $movieCollectionService->recommended();
 
-        $topRatedMovies = Cache::remember('top-rated-movies', now()->endOfDay(), static fn () => MovieDetail::topRated()
+        $topRatedMovies = Cache::remember(MovieDetail::cardCacheKey('top-rated-movies'), now()->endOfDay(), static fn () => MovieDetail::topRated()
             ->inRandomOrder()
             ->take(6)
             ->get(MovieDetail::CARD_COLUMNS));
@@ -57,7 +57,7 @@ final class HomeController extends Controller
                 'recentlyReleasedMovies' => $recentlyReleasedMovies,
                 'topRatedMovies' => $topRatedMovies,
                 'recommendedMovies' => $recommendedMovies,
-                'mostWatchedMovies' => Cache::remember('most-watched-movies', now()->endOfDay(), function () {
+                'mostWatchedMovies' => Cache::remember(MovieDetail::cardCacheKey('most-watched-movies'), now()->endOfDay(), function () {
                     $topImdbIds = ShowPageAnalytics::query()
                         ->where('created_at', '>=', now()->subDays(7))
                         ->selectRaw('imdb_id, COUNT(*) as view_count')

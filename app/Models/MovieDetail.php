@@ -38,6 +38,12 @@ final class MovieDetail extends Model
         'actors',
     ];
 
+    /**
+     * Version suffix of every cached card collection key. Bump it whenever CARD_COLUMNS or the card
+     * payload changes, so a deploy does not keep serving rows cached in the old shape until they expire.
+     */
+    public const string CARD_CACHE_VERSION = 'v2';
+
     protected $fillable = [
         'imdb_id',
         'title',
@@ -57,6 +63,14 @@ final class MovieDetail extends Model
         'affiliate_link',
         'views',
     ];
+
+    /**
+     * The cache key of a card collection, such as "popular-movies", for the current card payload.
+     */
+    public static function cardCacheKey(string $collection): string
+    {
+        return $collection . '.' . self::CARD_CACHE_VERSION;
+    }
 
     public function incrementViews(string $ipAddress): void
     {

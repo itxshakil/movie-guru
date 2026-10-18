@@ -18,7 +18,7 @@ final class MovieCollectionService
      */
     public function recentlyReleased(): Collection
     {
-        return Cache::remember('recently-released-movies', now()->endOfDay(), static fn () => MovieDetail::recentlyReleased()
+        return Cache::remember(MovieDetail::cardCacheKey('recently-released-movies'), now()->endOfDay(), static fn () => MovieDetail::recentlyReleased()
             ->inRandomOrder()
             ->take(6)
             ->get(MovieDetail::CARD_COLUMNS));
@@ -29,7 +29,7 @@ final class MovieCollectionService
      */
     public function recommended(): Collection
     {
-        return Cache::remember('recommended-movies', now()->endOfDay(), static fn () => MovieDetail::recommended()
+        return Cache::remember(MovieDetail::cardCacheKey('recommended-movies'), now()->endOfDay(), static fn () => MovieDetail::recommended()
             ->inRandomOrder()
             ->take(6)
             ->get(MovieDetail::CARD_COLUMNS));

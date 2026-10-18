@@ -17,7 +17,7 @@ final class TrendingMovieService
      */
     public function fetch(): Collection
     {
-        return Cache::remember('trending-movies', now()->endOfDay(), static fn () => MovieDetail::trending()
+        return Cache::remember(MovieDetail::cardCacheKey('trending-movies'), now()->endOfDay(), static fn () => MovieDetail::trending()
             ->inRandomOrder()
             ->take(6)
             ->get(MovieDetail::CARD_COLUMNS));
