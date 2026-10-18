@@ -328,7 +328,7 @@ const moviePoster = (movie) => {
                     </div>
                 </form>
 
-                <h1 class="mt-8 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                <h1 class="mt-8 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
                     <template v-if="searchResults.Response === 'False'">No results for '{{ search }}'</template>
                     <template v-else>{{ searchResults.totalResults }} results for '{{ search }}'</template>
                 </h1>
