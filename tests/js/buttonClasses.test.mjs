@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {buttonClasses, buttonTag, chipClasses} from '../../resources/js/Components/Ui/buttonClasses.js';
+import {buttonClasses, buttonTag, chipClasses, chipPressed} from '../../resources/js/Components/Ui/buttonClasses.js';
 
 test('primary md button has the shared shape and primary colours', () => {
     const classes = buttonClasses({});
@@ -57,4 +57,16 @@ test('chips switch colours when active and drop hover styles when static', () =>
     assert.match(chipClasses({}), /bg-white/);
     assert.doesNotMatch(chipClasses({interactive: false}), /hover:/);
     assert.match(chipClasses({size: 'sm'}), /text-\[11px\]/);
+});
+
+test('interactive chips get the shared focus ring and static chips do not', () => {
+    assert.match(chipClasses({}), /focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500/);
+    assert.doesNotMatch(chipClasses({interactive: false}), /focus-visible/);
+});
+
+test('only a button chip with an active state reports aria-pressed', () => {
+    assert.equal(chipPressed({as: 'button', active: true}), true);
+    assert.equal(chipPressed({as: 'button', active: false}), false);
+    assert.equal(chipPressed({as: 'button'}), undefined);
+    assert.equal(chipPressed({as: 'span', active: true}), undefined);
 });
