@@ -45,7 +45,7 @@ const submitTitleBarSearch = () => {
                     id="title-bar-search"
                     v-model="titleBarSearch"
                     autocomplete="off"
-                    class="w-full rounded-md border-0 bg-gray-100 dark:bg-gray-800 px-3 py-1 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500"
+                    class="w-full rounded-md border-0 bg-gray-100 dark:bg-gray-800 px-3 py-1 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
                     enterkeyhint="search"
                     name="s"
                     placeholder="Search movies..."
