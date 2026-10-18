@@ -272,12 +272,12 @@ select:focus {
     }
 }
 
-/* Highlights a field's label once its input has been interacted with and
-   is invalid - applies everywhere InputLabel + a native/TextInput input
+/* Highlights a field's label once its input, textarea or select has been interacted
+   with and is invalid - applies everywhere InputLabel + a native/TextInput field
    share an immediate wrapper (Auth forms, Profile forms), with no changes
    needed per-page since InputLabel is a shared component. Purely additive;
    no existing JS-driven validation-class-toggling is being replaced. */
-div:has(> input:user-invalid) > .input-label {
+div:has(> :is(input, textarea, select):user-invalid) > .input-label {
     color: var(--color-red-500);
 }
 

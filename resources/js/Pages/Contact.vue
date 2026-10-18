@@ -6,9 +6,11 @@ import TextInput from '@/Components/TextInput.vue';
 import UiButton from '@/Components/Ui/UiButton.vue';
 import InputError from '@/Components/InputError.vue';
 import NewsletterForm from '@/Components/NewsletterForm.vue';
-import {inject} from "vue";
+import {inject, ref} from "vue";
 
 const gtag = inject("gtag");
+
+const contactForm = ref(null);
 
 const form = useForm({
     name: '',
@@ -27,8 +29,11 @@ const storeContact = ()=>{
     form.post(route('contact.store'), {
         preserveScroll:true,
         preserveState: true,
-        onSuccess: ()=>{
+        onSuccess: () => {
             form.reset();
+            // A native reset also clears the browser's user-validity flag, so the emptied
+            // required fields do not match :user-invalid and turn their labels red.
+            contactForm.value?.reset();
         }
     })
 }
@@ -52,7 +57,7 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                 <div class="my-4 rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
                     <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Get in touch</h1>
                     <p class="mt-2 mb-6 text-gray-500 dark:text-gray-400">Catch Us If You Can – Spoiler: You Totally Can. Let's Chat!</p>
-                    <form class="grid grid-cols-2 gap-4" id="contact-form" @submit.prevent="storeContact" method="POST">
+                    <form id="contact-form" ref="contactForm" class="grid grid-cols-2 gap-4" method="POST" @submit.prevent="storeContact">
                         <label for="website" class="sr-only">Website (Leave blank)</label>
                         <input type="text" v-model="form.website" id="website" name="website" class="hidden" />
                         <div class="col-span-2 md:col-span-1">
@@ -67,10 +72,15 @@ const pageDescription = 'Whether you have questions, suggestions, or just want t
                         </div>
                         <div class="col-span-2">
                             <InputLabel for="message" required value="Message" class="mb-2" />
-                          <textarea id="message" v-model="form.message" class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-xs placeholder:text-gray-400 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500" name="message"
-                                    placeholder="Your Message"
-                                    required
-                                    rows="6"></textarea>
+                            <textarea
+                                id="message"
+                                v-model="form.message"
+                                class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-xs placeholder:text-gray-400 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500"
+                                name="message"
+                                placeholder="Your Message"
+                                required
+                                rows="6"
+                            ></textarea>
                             <InputError :message="form.errors.message" />
                         </div>
                         <div class="col-span-2">
