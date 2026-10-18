@@ -208,6 +208,9 @@ body {
     --tab-bar-height: calc(4rem + env(safe-area-inset-bottom));
     /* The phone "Book tickets" bar on the detail page (DetailCard) is this tall. */
     --booking-bar-height: 4.5rem;
+    /* Fixed overlays (toasts, snackbars, the network status strip, the reaction prompt) sit this far
+       up, above whatever bars are pinned to the bottom of the viewport. */
+    --overlay-bottom: 0px;
 }
 
 @media (width >= 48rem) {
@@ -216,9 +219,17 @@ body {
     }
 }
 
+body:has(.app-tab-bar) {
+    --overlay-bottom: var(--tab-bar-height);
+}
+
 /* While the phone "Book tickets" bar is shown, reserve its height under the page as well as the
-   tab bar's, so the bar never covers the end of the footer. */
+   tab bar's, so the bar never covers the end of the footer, and lift the fixed overlays above it. */
 @media (width < 48rem) {
+    body:has(.booking-bar) {
+        --overlay-bottom: calc(var(--tab-bar-height) + var(--booking-bar-height));
+    }
+
     body:has(.booking-bar) .base-layout {
         padding-bottom: calc(var(--tab-bar-height) + var(--booking-bar-height));
     }
