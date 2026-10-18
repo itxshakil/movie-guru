@@ -20,18 +20,6 @@ final class TrendingMovieService
         return Cache::remember('trending-movies', now()->endOfDay(), static fn () => MovieDetail::trending()
             ->inRandomOrder()
             ->take(6)
-            ->get([
-                'imdb_id',
-                'title',
-                'year',
-                'release_date',
-                'poster',
-                'type',
-                'imdb_rating',
-                'imdb_votes',
-                'director',
-                'writer',
-                'actors',
-            ]));
+            ->get(MovieCollectionService::CARD_COLUMNS));
     }
 }

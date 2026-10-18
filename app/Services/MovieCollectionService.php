@@ -25,6 +25,7 @@ final class MovieCollectionService
         'type',
         'imdb_rating',
         'imdb_votes',
+        'genre',
         'director',
         'writer',
         'actors',
