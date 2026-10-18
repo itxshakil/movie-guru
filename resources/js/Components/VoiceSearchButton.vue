@@ -59,7 +59,7 @@ onBeforeUnmount(() => recognition?.abort());
         v-if="isSupported"
         :aria-label="isListening ? 'Stop voice search' : 'Search by voice'"
         :aria-pressed="isListening"
-        :class="isListening ? 'text-red-500! dark:text-red-400!' : ''"
+        :class="{'voice-search--listening': isListening}"
         :title="isListening ? 'Listening... tap to stop' : 'Search by voice'"
         class="relative"
         size="icon"
@@ -73,3 +73,16 @@ onBeforeUnmount(() => recognition?.abort());
         </svg>
     </UiButton>
 </template>
+
+<style scoped>
+/* Unlayered, so it beats the ghost variant's text colour utilities without !important. */
+.voice-search--listening {
+    color: var(--color-red-500);
+}
+
+@media (prefers-color-scheme: dark) {
+    .voice-search--listening {
+        color: var(--color-red-400);
+    }
+}
+</style>
