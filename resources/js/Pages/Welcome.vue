@@ -146,18 +146,12 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                         type="search"
                     />
                     <VoiceSearchButton v-if="!form.s" class="shrink-0" @result="searchByVoice"/>
-                    <button
-                        v-else
-                        aria-label="Clear search"
-                        class="shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                        type="button"
-                        @click="clearSearch"
-                    >
+                    <UiButton v-else aria-label="Clear search" size="icon" variant="ghost" @click="clearSearch">
                         <svg aria-hidden="true" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </button>
-                    <UiButton :loading="form.processing" class="shrink-0 rounded-full! px-4 sm:px-6" size="lg" type="submit">
+                    </UiButton>
+                    <UiButton :loading="form.processing" class="shrink-0 rounded-full! max-sm:px-3!" size="lg" type="submit">
                         <span class="hidden sm:inline">Explore</span>
                         <svg v-if="!form.processing" aria-hidden="true" class="h-5 w-5 sm:hidden" fill="none"
                              stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">

@@ -273,18 +273,12 @@ const moviePoster = (movie) => {
                                 @input="filterTrendingQueries"
                             />
                             <VoiceSearchButton v-if="!form.s" class="shrink-0" @result="searchByVoice"/>
-                            <button
-                                v-else
-                                aria-label="Clear search"
-                                class="shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                                type="button"
-                                @click="clearSearch"
-                            >
+                            <UiButton v-else aria-label="Clear search" size="icon" variant="ghost" @click="clearSearch">
                                 <svg aria-hidden="true" class="h-5 w-5" fill="none" stroke="currentColor"
                                      stroke-width="2" viewBox="0 0 24 24">
                                     <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                            </button>
+                            </UiButton>
                         </div>
 
                         <ul
