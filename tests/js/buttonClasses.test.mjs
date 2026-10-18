@@ -38,6 +38,25 @@ test('unknown variant or size falls back to the defaults', () => {
     assert.equal(buttonClasses({variant: 'nope', size: 'huge'}), buttonClasses({}));
 });
 
+test('a pressed toggle swaps its variant colours for its tone and keeps its size', () => {
+    const watchlist = buttonClasses({variant: 'secondary', size: 'sm', pressed: true, pressedTone: 'primary'});
+    assert.match(watchlist, /bg-primary-50 text-primary-700 ring-1/);
+    assert.match(watchlist, /hover:bg-primary-100/);
+    assert.match(watchlist, /dark:bg-primary-950/);
+    assert.match(watchlist, /px-3 py-1\.5 text-xs/);
+    assert.doesNotMatch(watchlist, /bg-gray-100|hover:bg-gray-200|dark:bg-gray-800/);
+
+    const watched = buttonClasses({variant: 'secondary', pressed: true, pressedTone: 'success'});
+    assert.match(watched, /bg-emerald-50 text-emerald-800 ring-1/);
+    assert.doesNotMatch(watched, /bg-gray-100|bg-primary/);
+});
+
+test('an unpressed toggle keeps its variant and an unknown tone falls back to primary', () => {
+    assert.equal(buttonClasses({variant: 'secondary', pressed: false, pressedTone: 'success'}), buttonClasses({variant: 'secondary'}));
+    assert.equal(buttonClasses({pressed: true, pressedTone: 'nope'}), buttonClasses({pressed: true, pressedTone: 'primary'}));
+    assert.doesNotMatch(buttonClasses({pressed: true}), /!/);
+});
+
 test('an external button renders as a plain anchor only with an href and while enabled', () => {
     assert.equal(buttonTag({href: 'https://wa.me/1', external: true}), 'external');
     assert.equal(buttonTag({href: '', external: true}), 'button');

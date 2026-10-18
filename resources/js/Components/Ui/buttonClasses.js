@@ -9,6 +9,14 @@ const VARIANTS = {
     danger: 'bg-red-600 text-white shadow-sm hover:bg-red-500 active:bg-red-700',
 };
 
+// A toggle that is on swaps its variant colours for a tint of its tone, mirroring the filled icon toggles on cards.
+const PRESSED_TONES = {
+    primary: 'bg-primary-50 text-primary-700 ring-1 ring-inset ring-primary-200 hover:bg-primary-100 '
+        + 'dark:bg-primary-950 dark:text-primary-100 dark:ring-primary-800 dark:hover:bg-primary-900',
+    success: 'bg-emerald-50 text-emerald-800 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100 '
+        + 'dark:bg-emerald-950 dark:text-emerald-100 dark:ring-emerald-800 dark:hover:bg-emerald-900',
+};
+
 // Each size owns its corner radius so an icon-only button can be round without a class conflict.
 const SIZES = {
     sm: 'rounded-xl px-3 py-1.5 text-xs',
@@ -20,8 +28,11 @@ const SIZES = {
 const CHIP_BASE = 'inline-flex items-center gap-1.5 rounded-full border font-medium transition-colors';
 const CHIP_SIZES = {sm: 'px-2 py-0.5 text-[11px]', md: 'px-3.5 py-1.5 text-sm'};
 
-export function buttonClasses({variant = 'primary', size = 'md', block = false} = {}) {
-    return [BASE, VARIANTS[variant] ?? VARIANTS.primary, SIZES[size] ?? SIZES.md, block ? 'w-full' : ''].join(' ').trim();
+export function buttonClasses({variant = 'primary', size = 'md', block = false, pressed = false, pressedTone = 'primary'} = {}) {
+    const colours = pressed
+        ? PRESSED_TONES[pressedTone] ?? PRESSED_TONES.primary
+        : VARIANTS[variant] ?? VARIANTS.primary;
+    return [BASE, colours, SIZES[size] ?? SIZES.md, block ? 'w-full' : ''].join(' ').trim();
 }
 
 export function buttonTag({href, disabled, external = false} = {}) {
