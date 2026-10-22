@@ -18,12 +18,20 @@ const handleServiceWorkerMessage = (event) => {
     }
 };
 
+// Background Sync gives up after a few tries, and some browsers don't have it, so coming
+// back online also asks the worker to fetch whatever searches are still queued.
+const processQueuedSearches = () => {
+    navigator.serviceWorker?.controller?.postMessage({type: "PROCESS_SEARCH_QUEUE"});
+};
+
 onMounted(() => {
     navigator.serviceWorker?.addEventListener("message", handleServiceWorkerMessage);
+    window.addEventListener("online", processQueuedSearches);
 });
 
 onBeforeUnmount(() => {
     navigator.serviceWorker?.removeEventListener("message", handleServiceWorkerMessage);
+    window.removeEventListener("online", processQueuedSearches);
 });
 
 const cancelPrompt = () => {

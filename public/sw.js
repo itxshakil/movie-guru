@@ -31,6 +31,8 @@ const DB_VERSION = 1;
 const KV_STORE = 'kv';
 const SEARCH_QUEUE_STORE = 'search-queue';
 const OFFLINE_SEARCH_SYNC_TAG = 'offline-search-sync';
+// A search nobody has opened in three days isn't worth a notification any more.
+const SEARCH_QUEUE_MAX_AGE = 3 * 24 * 60 * 60 * 1000;
 
 /**
  * The service worker owns this database. Pages never open it directly;
@@ -876,7 +878,6 @@ function handleNotificationClick(event) {
             (async () => {
                 const notification = event.notification;
                 const data = notification.data || {};
-                const urlToOpen = data.url || '/';
 
                 // Get the time of day for event label (morning, afternoon, etc.)
                 const hourOfDay = new Date().getHours();
@@ -902,69 +903,101 @@ function handleNotificationClick(event) {
                     event_label: timeOfDayLabel,
                 });
 
-                // Check if there's an open window client
-                try {
-                    const clientList = await clients.matchAll({type: 'window', includeUncontrolled: true});
-                    const openWindow = clientList.find(client => client.url === urlToOpen && client.visibilityState === 'visible');
-
-                    if (openWindow) {
-                        openWindow.focus();
-                        event.notification.close();
-                    } else {
-                        if (clients.openWindow) {
-                            if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
-                                await clients.openWindow(urlToOpen);
-                            } else {
-                                await clients.openWindow('/');
-                            }
-                        } else {
-                            // Fallback for non-Service Worker environments (e.g., browser window)
-                            if (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://')) {
-                                window.open(urlToOpen, '_blank');
-                            } else {
-                                window.open('/', '_blank');
-                            }
-                        }
-
-                        event.notification.close();
-                    }
-                } catch (err) {
-                    // Handle potential errors, e.g., if clients.matchAll fails
-                    console.error('Error matching client windows:', err);
-                    // Fallback to opening the home URL if there's an issue
-                    if (clients.openWindow) {
-                        await clients.openWindow('/');
-                    }
-                }
+                event.notification.close();
+                await openNotificationTarget(notificationTarget(data.url));
             })()
         );
     }
 }
 
+/**
+ * Same-origin links only, so a relative "/search?s=dune" lands on that search and a foreign
+ * link can't open from our notification.
+ */
+function notificationTarget(url) {
+    const target = new URL(url || '/', self.location.origin);
+
+    return target.origin === self.location.origin ? target.href : `${self.location.origin}/`;
+}
+
+/**
+ * Reuses an open app window when there is one, so each tap doesn't stack another window.
+ */
+async function openNotificationTarget(url) {
+    const windowClients = await clients.matchAll({type: 'window', includeUncontrolled: true});
+    const appWindow = windowClients.find((client) => client.url === url) ?? windowClients[0];
+
+    if (appWindow) {
+        try {
+            const focused = await appWindow.focus();
+            if (focused.url !== url) {
+                await focused.navigate(url);
+            }
+            return;
+        } catch (error) {
+            // navigate() rejects for a window this worker doesn't control yet.
+            logError('Could not reuse the open window', error);
+        }
+    }
+
+    try {
+        await clients.openWindow(url);
+    } catch (error) {
+        logError('Opening the notification link was refused', error);
+    }
+}
+
 self.addEventListener('sync', (event) => {
     if (event.tag === OFFLINE_SEARCH_SYNC_TAG) {
-        event.waitUntil(processSearchQueue());
+        event.waitUntil(processSearchQueue({lastChance: event.lastChance === true}));
     }
 });
 
 /**
- * Fetches every queued search, caches the full page so it opens offline, and notifies.
- * Throws when any search still fails so Background Sync retries it later.
+ * Two passes at once (a sync and a page's PROCESS_SEARCH_QUEUE) would fetch and notify the
+ * same search twice, so they take turns.
  */
-async function processSearchQueue() {
+async function processSearchQueue({lastChance = false} = {}) {
+    if (self.navigator?.locks) {
+        return self.navigator.locks.request('movie-guru-search-queue', () => drainSearchQueue(lastChance));
+    }
+
+    return drainSearchQueue(lastChance);
+}
+
+const removeQueuedSearch = (url) => runTransaction(SEARCH_QUEUE_STORE, 'readwrite', (store) => store.delete(url));
+
+/**
+ * Fetches every queued search, caches the full page so it opens offline, and notifies.
+ * Throws when a search can still succeed later so Background Sync retries, except on the
+ * browser's last retry: what's left then waits for the page to post PROCESS_SEARCH_QUEUE
+ * when it comes back online.
+ */
+async function drainSearchQueue(lastChance) {
     const queuedSearches = await runTransaction(SEARCH_QUEUE_STORE, 'readonly', (store) => store.getAll());
     let hasFailures = false;
 
-    for (const {url} of queuedSearches) {
+    for (const {url, queuedAt} of queuedSearches) {
+        if (!queuedAt || Date.now() - queuedAt > SEARCH_QUEUE_MAX_AGE) {
+            await removeQueuedSearch(url);
+            continue;
+        }
+
         try {
             const response = await fetch(new Request(url, {headers: {Accept: 'text/html'}}));
+            // A 4xx gives the same answer on every retry.
+            if (response.status >= 400 && response.status < 500) {
+                logError('Dropping a queued search the server refused', url, response.status);
+                await removeQueuedSearch(url);
+                continue;
+            }
             if (!response.ok) {
                 throw new Error(`Search request failed with status ${response.status}`);
             }
 
             const cache = await caches.open(SEARCH_CACHE);
             await putTaggedResponse(cache, new Request(url), response, 15);
-            await runTransaction(SEARCH_QUEUE_STORE, 'readwrite', (store) => store.delete(url));
+            await removeQueuedSearch(url);
             await notifySearchReady(url);
         } catch (error) {
             hasFailures = true;
@@ -972,7 +1005,7 @@ async function processSearchQueue() {
         }
     }
 
-    if (hasFailures) {
+    if (hasFailures && !lastChance) {
         throw new Error('Some queued searches could not be fetched yet');
     }
 }
