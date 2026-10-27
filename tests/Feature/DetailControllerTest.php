@@ -47,6 +47,17 @@ test('a detail page view is recorded for analytics', function (): void {
     $this->assertDatabaseHas('show_page_analytics', ['imdb_id' => 'tt7000001']);
 });
 
+test('a detail page requested without a user agent renders and is not recorded as a view', function (): void {
+    Http::fake();
+    $movie = MovieDetail::factory()->create(['imdb_id' => 'tt7000003', 'sources' => ['Netflix']]);
+
+    $this->withServerVariables(['HTTP_USER_AGENT' => null])
+        ->get('/movie/' . $movie->imdb_id)
+        ->assertSuccessful();
+
+    $this->assertDatabaseMissing('show_page_analytics', ['imdb_id' => 'tt7000003']);
+});
+
 test('the service worker caching a saved title for offline use is not recorded as a view', function (): void {
     Http::fake();
     $movie = MovieDetail::factory()->create(['imdb_id' => 'tt7000002', 'sources' => ['Netflix']]);
