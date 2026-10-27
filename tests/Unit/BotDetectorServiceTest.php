@@ -34,6 +34,32 @@ final class BotDetectorServiceTest extends TestCase
         Log::shouldHaveReceived('info')->with('Bot detected', Mockery::any());
     }
 
+    public function test_it_detects_bots_when_the_user_agent_header_is_missing(): void
+    {
+        Log::spy();
+        $botDetectorService = new BotDetectorService();
+        $request = Request::create('/', 'GET');
+        $request->headers->remove('User-Agent');
+        $request->headers->set('Accept-Language', 'en-US,en;q=0.9');
+        $request->headers->set('Accept-Encoding', 'gzip, deflate, br');
+
+        $this->assertTrue($botDetectorService->isBot($request));
+        Log::shouldHaveReceived('info')->with('Bot detected', Mockery::on(
+            fn (array $context): bool => $context['reason'] === 'Empty user agent',
+        ));
+    }
+
+    public function test_it_does_not_fail_when_the_ip_address_and_user_agent_are_missing(): void
+    {
+        Log::spy();
+        $botDetectorService = new BotDetectorService();
+        $request = Request::create('/', 'GET');
+        $request->server->remove('REMOTE_ADDR');
+        $request->headers->remove('User-Agent');
+
+        $this->assertTrue($botDetectorService->isBot($request));
+    }
+
     public function test_it_detects_bots_by_known_ip_ranges(): void
     {
         Log::spy();

@@ -79,8 +79,8 @@ final class BotDetectorService
      */
     public function isBot(Request $request): bool
     {
-        $browser = $request->userAgent();
-        $ipAddress = $request->ip();
+        $browser = (string) $request->userAgent();
+        $ipAddress = (string) $request->ip();
 
         // Generate a cache key based on IP and user agent
         $cacheKey = 'bot_detection_' . md5($ipAddress . $browser);
@@ -93,7 +93,7 @@ final class BotDetectorService
         $isBot =
             $this->checkUserAgent($browser, $ipAddress, $request)
             || $this->checkIpRange($ipAddress)
-            || $this->checkBehavioralPatterns($request);
+            || $this->checkBehavioralPatterns($browser, $ipAddress, $request);
 
         // Cache the result
         Cache::put($cacheKey, $isBot, $this->cacheDuration * 60);
@@ -192,11 +192,11 @@ final class BotDetectorService
     /**
      * Check if the request exhibits behavioral patterns of a bot.
      */
-    private function checkBehavioralPatterns(Request $request): bool
+    private function checkBehavioralPatterns(string $userAgent, string $ipAddress, Request $request): bool
     {
         // Check request headers that are commonly missing in bots
         if (! $request->header('Accept-Language') && ! $request->header('Accept-Encoding')) {
-            $this->logBotDetection($request->ip(), $request->userAgent(), $request, 'Missing critical headers');
+            $this->logBotDetection($ipAddress, $userAgent, $request, 'Missing critical headers');
 
             return true;
         }
