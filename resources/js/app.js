@@ -10,6 +10,7 @@ import Analytics from '@/Plugins/analytics.js';
 import {requestPersistentStorage} from '@/Composables/useLibrary.js';
 import ToastNotifications from '@/Components/ToastNotifications.vue';
 import {reloadWhenUpdated, routeLaunches} from '@/Composables/appLifecycle.js';
+import {showToast} from '@/Composables/toast.js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Movie Guru';
 
@@ -26,7 +27,19 @@ broadcast.onmessage = (event) => {
 // Installing the app is a strong signal the user wants cached titles and their watchlist kept.
 window.addEventListener('appinstalled', requestPersistentStorage);
 
-reloadWhenUpdated(navigator.serviceWorker, () => window.location.reload());
+// The update toast has to survive the reload it causes, so it is shown on the next boot.
+const UPDATED_FLAG = 'movie-guru:updated';
+reloadWhenUpdated(navigator.serviceWorker, () => {
+    sessionStorage.setItem(UPDATED_FLAG, '1');
+    window.location.reload();
+});
+// Called once the app has mounted: before that, ToastNotifications is not listening yet.
+const announcePendingUpdate = () => {
+    if (sessionStorage.getItem(UPDATED_FLAG)) {
+        sessionStorage.removeItem(UPDATED_FLAG);
+        showToast('Movie Guru has been updated to the latest version.', 'success');
+    }
+};
 routeLaunches(window.launchQueue, (url) => router.visit(url), () => window.location.href);
 
 createInertiaApp({
@@ -41,7 +54,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         // Toasts live beside the page rather than in a layout, so flashes reach every layout and the
         // component (with its router listener) is mounted exactly once.
-        return createApp({ render: () => [h(App, props), h(ToastNotifications)] })
+        const app = createApp({ render: () => [h(App, props), h(ToastNotifications)] })
             .use(plugin)
             .use(ZiggyVue)
             .use(Analytics)
@@ -59,6 +72,8 @@ createInertiaApp({
                 }
             })
             .mount(el);
+        announcePendingUpdate();
+        return app;
     },
     progress: {
         color: '#1d34ff',

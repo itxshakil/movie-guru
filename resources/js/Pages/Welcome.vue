@@ -11,7 +11,7 @@ import SectionHeading from '@/Components/Ui/SectionHeading.vue';
 import SearchCard from "@/Components/SearchCard.vue";
 import {inject, ref} from "vue";
 import Show from "@/Components/Show.vue";
-import {shareTitle} from '@/Composables/shareTitle.js';
+import {shareMovie} from '@/Composables/shareTitle.js';
 
 const gtag = inject('gtag');
 
@@ -50,20 +50,6 @@ const searchByVoice = (transcript) => {
 
 // Randomize trending search queries
 const shuffledTrendingQueries = [...props.trendingSearchQueries].sort(() => Math.random() - 0.5);
-
-// Cards pass search rows (title, imdb_id); the quick view passes OMDb detail (Title, imdbID).
-const shareMovie = (detail) => {
-    if (!detail) return;
-    shareTitle({
-        title: detail.Title || detail.title,
-        url: route('movie.detail.full', {imdbID: detail.imdbID || detail.imdb_id}),
-    });
-};
-
-const shareMovieFromCard = (movie) => {
-    navigator.vibrate?.(10);
-    shareMovie(movie);
-};
 
 const viewDetail = (imdb_id, sectionName) => {
     selectedIMDBId.value = imdb_id;
@@ -172,7 +158,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Most Watched This Week')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -187,7 +173,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                         :movie="movie"
                         class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Trending Movies')"
-                        @share="shareMovieFromCard"
+                        @share="shareMovie"
                     />
                 </li>
             </ul>
@@ -204,7 +190,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -220,7 +206,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Top Rated Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -236,7 +222,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Hidden Gems')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -252,7 +238,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -268,7 +254,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Popular Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>

@@ -38,12 +38,13 @@ export async function shareOrDownloadFile(file, {title, text} = {}) {
 /**
  * Shares a link with the Web Share API, falling back to the clipboard.
  *
+ * @param {Navigator} [nav] a seam for tests
  * @returns {Promise<'shared'|'copied'|'cancelled'>}
  */
-export async function shareOrCopyLink({url, title, text}) {
-    if (navigator.share) {
+export async function shareOrCopyLink({url, title, text}, nav = navigator) {
+    if (nav.share) {
         try {
-            await navigator.share({url, title, text});
+            await nav.share({url, title, text});
             return 'shared';
         } catch (error) {
             if (error.name === 'AbortError') {
@@ -53,6 +54,6 @@ export async function shareOrCopyLink({url, title, text}) {
         }
     }
 
-    await navigator.clipboard.writeText(url);
+    await nav.clipboard.writeText(url);
     return 'copied';
 }
