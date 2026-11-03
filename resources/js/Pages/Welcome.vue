@@ -11,6 +11,7 @@ import SectionHeading from '@/Components/Ui/SectionHeading.vue';
 import SearchCard from "@/Components/SearchCard.vue";
 import {inject, ref} from "vue";
 import Show from "@/Components/Show.vue";
+import {shareMovie} from '@/Composables/shareTitle.js';
 
 const gtag = inject('gtag');
 
@@ -49,34 +50,6 @@ const searchByVoice = (transcript) => {
 
 // Randomize trending search queries
 const shuffledTrendingQueries = [...props.trendingSearchQueries].sort(() => Math.random() - 0.5);
-
-const shareMovie = async (detail) => {
-    if (!detail) return;
-    const shareData = {
-        title: detail.Title || detail.title,
-        text: `Check out ${detail.Title || detail.title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: detail.imdbID || detail.imdb_id}),
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await navigator.clipboard.writeText(shareData.url);
-            new BroadcastChannel('toast-notifications').postMessage({message: 'Link copied to clipboard!', level: 'success'});
-        }
-    } catch (err) {
-        console.error('Error sharing:', err);
-    }
-};
-
-const shareMovieFromCard = (movie) => {
-    // Vibrate on mobile
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
-    }
-    shareMovie(movie);
-};
 
 const viewDetail = (imdb_id, sectionName) => {
     selectedIMDBId.value = imdb_id;
@@ -185,7 +158,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Most Watched This Week')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -200,7 +173,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                         :movie="movie"
                         class="scroll-reveal"
                         @selected="viewDetail(movie.imdb_id, 'Trending Movies')"
-                        @share="shareMovieFromCard"
+                        @share="shareMovie"
                     />
                 </li>
             </ul>
@@ -217,7 +190,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -233,7 +206,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Top Rated Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -249,7 +222,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Hidden Gems')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -265,7 +238,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -281,7 +254,7 @@ const ogImage = "https://movieguru.shakiltech.com/icons/ios/64.png";
                     :movie="movie"
                     class="scroll-reveal"
                     @selected="viewDetail(movie.imdb_id, 'Popular Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>

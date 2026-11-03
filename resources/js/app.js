@@ -2,13 +2,15 @@ import './bootstrap';
 import '../css/app.css';
 
 import {createApp, h} from 'vue';
-import {createInertiaApp} from '@inertiajs/vue3';
+import {createInertiaApp, router} from '@inertiajs/vue3';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {ZiggyVue} from '../../vendor/tightenco/ziggy';
 import useInstallPrompt from '@/Composables/useInstalPrompt.js';
 import Analytics from '@/Plugins/analytics.js';
 import {requestPersistentStorage} from '@/Composables/useLibrary.js';
 import ToastNotifications from '@/Components/ToastNotifications.vue';
+import {reloadWhenUpdated, routeLaunches} from '@/Composables/appLifecycle.js';
+import {showToast} from '@/Composables/toast.js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Movie Guru';
 
@@ -25,6 +27,21 @@ broadcast.onmessage = (event) => {
 // Installing the app is a strong signal the user wants cached titles and their watchlist kept.
 window.addEventListener('appinstalled', requestPersistentStorage);
 
+// The update toast has to survive the reload it causes, so it is shown on the next boot.
+const UPDATED_FLAG = 'movie-guru:updated';
+reloadWhenUpdated(navigator.serviceWorker, () => {
+    sessionStorage.setItem(UPDATED_FLAG, '1');
+    window.location.reload();
+});
+// Called once the app has mounted: before that, ToastNotifications is not listening yet.
+const announcePendingUpdate = () => {
+    if (sessionStorage.getItem(UPDATED_FLAG)) {
+        sessionStorage.removeItem(UPDATED_FLAG);
+        showToast('Movie Guru has been updated to the latest version.', 'success');
+    }
+};
+routeLaunches(window.launchQueue, (url) => router.visit(url), () => window.location.href);
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     // Wraps every Inertia page swap in the View Transitions API (native
@@ -37,7 +54,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         // Toasts live beside the page rather than in a layout, so flashes reach every layout and the
         // component (with its router listener) is mounted exactly once.
-        return createApp({ render: () => [h(App, props), h(ToastNotifications)] })
+        const app = createApp({ render: () => [h(App, props), h(ToastNotifications)] })
             .use(plugin)
             .use(ZiggyVue)
             .use(Analytics)
@@ -55,6 +72,8 @@ createInertiaApp({
                 }
             })
             .mount(el);
+        announcePendingUpdate();
+        return app;
     },
     progress: {
         color: '#1d34ff',
