@@ -5,7 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title inertia>{{ config('app.name', 'Movie Guru') }}</title>
+    {{-- Any page that passes a PageMeta "meta" prop gets these on the server. The inertia="key" attribute lets the page's <Head> replace them in place instead of duplicating them. --}}
+    @php($meta = $page['props']['meta'] ?? null)
+    <title inertia>{{ $meta->title ?? config('app.name', 'Movie Guru') }}</title>
+
+    @isset($meta)
+        <meta name="description" content="{{ $meta->description }}" inertia="description">
+        <link rel="canonical" href="{{ $meta->canonical }}" inertia="canonical">
+        <meta property="og:url" content="{{ $meta->canonical }}" inertia="og:url">
+        <meta property="og:title" content="{{ $meta->title }}" inertia="og:title">
+        <meta property="og:description" content="{{ $meta->description }}" inertia="og:description">
+        <meta property="og:image" content="{{ $meta->image }}" inertia="og:image">
+        <meta name="twitter:card" content="summary_large_image" inertia="twitter:card">
+        <meta name="twitter:title" content="{{ $meta->title }}" inertia="twitter:title">
+        <meta name="twitter:description" content="{{ $meta->description }}" inertia="twitter:description">
+        <meta name="twitter:image" content="{{ $meta->image }}" inertia="twitter:image">
+    @endisset
 
     <!-- <meta name="description" content="{{ $metadescription ?? "Your go-to source for movie information, ratings, and reviews. Whether you're a film enthusiast or just looking for your next cinematic experience, Movie Guru has something for everyone." }}" /> -->
     <meta name="keywords" content="movie, film, ratings, reviews, movie database" />
