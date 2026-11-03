@@ -8,7 +8,7 @@ import DetailCard from '@/Components/DetailCard.vue';
 import SearchCard from "@/Components/SearchCard.vue";
 import SectionHeading from '@/Components/Ui/SectionHeading.vue';
 import TrailerPlayer from '@/Components/TrailerPlayer.vue';
-import {shareTitle} from '@/Composables/shareTitle.js';
+import {shareMovie, shareTitle} from '@/Composables/shareTitle.js';
 
 const props = defineProps({
     detail: Object,
@@ -35,14 +35,9 @@ defineOptions({ layout: BaseLayout })
 const gtag = inject('gtag');
 
 // The canonical URL is the one the server already gives link previews a proper card for.
-const shareMovie = () => {
+const shareThisTitle = () => {
     if (!props.detail) return;
     shareTitle({title: props.detail.Title, url: props.meta.canonical});
-};
-
-const shareMovieFromCard = (movie) => {
-    navigator.vibrate?.(10);
-    shareTitle({title: movie.title, url: route('movie.detail.full', {imdbID: movie.imdb_id})});
 };
 
 /** Cards emit `selected` only for a plain tap below 1024px; this page has no quick view, so it navigates. */
@@ -83,7 +78,7 @@ const viewDetail = (imdb_id, sectionName) => {
 
     <div class="mx-auto max-w-7xl pt-6 sm:px-6 sm:pt-10 lg:px-8">
         <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources" layout="page"
-                    @share="shareMovie"/>
+                    @share="shareThisTitle"/>
     </div>
 
     <section v-if="trailerId" class="pt-12 sm:pt-16">
@@ -107,7 +102,7 @@ const viewDetail = (imdb_id, sectionName) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -123,7 +118,7 @@ const viewDetail = (imdb_id, sectionName) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -139,7 +134,7 @@ const viewDetail = (imdb_id, sectionName) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Similar Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>

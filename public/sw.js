@@ -595,13 +595,9 @@ async function activate() {
         // Cached watchlist pages reference this build's hashed assets, which were just deleted.
         await purgeWatchlistPages();
 
+        // Open pages reload when this worker takes control and announce the update
+        // themselves (appLifecycle.js); a toast posted from here would vanish with the reload.
         if (staleKeys.length > 0) {
-            channel.postMessage({
-                type: 'APP_UPDATED',
-                message: 'The app has been updated and is ready to use.',
-                level: 'success',
-            });
-
             broadcastTrackingEvent(`APP_UPDATED`, {
                 event_category: 'APP_UPDATED',
                 event_label: APP_CACHE,

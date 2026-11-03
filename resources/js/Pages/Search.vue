@@ -11,7 +11,8 @@ import VoiceSearchButton from '@/Components/VoiceSearchButton.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
 import {isPlainClick} from '@/Components/cardClicks.js';
-import {shareTitle} from '@/Composables/shareTitle.js';
+import {shareMovie} from '@/Composables/shareTitle.js';
+import {showToast} from '@/Composables/toast.js';
 
 const gtag = inject('gtag');
 
@@ -99,10 +100,6 @@ const searchByVoice = (transcript) => {
     doSearch();
 };
 
-const notifyError = (message) => {
-    new BroadcastChannel('toast-notifications').postMessage({message, level: 'danger'});
-};
-
 const loadMore = async () => {
     loading.value = true;
     const previousCount = movieList.value.length;
@@ -123,13 +120,13 @@ const loadMore = async () => {
         }
 
         if (!response.ok) {
-            notifyError(`Something went wrong. Error -RE-${response.status}`);
+            showToast(`Something went wrong. Error -RE-${response.status}`);
             return;
         }
 
         const data = await response.json();
         if (data.searchResults.Response === 'False') {
-            notifyError('Something went wrong. Please try again later. S-100');
+            showToast('Something went wrong. Please try again later. S-100');
             return;
         }
 
@@ -147,7 +144,7 @@ const loadMore = async () => {
             }
         }
     } catch (error) {
-        notifyError('Something went wrong. Please try again later.');
+        showToast('Something went wrong. Please try again later.');
     } finally {
         loading.value = false;
     }
@@ -162,20 +159,6 @@ const onLoadMoreClick = (event) => {
     if (!loading.value) {
         loadMore();
     }
-};
-
-// Cards pass search rows (title, imdb_id); the quick view passes OMDb detail (Title, imdbID).
-const shareMovie = (detail) => {
-    if (!detail) return;
-    shareTitle({
-        title: detail.Title || detail.title,
-        url: route('movie.detail.full', {imdbID: detail.imdbID || detail.imdb_id}),
-    });
-};
-
-const shareMovieFromCard = (movie) => {
-    navigator.vibrate?.(10);
-    shareMovie(movie);
 };
 
 const viewDetail = (imdb_id, sectionName, title = null) => {
@@ -329,7 +312,7 @@ const moviePoster = (movie) => {
                         :movie="movie"
                         class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Search', movie.title)"
-                        @share="shareMovieFromCard"
+                        @share="shareMovie"
                     />
                 </div>
 
@@ -354,7 +337,7 @@ const moviePoster = (movie) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -371,7 +354,7 @@ const moviePoster = (movie) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>

@@ -51,10 +51,10 @@ broadcastChannel.onmessage = (event) => {
     }
 };
 
-// Listen for service worker toasts (APP_UPDATED, APP_AVAILABLE_OFFLINE, etc.)
+// Listen for service worker toasts (APP_AVAILABLE_OFFLINE, etc.). Updates are announced by app.js after its reload.
 const swChannel = new BroadcastChannel('service-worker-channel');
 swChannel.onmessage = (event) => {
-    const toastTypes = ['APP_AVAILABLE_OFFLINE', 'APP_UPDATED', 'OFFLINE_SYNC_FETCHED', 'NOTIFICATION_PERMISSION_DENIED'];
+    const toastTypes = ['APP_AVAILABLE_OFFLINE', 'OFFLINE_SYNC_FETCHED', 'NOTIFICATION_PERMISSION_DENIED'];
     if (event.data && toastTypes.includes(event.data.type) && event.data.message) {
         addNotification(event.data.message, event.data.level);
     }
