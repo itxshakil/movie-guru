@@ -8,6 +8,7 @@ import DetailCard from '@/Components/DetailCard.vue';
 import SearchCard from "@/Components/SearchCard.vue";
 import SectionHeading from '@/Components/Ui/SectionHeading.vue';
 import TrailerPlayer from '@/Components/TrailerPlayer.vue';
+import {shareTitle} from '@/Composables/shareTitle.js';
 
 const props = defineProps({
     detail: Object,
@@ -33,66 +34,15 @@ defineOptions({ layout: BaseLayout })
 
 const gtag = inject('gtag');
 
-const copyToClipboard = async (text) => {
-    if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-    } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-    }
-};
-
-const shareMovie = async () => {
+// The canonical URL is the one the server already gives link previews a proper card for.
+const shareMovie = () => {
     if (!props.detail) return;
-    const shareData = {
-        title: props.detail.Title,
-        text: `Check out ${props.detail.Title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: props.detail.imdbID}),
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await copyToClipboard(shareData.url);
-            alert('Link copied to clipboard!');
-        }
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error('Error sharing:', err);
-        }
-    }
+    shareTitle({title: props.detail.Title, url: props.meta.canonical});
 };
 
-const shareMovieFromCard = async (movie) => {
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
-    }
-    const shareData = {
-        title: movie.title,
-        text: `Check out ${movie.title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: movie.imdb_id}),
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await copyToClipboard(shareData.url);
-            alert('Link copied to clipboard!');
-        }
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error('Error sharing:', err);
-        }
-    }
+const shareMovieFromCard = (movie) => {
+    navigator.vibrate?.(10);
+    shareTitle({title: movie.title, url: route('movie.detail.full', {imdbID: movie.imdb_id})});
 };
 
 /** Cards emit `selected` only for a plain tap below 1024px; this page has no quick view, so it navigates. */

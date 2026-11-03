@@ -2,13 +2,14 @@ import './bootstrap';
 import '../css/app.css';
 
 import {createApp, h} from 'vue';
-import {createInertiaApp} from '@inertiajs/vue3';
+import {createInertiaApp, router} from '@inertiajs/vue3';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {ZiggyVue} from '../../vendor/tightenco/ziggy';
 import useInstallPrompt from '@/Composables/useInstalPrompt.js';
 import Analytics from '@/Plugins/analytics.js';
 import {requestPersistentStorage} from '@/Composables/useLibrary.js';
 import ToastNotifications from '@/Components/ToastNotifications.vue';
+import {reloadWhenUpdated, routeLaunches} from '@/Composables/appLifecycle.js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Movie Guru';
 
@@ -24,6 +25,9 @@ broadcast.onmessage = (event) => {
 
 // Installing the app is a strong signal the user wants cached titles and their watchlist kept.
 window.addEventListener('appinstalled', requestPersistentStorage);
+
+reloadWhenUpdated(navigator.serviceWorker, () => window.location.reload());
+routeLaunches(window.launchQueue, (url) => router.visit(url), () => window.location.href);
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
