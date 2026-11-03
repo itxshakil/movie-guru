@@ -11,6 +11,8 @@ import VoiceSearchButton from '@/Components/VoiceSearchButton.vue';
 import BaseLayout from '@/Layouts/BaseLayout.vue';
 import SearchCard from '@/Components/SearchCard.vue';
 import {isPlainClick} from '@/Components/cardClicks.js';
+import {shareMovie} from '@/Composables/shareTitle.js';
+import {showToast} from '@/Composables/toast.js';
 
 const gtag = inject('gtag');
 
@@ -98,10 +100,6 @@ const searchByVoice = (transcript) => {
     doSearch();
 };
 
-const notifyError = (message) => {
-    new BroadcastChannel('toast-notifications').postMessage({message, level: 'danger'});
-};
-
 const loadMore = async () => {
     loading.value = true;
     const previousCount = movieList.value.length;
@@ -122,13 +120,13 @@ const loadMore = async () => {
         }
 
         if (!response.ok) {
-            notifyError(`Something went wrong. Error -RE-${response.status}`);
+            showToast(`Something went wrong. Error -RE-${response.status}`);
             return;
         }
 
         const data = await response.json();
         if (data.searchResults.Response === 'False') {
-            notifyError('Something went wrong. Please try again later. S-100');
+            showToast('Something went wrong. Please try again later. S-100');
             return;
         }
 
@@ -146,7 +144,7 @@ const loadMore = async () => {
             }
         }
     } catch (error) {
-        notifyError('Something went wrong. Please try again later.');
+        showToast('Something went wrong. Please try again later.');
     } finally {
         loading.value = false;
     }
@@ -161,34 +159,6 @@ const onLoadMoreClick = (event) => {
     if (!loading.value) {
         loadMore();
     }
-};
-
-const shareMovie = async (detail) => {
-    if (!detail) return;
-    const shareData = {
-        title: detail.Title || detail.title,
-        text: `Check out ${detail.Title || detail.title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: detail.imdbID || detail.imdb_id}),
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await navigator.clipboard.writeText(shareData.url);
-            new BroadcastChannel('toast-notifications').postMessage({message: 'Link copied to clipboard!', level: 'success'});
-        }
-    } catch (err) {
-        console.error('Error sharing:', err);
-    }
-};
-
-const shareMovieFromCard = (movie) => {
-    // Vibrate on mobile
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
-    }
-    shareMovie(movie);
 };
 
 const viewDetail = (imdb_id, sectionName, title = null) => {
@@ -342,7 +312,7 @@ const moviePoster = (movie) => {
                         :movie="movie"
                         class="scroll-reveal cv-card"
                         @selected="viewDetail(movie.imdb_id, 'Search', movie.title)"
-                        @share="shareMovieFromCard"
+                        @share="shareMovie"
                     />
                 </div>
 
@@ -367,7 +337,7 @@ const moviePoster = (movie) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -384,7 +354,7 @@ const moviePoster = (movie) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>

@@ -1,5 +1,6 @@
 import {computed, ref, watch} from 'vue';
 import {usePage} from '@inertiajs/vue3';
+import {showToast} from '@/Composables/toast.js';
 import {
     applyLibraryChange,
     chunk,
@@ -236,10 +237,6 @@ export function requestPersistentStorage() {
     navigator.storage.persisted()
         .then((isPersisted) => isPersisted || navigator.storage.persist())
         .catch((error) => console.error('Requesting persistent storage failed', error));
-}
-
-function showToast(message, level = 'danger') {
-    new BroadcastChannel('toast-notifications').postMessage({message, level});
 }
 
 const findItem = (imdbId) => library.value.find((item) => item.imdb_id === imdbId) ?? null;

@@ -8,6 +8,7 @@ import DetailCard from '@/Components/DetailCard.vue';
 import SearchCard from "@/Components/SearchCard.vue";
 import SectionHeading from '@/Components/Ui/SectionHeading.vue';
 import TrailerPlayer from '@/Components/TrailerPlayer.vue';
+import {shareMovie, shareTitle} from '@/Composables/shareTitle.js';
 
 const props = defineProps({
     detail: Object,
@@ -33,66 +34,10 @@ defineOptions({ layout: BaseLayout })
 
 const gtag = inject('gtag');
 
-const copyToClipboard = async (text) => {
-    if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-    } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-    }
-};
-
-const shareMovie = async () => {
+// The canonical URL is the one the server already gives link previews a proper card for.
+const shareThisTitle = () => {
     if (!props.detail) return;
-    const shareData = {
-        title: props.detail.Title,
-        text: `Check out ${props.detail.Title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: props.detail.imdbID}),
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await copyToClipboard(shareData.url);
-            alert('Link copied to clipboard!');
-        }
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error('Error sharing:', err);
-        }
-    }
-};
-
-const shareMovieFromCard = async (movie) => {
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
-    }
-    const shareData = {
-        title: movie.title,
-        text: `Check out ${movie.title} on Movie Guru!`,
-        url: route('movie.detail.full', {imdbID: movie.imdb_id}),
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await copyToClipboard(shareData.url);
-            alert('Link copied to clipboard!');
-        }
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error('Error sharing:', err);
-        }
-    }
+    shareTitle({title: props.detail.Title, url: props.meta.canonical});
 };
 
 /** Cards emit `selected` only for a plain tap below 1024px; this page has no quick view, so it navigates. */
@@ -133,7 +78,7 @@ const viewDetail = (imdb_id, sectionName) => {
 
     <div class="mx-auto max-w-7xl pt-6 sm:px-6 sm:pt-10 lg:px-8">
         <DetailCard :affiliate-link="affiliateLink" :detail="detail" :sources="sources" layout="page"
-                    @share="shareMovie"/>
+                    @share="shareThisTitle"/>
     </div>
 
     <section v-if="trailerId" class="pt-12 sm:pt-16">
@@ -157,7 +102,7 @@ const viewDetail = (imdb_id, sectionName) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recently Released Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -173,7 +118,7 @@ const viewDetail = (imdb_id, sectionName) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Recommended Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
@@ -189,7 +134,7 @@ const viewDetail = (imdb_id, sectionName) => {
                     :movie="movie"
                     class="scroll-reveal cv-card"
                     @selected="viewDetail(movie.imdb_id, 'Similar Movies')"
-                    @share="shareMovieFromCard"
+                    @share="shareMovie"
                 />
             </div>
         </div>
