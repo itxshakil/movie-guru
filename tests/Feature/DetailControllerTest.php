@@ -115,3 +115,39 @@ test('an omdb miss is reported instead of crashing the background save', functio
     $this->assertDatabaseMissing('movie_details', ['imdb_id' => 'tt0000009']);
     Exceptions::assertReported(fn (Exception $exception): bool => str_contains($exception->getMessage(), 'tt0000009'));
 });
+
+test('a title page serves its own title, description, canonical and poster to crawlers and link previews', function (): void {
+    Http::fake();
+    MovieDetail::factory()->create([
+        'imdb_id' => 'tt0111161',
+        'details' => [
+            'Title' => 'The Shawshank Redemption',
+            'Year' => '1994',
+            'Genre' => 'Drama',
+            'Actors' => 'Tim Robbins, Morgan Freeman, Bob Gunton',
+            'Plot' => 'Two imprisoned men bond over a number of years.',
+            'Poster' => 'https://m.media-amazon.com/images/shawshank.jpg',
+        ],
+    ]);
+
+    $response = $this->get('/i/tt0111161')
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page->where('meta.canonical', url('/movie/tt0111161'))->has('meta', 4));
+
+    expect($response->getContent())
+        ->toContain('<title inertia>Watch The Shawshank Redemption (1994) Online: Cast, Plot &amp; Info</title>')
+        ->toContain('content="The Shawshank Redemption (1994): Genre: Drama. Starring: Tim Robbins, Morgan Freeman. Two imprisoned men bond over a number of years. Find streaming options and detailed information on MovieGuru."')
+        ->toContain('<link rel="canonical" href="' . url('/movie/tt0111161') . '" inertia="canonical">')
+        ->toContain('<meta property="og:image" content="https://m.media-amazon.com/images/shawshank.jpg" inertia="og:image">');
+});
+
+test('a title the catalogue knows nothing about still gets a generic title and a canonical url', function (): void {
+    Http::fake(['*' => Http::response(['Response' => 'False', 'Error' => 'Incorrect IMDb ID.'])]);
+    Exceptions::fake();
+
+    $html = $this->get('/movie/tt0000010')->assertSuccessful()->getContent();
+
+    expect($html)
+        ->toContain('<title inertia>MovieGuru - Find Your Next Favorite</title>')
+        ->toContain('<link rel="canonical" href="' . url('/movie/tt0000010') . '" inertia="canonical">');
+});

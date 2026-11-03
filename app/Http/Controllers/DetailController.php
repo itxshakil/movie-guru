@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\RecordTitleView;
+use App\DTOs\PageMeta;
 use App\Models\MovieDetail;
 use App\Services\BotDetectorService;
 use App\Services\ImdbIdExtractor;
@@ -59,6 +60,8 @@ final class DetailController extends Controller
 
         return Inertia::render('Show', [
             ...$props,
+            // /i/ and /movie/ serve the same page; the sitemap lists /movie/, so that is the canonical one.
+            'meta' => PageMeta::forTitle($props['detail'], route('movie.detail.full', $cleanImdbId)),
             'recentlyReleasedMovies' => $this->movieCollectionService->recentlyReleased(),
             'recommendedMovies' => $this->movieCollectionService->recommended(),
             'similarMovies' => $this->movieCollectionService->similarTo($movieDetail->genre ?? '', $cleanImdbId),
