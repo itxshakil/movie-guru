@@ -78,10 +78,6 @@ final class AdminDigestService
         while (! $file->eof()) {
             $line = $file->fgets();
 
-            if ($line === false) {
-                continue;
-            }
-
             // Only record-start lines (those beginning with a timestamp) are counted;
             // stack-trace continuation lines are skipped even if they mention ".ERROR:".
             if (preg_match('/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/', $line, $matches) !== 1) {

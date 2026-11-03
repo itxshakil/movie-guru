@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, pdo_sqlite, intl, gd, zip
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist
+          npm ci --no-audit --no-fund
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Lint (Mago, Larastan, Pint)
+        run: composer lint
+
+      # public/build is not committed and the feature tests render pages through Vite.
+      - name: Build assets
+        run: npm run build
+
+      - name: PHP tests
+        run: vendor/bin/pest --parallel
+
+      - name: JS tests
+        run: npm run test:js
+
+      - name: Security audit
+        run: |
+          composer audit --abandoned=ignore
+          npm audit --audit-level=high
