@@ -25,16 +25,13 @@ const props = defineProps({
         required: false,
         default: null,
     },
+    // Built on the server by PageMeta so crawlers and link previews get the same tags without running JS.
+    meta: Object,
 })
 
 defineOptions({ layout: BaseLayout })
 
 const gtag = inject('gtag');
-
-const moviePoster = (movie) => {
-    return movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : '/assets/images/no-poster.jpg';
-};
-const pageUrl = window.location.href;
 
 const copyToClipboard = async (text) => {
     if (navigator.clipboard?.writeText) {
@@ -104,60 +101,34 @@ const viewDetail = (imdb_id, sectionName) => {
     router.visit(route('movie.detail.full', {imdbID: imdb_id}));
 };
 
-const generateMetaTitle = (detail) => {
-  if (!detail || !detail.Title) {
-    return 'MovieGuru - Find Your Next Favorite'; // Fallback
-  }
-  const year = detail.Year ? `(${detail.Year})` : '';
-
-  return `Watch ${detail.Title} ${year} Online: Cast, Plot & Info`;
-};
-
-const generateMetaDescription = (detail) => {
-  if (!detail || !detail.Title || !detail.Plot) {
-    return 'Explore a vast library of movies and series. Find details, ratings, and where to watch your favorites.';
-  }
-  const year = detail.Year ? `(${detail.Year})` : '';
-  const genre = detail.Genre ? `Genre: ${detail.Genre.split(', ')[0]}. ` : '';
-  const cast = detail.Actors ? `Starring: ${detail.Actors.split(', ').slice(0, 2).join(', ')}. ` : '';
-
-  const plotSnippet = detail.Plot.substring(0, 100) + (detail.Plot.length > 100 ? '...' : '');
-
-  return `${detail.Title} ${year}: ${genre}${cast}${plotSnippet} Find streaming options and detailed information on MovieGuru.`;
-};
-
-const pageTitle = generateMetaTitle(props.detail);
-const pageDescription = generateMetaDescription(props.detail);
-const ogImage = moviePoster(props.detail);
-
 </script>
 
 <template>
     <Head>
-        <title>{{ pageTitle }}</title>
+        <title>{{ meta.title }}</title>
 
         <!-- Warms the connection to the poster CDN before the LCP image request is discovered -->
         <link rel="preconnect" href="https://m.media-amazon.com" head-key="preconnect-poster">
         <link rel="dns-prefetch" href="https://m.media-amazon.com" head-key="dns-prefetch-poster">
 
-        <meta :content="pageDescription" head-key="description" name="description"/>
-        <meta property="subject" :content="pageTitle" head-key="subject">
+        <meta :content="meta.description" head-key="description" name="description"/>
+        <meta property="subject" :content="meta.title" head-key="subject">
 
-        <meta property="og:url" :content="pageUrl" head-key="og:url">
+        <meta property="og:url" :content="meta.canonical" head-key="og:url">
         <meta property="og:type" content="website">
-        <meta property="og:title" :content="pageTitle" head-key="og:title">
-        <meta property="og:description" :content="pageDescription" head-key="og:description">
-        <meta property="og:image" :content="ogImage" head-key="og:image">
+        <meta property="og:title" :content="meta.title" head-key="og:title">
+        <meta property="og:description" :content="meta.description" head-key="og:description">
+        <meta property="og:image" :content="meta.image" head-key="og:image">
 
         <!-- Twitter Meta Tags -->
-        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:card" content="summary_large_image" head-key="twitter:card">
         <meta property="twitter:domain" content="movieguru.shakiltech.com">
-        <meta property="twitter:url" :content="pageUrl" head-key="twitter:url">
-        <meta name="twitter:title" :content="pageTitle" head-key="twitter:title">
-        <meta name="twitter:description" :content="pageDescription" head-key="twitter:description">
-        <meta name="twitter:image" :content="ogImage" head-key="twitter:image">
+        <meta property="twitter:url" :content="meta.canonical" head-key="twitter:url">
+        <meta name="twitter:title" :content="meta.title" head-key="twitter:title">
+        <meta name="twitter:description" :content="meta.description" head-key="twitter:description">
+        <meta name="twitter:image" :content="meta.image" head-key="twitter:image">
 
-        <link rel="canonical" :href="pageUrl" head-key="canonical" />
+        <link rel="canonical" :href="meta.canonical" head-key="canonical" />
     </Head>
 
     <div class="mx-auto max-w-7xl pt-6 sm:px-6 sm:pt-10 lg:px-8">
