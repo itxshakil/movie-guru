@@ -50,7 +50,7 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan boost:update --ansi"
+            "if \"$PHP_BINARY\" artisan list --raw | grep -q '^boost:update '; then \"$PHP_BINARY\" artisan boost:update --ansi; fi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -85,7 +85,6 @@
     },
     "scripts-descriptions": {
         "setup": "Fresh project setup: install dependencies, copy .env, generate key, run migrations/seeders, install NPM packages and build assets.",
-        "test:types": "Run PHPStan static analysis with extended memory limit.",
         "test": "Run the PHPUnit test suite",
         "analyse": "Run static analysis using PHPStan",
         "lint:fix": "Automatically fix code style issues using Rector and Laravel Pint",
