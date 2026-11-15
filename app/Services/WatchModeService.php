@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class WatchModeService
+final readonly class WatchModeService
 {
     public function __construct(
-        private readonly WatchModeClient $watchModeClient,
+        private WatchModeClient $watchModeClient,
     ) {}
 
     /**
@@ -88,14 +88,8 @@ final class WatchModeService
 
         $raw = $this->watchModeClient->get(sprintf('/title/%s/sources/', $titleId), $params);
 
+        // The client already logged or reported real failures; a missing title or a resting key is not one.
         if (isset($raw['error'])) {
-            Log::error('Error getting title sources', [
-                'title_id' => $titleId,
-                'regions' => $regions,
-                'error' => $raw['error'],
-                'raw' => $raw,
-            ]);
-
             return collect();
         }
 
