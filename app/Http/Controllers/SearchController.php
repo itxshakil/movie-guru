@@ -78,18 +78,18 @@ final class SearchController extends Controller
             $search = $defaultSearches[array_rand($defaultSearches)];
         }
 
-        $criteria = new SearchCriteria($search, $page, $movieType, $year);
+        $searchCriteria = new SearchCriteria($search, $page, $movieType, $year);
         $movies = $isBot
-            ? $this->movieSearchService->searchForBot($criteria)
-            : $this->movieSearchService->search($criteria);
+            ? $this->movieSearchService->searchForBot($searchCriteria)
+            : $this->movieSearchService->search($searchCriteria);
 
         if (! $isBot) {
-            $this->recordSearch->handle($request, $criteria, $movies);
+            $this->recordSearch->handle($request, $searchCriteria, $movies);
         }
 
         $movieTypes = MovieType::cases();
 
-        $hasNextPage = ($movies['Response'] ?? null) === 'True' && $movies['totalResults'] > $page * 10;
+        $hasNextPage = ($movies['Response'] ?? null) === 'True' && $movies['totalResults'] > $page * MovieSearchService::PER_PAGE;
         $nextUrl = $hasNextPage
             ? route('search', ['s' => $search, 'page' => $page + 1, 'type' => $movieType, 'year' => $year])
             : null;

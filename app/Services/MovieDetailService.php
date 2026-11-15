@@ -18,8 +18,6 @@ final readonly class MovieDetailService
 {
     private const string CACHE_PREFIX = 'detail.';
 
-    private const string REFRESH_PREFIX = 'omdb-refresh.';
-
     public function __construct(
         private OMDBApiService $omdbApiService,
         private OmdbDetailMapper $omdbDetailMapper,
@@ -31,7 +29,7 @@ final readonly class MovieDetailService
      */
     public function find(string $imdbId, string $ipAddress): MovieDetail|array|null
     {
-        return $this->remember($imdbId, $ipAddress);
+        return $this->remember($imdbId, fn (): MovieDetail|array|null => $this->load($imdbId, $ipAddress));
     }
 
     /**
@@ -44,58 +42,60 @@ final readonly class MovieDetailService
      */
     public function findForBot(string $imdbId): MovieDetail|array|null
     {
-        $cached = Cache::get(self::CACHE_PREFIX . $imdbId);
+        $cached = Cache::get(self::CACHE_PREFIX . $imdbId)
+            ?? MovieDetail::query()->where('imdb_id', $imdbId)->first();
 
         if ($cached !== null) {
             return $cached;
-        }
-
-        $movie = MovieDetail::query()->where('imdb_id', $imdbId)->first();
-
-        if ($movie !== null) {
-            return $movie;
         }
 
         if (! $this->botFetchBudget->spend()) {
             throw BotFetchBudgetExhaustedException::retryAfter($this->botFetchBudget->secondsUntilRefill());
         }
 
-        return $this->remember($imdbId, ipAddress: null);
+        return $this->remember($imdbId, fn (): ?array => $this->fetchAndStore($imdbId, ipAddress: null));
     }
 
     /**
+     * @param  callable(): (MovieDetail|array<string, mixed>|null) $loader
      * @return MovieDetail|array<string, mixed>|null
      */
-    private function remember(string $imdbId, ?string $ipAddress): MovieDetail|array|null
+    private function remember(string $imdbId, callable $loader): MovieDetail|array|null
     {
-        return Cache::flexible(
-            self::CACHE_PREFIX . $imdbId,
-            [now()->addHours(18), now()->addHours(24)],
-            fn (): MovieDetail|array|null => $this->load($imdbId, $ipAddress),
-        );
+        return Cache::flexible(self::CACHE_PREFIX . $imdbId, [now()->addHours(18), now()->addHours(24)], $loader);
     }
 
     /**
      * @return MovieDetail|array<string, mixed>|null
      */
-    private function load(string $imdbId, ?string $ipAddress): MovieDetail|array|null
+    private function load(string $imdbId, string $ipAddress): MovieDetail|array|null
     {
         $movie = MovieDetail::query()->where('imdb_id', $imdbId)->first();
 
-        if ($movie !== null) {
-            if ($ipAddress !== null) {
-                defer(static fn () => $movie->incrementViews($ipAddress));
-            }
-
-            if ($this->isRefreshDue($imdbId)) {
-                defer(function () use ($imdbId): void {
-                    $this->refreshFromOmdb($imdbId);
-                });
-            }
-
-            return $movie;
+        if ($movie === null) {
+            return $this->fetchAndStore($imdbId, $ipAddress);
         }
 
+        defer(static fn () => $movie->incrementViews($ipAddress));
+
+        $isRefreshDue = $movie->omdb_last_fetched_at === null || $movie->omdb_last_fetched_at->lt(now()->subWeek());
+
+        if ($isRefreshDue) {
+            defer(function () use ($imdbId): void {
+                $this->refreshFromOmdb($imdbId);
+            });
+        }
+
+        return $movie;
+    }
+
+    /**
+     * Fetches a title we do not store yet and saves it after the response is sent.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function fetchAndStore(string $imdbId, ?string $ipAddress): ?array
+    {
         $detail = $this->fetchFromOmdb($imdbId);
 
         defer(function () use ($detail, $imdbId, $ipAddress): void {
@@ -111,14 +111,6 @@ final readonly class MovieDetailService
         });
 
         return $detail;
-    }
-
-    /**
-     * Claims this week's refresh of a stored title. updated_at cannot tell, as counting a view touches it.
-     */
-    private function isRefreshDue(string $imdbId): bool
-    {
-        return Cache::add(self::REFRESH_PREFIX . $imdbId, true, now()->addWeek());
     }
 
     /**
@@ -163,11 +155,9 @@ final readonly class MovieDetailService
      */
     private function save(string $imdbId, array $detail): MovieDetail
     {
-        Cache::put(self::REFRESH_PREFIX . $imdbId, true, now()->addWeek());
-
         return MovieDetail::query()->updateOrCreate(
             ['imdb_id' => $imdbId],
-            $this->omdbDetailMapper->toAttributes($detail),
+            [...$this->omdbDetailMapper->toAttributes($detail), 'omdb_last_fetched_at' => now()],
         );
     }
 }

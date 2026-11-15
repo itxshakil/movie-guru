@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Cache;
  */
 final readonly class MovieSearchService
 {
-    private const int PER_PAGE = 10;
+    public const int PER_PAGE = 10;
+
+    private const int FALLBACK_TTL_HOURS = 6;
 
     public function __construct(
         private OMDBApiService $omdbApiService,
@@ -54,11 +56,15 @@ final readonly class MovieSearchService
             return $this->search($criteria);
         }
 
-        return $this->searchStoredTitles($criteria);
+        return Cache::remember(
+            'bot-' . $criteria->cacheKey(),
+            now()->addHours(self::FALLBACK_TTL_HOURS),
+            fn (): array => $this->searchStoredTitles($criteria),
+        );
     }
 
     /**
-     * Matches from our own catalogue, in the shape OMDBApiService returns. Deliberately not cached,
+     * Matches from our own catalogue, in the shape OMDBApiService returns. Cached for bots only,
      * so people searching the same query still get the full OMDb results.
      *
      * @return array{Response: string, totalResults: string, Search: list<array<string, string>>, Error?: string}
@@ -67,16 +73,13 @@ final readonly class MovieSearchService
     {
         $titles = MovieDetail::query()
             ->where('title', 'like', '%' . $criteria->search . '%')
-            ->when(
-                $criteria->movieType !== null && $criteria->movieType !== '',
-                static fn ($query) => $query->where('type', $criteria->movieType),
-            )
+            ->when(filled($criteria->movieType), static fn ($query) => $query->where('type', $criteria->movieType))
             ->when($criteria->year !== null, static fn ($query) => $query->where('year', 'like', $criteria->year . '%'))
-            ->orderByDesc('views')
+            ->popular()
             ->paginate(self::PER_PAGE, ['imdb_id', 'title', 'year', 'type', 'poster'], 'page', $criteria->page);
 
         if ($titles->total() === 0) {
-            return ['Response' => 'False', 'Error' => 'Movie not found!', 'Search' => [], 'totalResults' => '0'];
+            return OMDBApiService::NOT_FOUND;
         }
 
         return [
@@ -88,7 +91,7 @@ final readonly class MovieSearchService
                 'type' => $movie->type,
                 'imdb_id' => $movie->imdb_id,
                 'poster' => $movie->getRawOriginal('poster'),
-            ])->values()->all(),
+            ])->all(),
         ];
     }
 }

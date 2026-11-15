@@ -2,21 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Http;
-
-function fakeOmdbSearchResponse(): void
-{
-    Http::fake([
-        'omdbapi.com/*' => Http::response([
-            'Response' => 'True',
-            'totalResults' => '25',
-            'Search' => [
-                ['Title' => 'Batman Begins', 'Year' => '2005', 'Type' => 'movie', 'imdbID' => 'tt0372784', 'Poster' => 'N/A'],
-            ],
-        ]),
-    ]);
-}
-
 test('search endpoint returns json for an xhr request that accepts json', function (): void {
     fakeOmdbSearchResponse();
 

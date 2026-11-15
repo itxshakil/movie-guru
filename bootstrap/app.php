@@ -13,6 +13,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -40,9 +41,9 @@ return Application::configure(basePath: dirname(__DIR__))
                         ->toResponse($request)
                         ->setStatusCode($response->getStatusCode());
 
-                    // Keep Retry-After so crawlers told to back off with a 503 come back instead of dropping the page.
-                    if ($response->headers->has('Retry-After')) {
-                        $errorPage->headers->set('Retry-After', $response->headers->get('Retry-After'));
+                    // Keep the exception's own headers, such as Retry-After telling crawlers when to come back.
+                    if ($exception instanceof HttpExceptionInterface) {
+                        $errorPage->headers->add($exception->getHeaders());
                     }
 
                     return $errorPage;

@@ -51,11 +51,9 @@ final class BotDetectorService
         'phantom',
         'selenium',
         'puppeteer',
-        'chrome-lighthouse',
         'lighthouse',
         'facebookexternalhit',
         'meta-externalagent',
-        'linkedinbot',
         'embedly',
         'scrapy',
         'curl/',
@@ -77,9 +75,7 @@ final class BotDetectorService
         'perplexity',
         'anthropic-ai',
         'cohere-ai',
-        'gptbot',
         'chatgpt-user',
-        'oai-searchbot',
     ];
 
     /**

@@ -19,7 +19,7 @@ final readonly class BotFetchBudget
 
     public function __construct(
         private RateLimiter $rateLimiter,
-        #[Config('omdb.bot_daily_budget')]
+        #[Config(key: 'omdb.bot_daily_budget')]
         private int $dailyLimit,
     ) {}
 
@@ -28,19 +28,19 @@ final readonly class BotFetchBudget
      */
     public function spend(): bool
     {
-        if ($this->isDisabled() || $this->rateLimiter->tooManyAttempts(self::KEY, $this->dailyLimit)) {
+        if ($this->isDisabled()) {
             return false;
         }
 
         $attempts = $this->rateLimiter->hit(self::KEY, self::WINDOW_SECONDS);
 
         if ($attempts === $this->dailyLimit) {
-            Log::warning('Bots used up today\'s OMDb budget; they get cached and stored data only until it refills.', [
+            Log::warning("Bots used up today's OMDb budget; they get cached and stored data only until it refills.", [
                 'daily_limit' => $this->dailyLimit,
             ]);
         }
 
-        return true;
+        return $attempts <= $this->dailyLimit;
     }
 
     public function secondsUntilRefill(): int
