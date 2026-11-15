@@ -62,19 +62,18 @@ test('a key over its plan quota rests for an hour instead of failing on every re
 });
 
 test('requests move on to a key that still has quota', function (): void {
-    config()->set('services.watchmode.key', 'spent-key,fresh-key');
     Http::fake(['api.watchmode.com/*' => static fn (Request $request) => $request['apiKey'] === 'spent-key'
         ? Http::response(['success' => false, 'errorMessage' => 'Over plan quota on this API Key.'], 429)
         : Http::response(['ok' => true])]);
+    config()->set('services.watchmode.key', 'spent-key');
+    resolve(WatchModeClient::class)->get('/sources/');
+    config()->set('services.watchmode.key', 'spent-key,fresh-key');
     $client = resolve(WatchModeClient::class);
 
-    // Enough calls that the random pick reaches the spent key, after which only the fresh one is used.
-    $results = collect(range(1, 20))->map(static fn (): array => $client->get('/sources/'));
+    $results = collect(range(1, 10))->map(static fn (): array => $client->get('/sources/'));
 
-    expect($results->last())->toBe(['ok' => true]);
-    expect(collect(Http::recorded())->filter(
-        static fn (array $pair): bool => $pair[0]['apiKey'] === 'spent-key',
-    ))->toHaveCount(1);
+    expect($results->unique()->all())->toBe([['ok' => true]])
+        ->and(collect(Http::recorded())->skip(1)->pluck('0.apiKey')->unique()->all())->toBe(['fresh-key']);
 });
 
 test('a short rate limit rests the key for a minute only', function (): void {

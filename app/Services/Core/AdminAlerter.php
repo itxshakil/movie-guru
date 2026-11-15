@@ -30,17 +30,19 @@ final readonly class AdminAlerter
 
     public function send(string $kind, Notification $notification): void
     {
-        $address = (string) config('mail.admin.address');
-        $key = 'admin-alert:' . $kind;
+        // Everything waits for the response: a slow-query alert is raised from inside a query listener,
+        // where touching a database-backed cache would run another query and raise the alert again.
+        defer(function () use ($kind, $notification): void {
+            $address = (string) config('mail.admin.address');
+            $key = 'admin-alert:' . $kind;
 
-        if ($address === '' || $this->rateLimiter->tooManyAttempts($key, maxAttempts: 1)) {
-            return;
-        }
+            if ($address === '' || $this->rateLimiter->tooManyAttempts($key, maxAttempts: 1)) {
+                return;
+            }
 
-        // Counted before sending, so a mail server that keeps refusing is not retried on every request.
-        $this->rateLimiter->hit($key, self::WINDOW_SECONDS);
+            // Counted before sending, so a mail server that keeps refusing is not retried on every request.
+            $this->rateLimiter->hit($key, self::WINDOW_SECONDS);
 
-        defer(static function () use ($address, $kind, $notification): void {
             try {
                 NotificationSender::route('mail', $address)->notify($notification);
             } catch (Throwable $throwable) {
