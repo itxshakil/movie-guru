@@ -36,9 +36,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     ! app()->environment(['local', 'testing'])
                     && in_array($response->getStatusCode(), [500, 503, 404, 403], strict: true)
                 ) {
-                    return Inertia::render('Error', ['status' => $response->getStatusCode()])
+                    $errorPage = Inertia::render('Error', ['status' => $response->getStatusCode()])
                         ->toResponse($request)
                         ->setStatusCode($response->getStatusCode());
+
+                    // Keep Retry-After so crawlers told to back off with a 503 come back instead of dropping the page.
+                    if ($response->headers->has('Retry-After')) {
+                        $errorPage->headers->set('Retry-After', $response->headers->get('Retry-After'));
+                    }
+
+                    return $errorPage;
                 }
 
                 if ($response->getStatusCode() === 419) {

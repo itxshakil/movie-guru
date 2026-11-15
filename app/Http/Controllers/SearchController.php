@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Search;
-use App\Models\SearchQuery;
+use App\Actions\RecordSearch;
+use App\DTOs\SearchCriteria;
 use App\OMDB\MovieType;
 use App\Services\BotDetectorService;
 use App\Services\MovieCollectionService;
-use App\Services\OMDBApiService;
+use App\Services\MovieSearchService;
 use App\Services\SharedLinkResolver;
 use App\Services\TitleCleaner;
 use App\Services\TrendingQueryService;
@@ -17,7 +17,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,6 +24,9 @@ final class SearchController extends Controller
 {
     public function __construct(
         private readonly MovieCollectionService $movieCollectionService,
+        private readonly MovieSearchService $movieSearchService,
+        private readonly BotDetectorService $botDetectorService,
+        private readonly RecordSearch $recordSearch,
     ) {}
 
     public function index(Request $request, SharedLinkResolver $sharedLinkResolver): Response|JsonResponse|RedirectResponse
@@ -50,23 +52,6 @@ final class SearchController extends Controller
         return $this->respond($request, $search, includeMovieRowsInJson: true);
     }
 
-    public function logSearchQuery(
-        ?string $search,
-        ?int $page,
-        ?string $movieType,
-        ?int $year,
-        Request $request,
-    ): SearchQuery {
-        return SearchQuery::create([
-            'query' => $search ?? 'empty',
-            'page' => $page,
-            'type' => $movieType,
-            'year' => $year,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-    }
-
     /**
      * @return array{0: int, 1: string|null, 2: int|null, 3: Collection<int, string>, 4: string|null, 5: mixed, 6: array<int, MovieType>, 7: string|null}
      */
@@ -74,7 +59,7 @@ final class SearchController extends Controller
     {
         $titleCleaner = resolve(TitleCleaner::class);
         $trendingQueryService = resolve(TrendingQueryService::class);
-        $OMDBApiService = resolve(OMDBApiService::class);
+        $isBot = $this->botDetectorService->isBot($request);
 
         $page = $request->integer('page', 1);
         $movieType = $request->get('type');
@@ -93,50 +78,21 @@ final class SearchController extends Controller
             $search = $defaultSearches[array_rand($defaultSearches)];
         }
 
-        $cacheKey = 'searcgh-' . $search . '-' . $page . '-' . $movieType . '-' . $year;
-        $movies = Cache::flexible(
-            $cacheKey,
-            [now()->addHours(16), now()->addHours(24)],
-            static fn () => $OMDBApiService->searchByTitle($search, $page, $movieType, $year),
-        );
+        $criteria = new SearchCriteria($search, $page, $movieType, $year);
+        $movies = $isBot
+            ? $this->movieSearchService->searchForBot($criteria)
+            : $this->movieSearchService->search($criteria);
 
-        $botdetector = resolve(BotDetectorService::class);
-        if ($botdetector->isBot($request) === false) {
-            defer(function () use ($request, $year, $movieType, $page, $search, $movies): void {
-                $searchQuery = $this->logSearchQuery($search, $page, $movieType, $year, $request);
-                $searchQuery->update([
-                    'response_at' => now(),
-                    'response' => $movies['Response'] === 'True',
-                    'response_result' => $movies,
-                ]);
-
-                $totalResults = $movies['totalResults'] ?? 0;
-
-                Search::updateOrCreate([
-                    'query' => $search,
-                ], [
-                    'total_results' => $totalResults,
-                ])->incrementViews();
-            });
+        if (! $isBot) {
+            $this->recordSearch->handle($request, $criteria, $movies);
         }
 
         $movieTypes = MovieType::cases();
 
-        $nextUrl = null;
-        if (isset($movies['Response']) && $movies['Response'] === 'True') {
-            $totalResults = $movies['totalResults'];
-            $currentPage = $page;
-
-            if ($totalResults > ($currentPage * 10)) {
-                $nextPage = $currentPage + 1;
-                $nextUrl = route('search', [
-                    's' => $search,
-                    'page' => $nextPage,
-                    'type' => $movieType,
-                    'year' => $year,
-                ]);
-            }
-        }
+        $hasNextPage = ($movies['Response'] ?? null) === 'True' && $movies['totalResults'] > $page * 10;
+        $nextUrl = $hasNextPage
+            ? route('search', ['s' => $search, 'page' => $page + 1, 'type' => $movieType, 'year' => $year])
+            : null;
 
         return [$page, $movieType, $year, $trendingQueries, $search, $movies, $movieTypes, $nextUrl];
     }
