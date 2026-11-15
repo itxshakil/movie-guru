@@ -16,6 +16,13 @@ use Throwable;
 final class OMDBApiService
 {
     /**
+     * What a search with no matches returns.
+     *
+     * @var array{Response: string, Error: string, Search: array{}, totalResults: string}
+     */
+    public const array NOT_FOUND = ['Response' => 'False', 'Error' => 'Movie not found!', 'Search' => [], 'totalResults' => '0'];
+
+    /**
      * @var mixed[]
      */
     private array $apiKeys;
@@ -76,7 +83,7 @@ final class OMDBApiService
         $this->year = $year ?? $this->year;
 
         if ($this->title === '') {
-            return ['Response' => 'False', 'Error' => 'Movie not found!', 'Search' => [], 'totalResults' => '0'];
+            return self::NOT_FOUND;
         }
 
         $query = $this->generateSearchQuery();

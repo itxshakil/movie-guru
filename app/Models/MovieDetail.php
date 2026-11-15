@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * @property-read Carbon $source_last_fetched_at
+ * @property-read Carbon|null $omdb_last_fetched_at
  * @property-read string $poster
  */
 final class MovieDetail extends Model
@@ -58,6 +59,7 @@ final class MovieDetail extends Model
         'writer',
         'actors',
         'details',
+        'omdb_last_fetched_at',
         'sources',
         'source_last_fetched_at',
         'affiliate_link',
@@ -179,6 +181,7 @@ final class MovieDetail extends Model
             'sources' => 'json',
             'affiliate_link' => 'json',
             'source_last_fetched_at' => 'datetime',
+            'omdb_last_fetched_at' => 'datetime',
         ];
     }
 

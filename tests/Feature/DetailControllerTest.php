@@ -41,7 +41,7 @@ test('a detail page view is recorded for analytics', function (): void {
     Http::fake();
     $movie = MovieDetail::factory()->create(['imdb_id' => 'tt7000001', 'sources' => ['Netflix']]);
 
-    $this->get('/movie/' . $movie->imdb_id, ['User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'])
+    $this->get('/movie/' . $movie->imdb_id, ['User-Agent' => BROWSER_USER_AGENT])
         ->assertSuccessful();
 
     $this->assertDatabaseHas('show_page_analytics', ['imdb_id' => 'tt7000001']);
@@ -63,7 +63,7 @@ test('the service worker caching a saved title for offline use is not recorded a
     $movie = MovieDetail::factory()->create(['imdb_id' => 'tt7000002', 'sources' => ['Netflix']]);
 
     $this->get('/movie/' . $movie->imdb_id, [
-        'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36',
+        'User-Agent' => BROWSER_USER_AGENT,
         'Purpose' => 'prefetch',
     ])->assertSuccessful();
 

@@ -13,6 +13,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -36,9 +37,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     ! app()->environment(['local', 'testing'])
                     && in_array($response->getStatusCode(), [500, 503, 404, 403], strict: true)
                 ) {
-                    return Inertia::render('Error', ['status' => $response->getStatusCode()])
+                    $errorPage = Inertia::render('Error', ['status' => $response->getStatusCode()])
                         ->toResponse($request)
                         ->setStatusCode($response->getStatusCode());
+
+                    // Keep the exception's own headers, such as Retry-After telling crawlers when to come back.
+                    if ($exception instanceof HttpExceptionInterface) {
+                        $errorPage->headers->add($exception->getHeaders());
+                    }
+
+                    return $errorPage;
                 }
 
                 if ($response->getStatusCode() === 419) {

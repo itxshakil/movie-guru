@@ -40,10 +40,13 @@ final class DetailController extends Controller
 
         throw_unless($cleanImdbId, NotFoundHttpException::class, 'Invalid IMDb ID. Provided');
 
-        $movie = $this->movieDetailService->find($cleanImdbId, (string) $request->ip());
+        $isBot = $botDetectorService->isBot($request);
+        $movie = $isBot
+            ? $this->movieDetailService->findForBot($cleanImdbId)
+            : $this->movieDetailService->find($cleanImdbId, (string) $request->ip());
         $movieDetail = $movie instanceof MovieDetail ? $movie : null;
 
-        if (! $botDetectorService->isBot($request) && ! $this->isBackgroundPrefetch($request)) {
+        if (! $isBot && ! $this->isBackgroundPrefetch($request)) {
             $recordTitleView->handle($cleanImdbId, $request->ip(), $request->userAgent(), $movieDetail);
         }
 

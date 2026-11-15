@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\BotFetchBudgetExhaustedException;
 use App\Models\MovieDetail;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -11,13 +12,16 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Looks up a title's details: from the database when we have it (refreshing it from OMDb in the
- * background), otherwise from OMDb, saving the result after the response is sent.
+ * background at most once a week), otherwise from OMDb, saving the result after the response is sent.
  */
 final readonly class MovieDetailService
 {
+    private const string CACHE_PREFIX = 'detail.';
+
     public function __construct(
         private OMDBApiService $omdbApiService,
         private OmdbDetailMapper $omdbDetailMapper,
+        private BotFetchBudget $botFetchBudget,
     ) {}
 
     /**
@@ -25,11 +29,40 @@ final readonly class MovieDetailService
      */
     public function find(string $imdbId, string $ipAddress): MovieDetail|array|null
     {
-        return Cache::flexible(
-            'detail.' . $imdbId,
-            [now()->addHours(18), now()->addHours(24)],
-            fn (): MovieDetail|array|null => $this->load($imdbId, $ipAddress),
-        );
+        return $this->remember($imdbId, fn (): MovieDetail|array|null => $this->load($imdbId, $ipAddress));
+    }
+
+    /**
+     * The same lookup for crawlers and bots, which only reach OMDb for titles we know nothing about,
+     * and only while today's bot budget lasts. They never count as views or trigger a refresh.
+     *
+     * @return MovieDetail|array<string, mixed>|null
+     *
+     * @throws BotFetchBudgetExhaustedException
+     */
+    public function findForBot(string $imdbId): MovieDetail|array|null
+    {
+        $cached = Cache::get(self::CACHE_PREFIX . $imdbId)
+            ?? MovieDetail::query()->where('imdb_id', $imdbId)->first();
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        if (! $this->botFetchBudget->spend()) {
+            throw BotFetchBudgetExhaustedException::retryAfter($this->botFetchBudget->secondsUntilRefill());
+        }
+
+        return $this->remember($imdbId, fn (): ?array => $this->fetchAndStore($imdbId, ipAddress: null));
+    }
+
+    /**
+     * @param  callable(): (MovieDetail|array<string, mixed>|null) $loader
+     * @return MovieDetail|array<string, mixed>|null
+     */
+    private function remember(string $imdbId, callable $loader): MovieDetail|array|null
+    {
+        return Cache::flexible(self::CACHE_PREFIX . $imdbId, [now()->addHours(18), now()->addHours(24)], $loader);
     }
 
     /**
@@ -39,15 +72,30 @@ final readonly class MovieDetailService
     {
         $movie = MovieDetail::query()->where('imdb_id', $imdbId)->first();
 
-        if ($movie !== null) {
-            defer(static fn () => $movie->incrementViews($ipAddress));
+        if ($movie === null) {
+            return $this->fetchAndStore($imdbId, $ipAddress);
+        }
+
+        defer(static fn () => $movie->incrementViews($ipAddress));
+
+        $isRefreshDue = $movie->omdb_last_fetched_at === null || $movie->omdb_last_fetched_at->lt(now()->subWeek());
+
+        if ($isRefreshDue) {
             defer(function () use ($imdbId): void {
                 $this->refreshFromOmdb($imdbId);
             });
-
-            return $movie;
         }
 
+        return $movie;
+    }
+
+    /**
+     * Fetches a title we do not store yet and saves it after the response is sent.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function fetchAndStore(string $imdbId, ?string $ipAddress): ?array
+    {
         $detail = $this->fetchFromOmdb($imdbId);
 
         defer(function () use ($detail, $imdbId, $ipAddress): void {
@@ -55,7 +103,11 @@ final readonly class MovieDetailService
                 return;
             }
 
-            $this->save($imdbId, $detail)->incrementViews($ipAddress);
+            $movie = $this->save($imdbId, $detail);
+
+            if ($ipAddress !== null) {
+                $movie->incrementViews($ipAddress);
+            }
         });
 
         return $detail;
@@ -105,7 +157,7 @@ final readonly class MovieDetailService
     {
         return MovieDetail::query()->updateOrCreate(
             ['imdb_id' => $imdbId],
-            $this->omdbDetailMapper->toAttributes($detail),
+            [...$this->omdbDetailMapper->toAttributes($detail), 'omdb_last_fetched_at' => now()],
         );
     }
 }

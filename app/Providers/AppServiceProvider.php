@@ -66,14 +66,21 @@ final class AppServiceProvider extends ServiceProvider
 
             $cacheKey = 'search-' . $search . '-' . $page . '-' . $movieType . '-' . $year . '-' . $request->ip();
 
-            return Limit::perMinute(10)->by($cacheKey);
+            return [
+                Limit::perMinute(10)->by($cacheKey),
+                // Per address too, so changing the query on every request cannot get around the limit.
+                Limit::perMinute(30)->by('search-ip-' . $request->ip()),
+            ];
         });
 
         RateLimiter::for('movie-show', static function (Request $request) {
             $imdbId = $request->route('imdbID');
             $cacheKey = 'movie-show.' . $imdbId . '.' . $request->ip();
 
-            return Limit::perMinute(10)->by($cacheKey);
+            return [
+                Limit::perMinute(10)->by($cacheKey),
+                Limit::perMinute(60)->by('movie-show-ip-' . $request->ip()),
+            ];
         });
 
         Vite::prefetch(concurrency: 3);
