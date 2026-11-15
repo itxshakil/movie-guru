@@ -62,7 +62,7 @@ test('a key over its plan quota rests for an hour instead of failing on every re
 });
 
 test('requests move on to a key that still has quota', function (): void {
-    Http::fake(['api.watchmode.com/*' => static fn (Request $request) => $request['apiKey'] === 'spent-key'
+    Http::fake(['api.watchmode.com/*' => static fn (Request $request) => hash_equals('spent-key', $request['apiKey'])
         ? Http::response(['success' => false, 'errorMessage' => 'Over plan quota on this API Key.'], 429)
         : Http::response(['ok' => true])]);
     config()->set('services.watchmode.key', 'spent-key');

@@ -9,6 +9,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use SensitiveParameter;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -95,12 +96,12 @@ final readonly class WatchModeClient
         }
     }
 
-    private static function pauseCacheKey(string $apiKey): string
+    private static function pauseCacheKey(#[SensitiveParameter] string $apiKey): string
     {
         return 'watchmode.key-paused.' . hash('sha256', $apiKey);
     }
 
-    private function pause(string $apiKey, RequestException $requestException): void
+    private function pause(#[SensitiveParameter] string $apiKey, RequestException $requestException): void
     {
         $isPlanQuota = str_contains($requestException->getMessage(), 'Over plan quota');
         $seconds = $isPlanQuota ? self::QUOTA_PAUSE_SECONDS : self::RATE_LIMIT_PAUSE_SECONDS;
