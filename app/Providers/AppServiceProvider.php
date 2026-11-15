@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Notifications\DatabaseApproachingMaxConnections;
 use App\Notifications\SlowQueryDetected;
+use App\Services\Core\AdminAlerter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,6 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -41,24 +41,22 @@ final class AppServiceProvider extends ServiceProvider
             });
         }
 
-        Event::listen(static function (DatabaseBusy $event): void {
-            Notification::route('mail', 'dev@example.com')
-                ->notify(new DatabaseApproachingMaxConnections(
-                    $event->connectionName,
-                    $event->connections,
-                ));
+        Event::listen(function (DatabaseBusy $event): void {
+            $this->app->make(AdminAlerter::class)->send('database-busy', new DatabaseApproachingMaxConnections(
+                $event->connectionName,
+                $event->connections,
+            ));
         });
 
-        DB::whenQueryingForLongerThan(100, static function (Connection $connection, QueryExecuted $event): void {
-            Notification::route('mail', config('mail.admin.address'))
-                ->notify(new SlowQueryDetected($connection, $event));
+        DB::whenQueryingForLongerThan(100, function (Connection $connection, QueryExecuted $event): void {
+            $this->app->make(AdminAlerter::class)->send('slow-query', new SlowQueryDetected($connection, $event));
         });
 
         RateLimiter::for('api', static fn (Request $request) => Limit::perMinute(60)->by(
             $request->user()?->id ?: $request->ip(),
         ));
 
-        RateLimiter::for('search', static function (Request $request) {
+        RateLimiter::for('search', static function (Request $request): array {
             $search = $request->get('s');
             $page = $request->get('page', 1);
             $movieType = $request->get('type');
@@ -73,7 +71,7 @@ final class AppServiceProvider extends ServiceProvider
             ];
         });
 
-        RateLimiter::for('movie-show', static function (Request $request) {
+        RateLimiter::for('movie-show', static function (Request $request): array {
             $imdbId = $request->route('imdbID');
             $cacheKey = 'movie-show.' . $imdbId . '.' . $request->ip();
 
